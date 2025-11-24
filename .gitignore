@@ -1,0 +1,27 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 안드로이드 자동 생성 파일
+/app/build
+
+# Firebase 보안 파일
+google-services.json
+GoogleService-Info.plist
+
+# 키스토어 파일 (앱 서명 키)
+*.jks
+*.keystore
+*.key
