@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_prescription"
+        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:title="@string/nav_prescription" />
+
+    <item
+        android:id="@+id/nav_medicine"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/nav_medicine" />
+
+    <item
+        android:id="@+id/nav_calendar"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="@string/nav_calendar" />
+
+    <item
+        android:id="@+id/nav_mypage"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/nav_mypage" />
+</menu>
