@@ -1,3 +1,52 @@
 <resources>
-    <string name="app_name">Altong_v2</string>
+    <string name="app_name">알통</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_prescription">나의 약통</string>
+    <string name="nav_medicine">약 검색</string>
+    <string name="nav_calendar">캘린더</string>
+    <string name="nav_mypage">마이페이지</string>
+
+    <!-- Prescription (나의 약통) -->
+    <string name="prescription_title">나의 약통</string>
+    <string name="prescription_add">처방전 추가하기</string>
+    <string name="prescription_empty">등록된 처방전이 없습니다</string>
+    <string name="prescription_total">처방전 총 %d건</string>
+    <string name="prescription_taking">복용 중인 약 %d개</string>
+
+    <!-- Medicine (약 검색) -->
+    <string name="medicine_title">약 검색</string>
+    <string name="medicine_search_hint">약품명 또는 증상 검색</string>
+    <string name="medicine_general">일반의약품</string>
+    <string name="medicine_prescription">전문의약품</string>
+    <string name="medicine_favorite">나의 상비약</string>
+
+    <!-- Calendar (캘린더) -->
+    <string name="calendar_title">복약 캘린더</string>
+    <string name="calendar_all_complete">모두 복용 완료</string>
+
+    <!-- MyPage (마이페이지) -->
+    <string name="mypage_title">마이페이지</string>
+    <string name="mypage_alarm_settings">알림 설정</string>
+    <string name="mypage_time_settings">기본 시간 설정</string>
+    <string name="mypage_app_info">앱 정보</string>
+    <string name="mypage_logout">로그아웃</string>
+
+    <!-- Common -->
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+    <string name="delete">삭제</string>
+    <string name="edit">수정</string>
+    <string name="confirm">확인</string>
+    <string name="yes">예</string>
+    <string name="no">아니오</string>
+
+    <!-- Time Slots -->
+    <string name="time_morning">아침</string>
+    <string name="time_lunch">점심</string>
+    <string name="time_evening">저녁</string>
+    <string name="time_bedtime">취침 전</string>
+
+    <!-- Legal -->
+    <string name="legal_disclaimer">본 정보는 참고용이며, 최종 판단은 반드시 의사/약사와 상의하십시오.</string>
 </resources>
