@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.altong_v2.R
 import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import com.example.altong_v2.databinding.FragmentPrescriptionBinding
 import kotlinx.coroutines.launch
@@ -71,8 +72,7 @@ class PrescriptionFragment : Fragment() {
     private fun setupClickListeners() {
         // 처방전 추가 버튼
         binding.btnAddPrescription.setOnClickListener {
-            // 처방전 추가 화면으로 이동 (TODO)
-            // navigateToAddPrescription()
+            navigateToAddPrescription()
         }
     }
 
@@ -252,5 +252,13 @@ class PrescriptionFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null  // 메모리 누수 방지
+    }
+    // 처방전 추가화면으로 이동
+    private fun navigateToAddPrescription() {
+        val fragment = AddPrescriptionStep1Fragment()
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)  // 뒤로가기 지원
+            .commit()
     }
 }
