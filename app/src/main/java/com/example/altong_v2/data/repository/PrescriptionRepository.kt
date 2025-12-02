@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 /*
  * 처방전 Repository
- * 처방전 및 약품 데이터 접근을 추상화
+ * 처방전 및 약 데이터 접근을 추상화
 */
 
 class PrescriptionRepository(
@@ -26,7 +26,7 @@ class PrescriptionRepository(
     suspend fun updatePrescription(prescription: PrescriptionEntity) {
         prescriptionDao.update(prescription)
     }
-    // 처방전 삭제 (CASCADE로 관련 약품도 자동 삭제됨)
+    // 처방전 삭제 (CASCADE로 관련 약도 자동 삭제됨)
     suspend fun deletePrescription(prescription: PrescriptionEntity) {
         prescriptionDao.delete(prescription)
     }
@@ -46,32 +46,32 @@ class PrescriptionRepository(
         return prescriptionDao.getCount()
     }
 
-    // ========== 약품 관련 ==========
-    // 특정 처방전의 약품 조회
+    // ========== 약 관련 ==========
+    // 특정 처방전의 약 조회
     fun getDrugsByPrescription(prescriptionId: Long): Flow<List<DrugEntity>> {
         return drugDao.getDrugsByPrescription(prescriptionId)
     }
-    // 약품 추가
+    // 약 추가
     suspend fun insertDrug(drug: DrugEntity): Long {
         return drugDao.insert(drug)
     }
-    // 약품 수정
+    // 약 수정
     suspend fun updateDrug(drug: DrugEntity) {
         drugDao.update(drug)
     }
-    // 약품 삭제
+    // 약 삭제
     suspend fun deleteDrug(drug: DrugEntity) {
         drugDao.delete(drug)
     }
-    // ID로 약품 조회
+    // ID로 약 조회
     suspend fun getDrugById(id: Long): DrugEntity? {
         return drugDao.getDrugById(id)
     }
-    // 특정 처방전의 약품 개수
+    // 특정 처방전의 약 개수
     suspend fun getDrugCount(prescriptionId: Long): Int {
         return drugDao.getDrugCountByPrescription(prescriptionId)
     }
-    // 모든 약품 조회 (캘린더용)
+    // 모든 약 조회 (캘린더용)
     fun getAllDrugs(): Flow<List<DrugEntity>> {
         return drugDao.getAllDrugs()
     }

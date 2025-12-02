@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.databinding.ItemDrugSearchResultBinding
 
 
-/* * 약품 검색 결과 어댑터*/
+/* * 약 검색 결과 어댑터*/
 class DrugSearchAdapter(
     private val onItemClick: (DrugSearchResult) -> Unit
 ) : ListAdapter<DrugSearchResult, DrugSearchAdapter.DrugViewHolder>(DrugDiffCallback()) {

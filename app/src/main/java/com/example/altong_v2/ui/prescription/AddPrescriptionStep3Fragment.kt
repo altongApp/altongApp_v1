@@ -52,6 +52,8 @@ class AddPrescriptionStep3Fragment : Fragment() {
 
     // 처방전 등록 완료되면
     private fun completePrescription() {
+        // 뷰모델에 step 3 데이터 저장
+        viewModel.tempPharmacy = binding.etPharmacy.text.toString()
         // Transition 화면으로 이동
         val fragment = PrescriptionCompleteFragment()
         parentFragmentManager.beginTransaction()

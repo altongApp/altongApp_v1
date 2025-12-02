@@ -35,7 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="약품 등록"
+            android:text="약 등록"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
@@ -61,7 +61,7 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- 약품 정보 카드 -->
+            <!-- 약 정보 카드 -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -433,14 +433,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 다른 약품 추가 버튼 -->
+        <!-- 다른 약 추가 버튼 -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_another"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="+ 다른 약품 추가"
+            android:text="+ 다른 약 추가"
             android:textSize="14sp"
             android:textStyle="bold"
             android:backgroundTint="@color/secondary_blue_dark"

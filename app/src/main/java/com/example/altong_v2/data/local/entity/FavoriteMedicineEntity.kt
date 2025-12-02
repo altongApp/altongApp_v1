@@ -7,8 +7,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-/* * 찜한 약품 테이블
- * 일반의약품 또는 전문의약품을 찜한 목록 저장 */
+/* * 찜한 약 테이블
+ * 일반의약 또는 전문의약을 찜한 목록 저장 */
 
 @Entity(
     tableName = "favorite_medicines",
@@ -18,13 +18,13 @@ data class FavoriteMedicineEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    // 약품 정보
+    // 약 정보
     @ColumnInfo(name = "medicine_id")
-    val medicineId: String,          // Firebase의 약품 ID
+    val medicineId: String,          // Firebase의 약 ID
 
-    val name: String,                // 약품명
+    val name: String,                // 약명
     val company: String,             // 제조사
-    val type: String,                // 약품 유형(일반의약품 or 전문의약품)
+    val type: String,                // 약 유형(일반의약 or 전문의약)
 
     // 개인 메모
     val memo: String? = null,

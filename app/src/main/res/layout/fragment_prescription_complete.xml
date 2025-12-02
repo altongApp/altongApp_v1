@@ -62,7 +62,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="이제 약품을 등록하시겠어요?"
+            android:text="이제 약을 등록하시겠어요?"
             android:textSize="16sp"
             android:textColor="@color/text_secondary"
             android:layout_marginBottom="32dp" />

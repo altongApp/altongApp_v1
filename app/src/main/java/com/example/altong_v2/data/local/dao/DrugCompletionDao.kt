@@ -28,11 +28,11 @@ interface DrugCompletionDao {
     @Query("SELECT * FROM drug_completions WHERE date = :date")
     fun getCompletionsByDate(date: String): Flow<List<DrugCompletionEntity>>
 
-    // 특정 약품의 특정 날짜 복용 기록 조회
+    // 특정 약의 특정 날짜 복용 기록 조회
     @Query("SELECT * FROM drug_completions WHERE drug_id = :drugId AND date = :date")
     suspend fun getCompletion(drugId: Long, date: String): DrugCompletionEntity?
 
-    // 특정 약품의 복용 완료 여부 확인
+    // 특정 약의 복용 완료 여부 확인
     @Query("SELECT is_completed FROM drug_completions WHERE drug_id = :drugId AND date = :date")
     suspend fun isCompleted(drugId: Long, date: String): Boolean?
 

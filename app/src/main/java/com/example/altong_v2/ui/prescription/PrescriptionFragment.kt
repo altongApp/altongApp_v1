@@ -58,7 +58,7 @@ class PrescriptionFragment : Fragment() {
                 // navigateToPrescriptionDetail(prescription.id)
             },
             onAddDrugClick = { prescriptionId ->
-                // 약품 추가 화면으로 이동 (TODO)
+                // 약 추가 화면으로 이동 (TODO)
                 // navigateToAddDrug(prescriptionId)
             }
         )
@@ -99,7 +99,7 @@ class PrescriptionFragment : Fragment() {
                 binding.emptyState.visibility = View.GONE
                 binding.recyclerViewPrescriptions.visibility = View.VISIBLE
 
-// 각 처방전의 약품 정보를 비동기로 조회
+// 각 처방전의 약 정보를 비동기로 조회
                 val prescriptionsWithDrugs = prescriptions.map { prescription ->
                     // 먼저 기본 정보로 생성
                     PrescriptionAdapter.PrescriptionWithDrugs(
@@ -109,11 +109,11 @@ class PrescriptionFragment : Fragment() {
                     )
                 }.toMutableList()
 
-// 약품 정보를 순차적으로 조회하여 업데이트
+// 약 정보를 순차적으로 조회하여 업데이트
                 prescriptions.forEachIndexed { index, prescription ->
                     val drugCount = viewModel.getDrugCount(prescription.id)
 
-                    // LiveData를 관찰하여 약품명 가져오기
+                    // LiveData를 관찰하여 약명 가져오기
                     viewModel.getDrugsByPrescription(prescription.id).observe(viewLifecycleOwner) { drugs ->
                         val drugNames = drugs.take(3).map { it.name }
 
@@ -139,7 +139,7 @@ class PrescriptionFragment : Fragment() {
      */
     private fun addTestData() {
         lifecycleScope.launch {
-            // 샘플 처방전 1: 약품 있음
+            // 샘플 처방전 1: 약 있음
             val prescription1 = PrescriptionEntity(
                 date = "2024-01-15",
                 hospital = "서울대학교병원",
@@ -155,7 +155,7 @@ class PrescriptionFragment : Fragment() {
                 }
             }
 
-            // 약품 추가 (순차적으로)
+            // 약 추가 (순차적으로)
             viewModel.insertDrug(
                 DrugEntity(
                     prescriptionId = id1,
@@ -181,7 +181,7 @@ class PrescriptionFragment : Fragment() {
                 )
             )
 
-            // 샘플 처방전 2: 약품 많음
+            // 샘플 처방전 2: 약 많음
             val prescription2 = PrescriptionEntity(
                 date = "2024-01-10",
                 hospital = "연세세브란스병원",
@@ -233,7 +233,7 @@ class PrescriptionFragment : Fragment() {
                 )
             )
 
-            // 샘플 처방전 3: 약품 없음 (경고 표시용)
+            // 샘플 처방전 3: 약 없음 (경고 표시용)
             val prescription3 = PrescriptionEntity(
                 date = "2024-01-05",
                 hospital = "서울아산병원",

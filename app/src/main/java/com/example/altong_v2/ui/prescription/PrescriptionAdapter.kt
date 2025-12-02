@@ -14,12 +14,12 @@ import com.google.android.material.chip.Chip
 
 class PrescriptionAdapter(
     private val onItemClick: (PrescriptionEntity) -> Unit,
-    private val onAddDrugClick: (Long) -> Unit  // 약품 추가 버튼 클릭
+    private val onAddDrugClick: (Long) -> Unit  // 약 추가 버튼 클릭
 ) : RecyclerView.Adapter<PrescriptionAdapter.PrescriptionViewHolder>() {
 
     private var prescriptionList: List<PrescriptionWithDrugs> = emptyList()
 
-    // 처방전 + 약품 개수를 담는 데이터클래스임
+    // 처방전 + 약 개수를 담는 데이터클래스임
     data class PrescriptionWithDrugs(
         val prescription: PrescriptionEntity,
         val drugCount: Int = 0,
@@ -61,7 +61,7 @@ class PrescriptionAdapter(
                 tvHospital.text = prescription.hospital ?: "병원명 없음"
                 tvDiagnosis.text = prescription.diagnosis
 
-                // 약품 뱃지 표시
+                // 약 뱃지 표시
                 chipGroupDrugs.removeAllViews()
                 if (item.drugNames.isNotEmpty()) {
                     item.drugNames.forEach { drugName ->
@@ -76,7 +76,7 @@ class PrescriptionAdapter(
                     }
                 }
 
-                // 약품 미등록 경고
+                // 약 미등록 경고
                 if (item.drugCount == 0) {
                     warningContainer.visibility = View.VISIBLE
                     btnAddDrug.setOnClickListener {

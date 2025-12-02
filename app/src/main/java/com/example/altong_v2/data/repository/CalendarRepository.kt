@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter
 
 
 /* * 캘린더 Repository
- * 날짜별 복용 약품 및 완료 기록 관리
+ * 날짜별 복용 약 및 완료 기록 관리
  * TODO (민주가): 캘린더 로직 구현*/
 
 class CalendarRepository(
@@ -20,7 +20,7 @@ class CalendarRepository(
     private val drugCompletionDao: DrugCompletionDao,
     private val prescriptionDao: PrescriptionDao
 ) {
-    // 모든 약품 조회
+    // 모든 약 조회
     val allDrugs: Flow<List<DrugEntity>> = drugDao.getAllDrugs()
 
     // ========== 복용 완료 기록 ==========
@@ -62,20 +62,20 @@ class CalendarRepository(
         return drugCompletionDao.getCompletionsByDateRange(startDate, endDate)
     }
 
-    // ========== 날짜별 복용할 약품 계산 (민주가 구현) ==========
-    // TODO (팀원): 특정 날짜에 복용해야 할 약품 리스트 계산
+    // ========== 날짜별 복용할 약 계산 (민주가 구현) ==========
+    // TODO (팀원): 특정 날짜에 복용해야 할 약 리스트 계산
     // suspend fun getDrugsForDate(date: String): List<DrugEntity> {
     //     // 1. 모든 처방전 가져오기
-    //     // 2. 각 처방전의 약품 가져오기
+    //     // 2. 각 처방전의 약 가져오기
     //     // 3. 날짜 범위 체크 (처방일 + 총 처방 일수)
-    //     // 4. 해당 날짜에 복용해야 하는 약품만 필터링
+    //     // 4. 해당 날짜에 복용해야 하는 약만 필터링
     // }
 
     // TODO (팀원): 월간 캘린더 데이터 생성
     // suspend fun getMonthlyCalendarData(year: Int, month: Int): List<CalendarDay> {
     //     // 1. 해당 월의 모든 날짜 생성
-    //     // 2. 각 날짜별로 복용할 약품 개수 계산
-    //     // 3. 완료한 약품 개수 계산
+    //     // 2. 각 날짜별로 복용할 약 개수 계산
+    //     // 3. 완료한 약 개수 계산
     //     // 4. CalendarDay 객체 리스트 반환
     // }
 

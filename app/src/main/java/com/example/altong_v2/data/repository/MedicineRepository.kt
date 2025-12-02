@@ -5,8 +5,8 @@ import com.example.altong_v2.data.local.entity.FavoriteMedicineEntity
 import kotlinx.coroutines.flow.Flow
 
 
-/* * 약품 검색 Repository
- * Firebase에서 약품 정보 조회 + 찜 기능 관리
+/* * 약 검색 Repository
+ * Firebase에서 약 정보 조회 + 찜 기능 관리
  * TODO (민주가): Firebase Firestore 연동 추가*/
 
 class MedicineRepository(
@@ -14,7 +14,7 @@ class MedicineRepository(
 ) {
 
     // ========== 찜 기능 (Room DB 사용) ==========
-    // 모든 찜한 약품 조회
+    // 모든 찜한 약 조회
     val allFavorites: Flow<List<FavoriteMedicineEntity>> =
         favoriteMedicineDao.getAllFavorites()
     // 타입별 찜 목록 조회
@@ -30,7 +30,7 @@ class MedicineRepository(
     suspend fun removeFavorite(favorite: FavoriteMedicineEntity) {
         favoriteMedicineDao.delete(favorite)
     }
-    // 약품 ID로 찜 삭제
+    // 약 ID로 찜 삭제
     suspend fun removeFavoriteById(medicineId: String) {
         favoriteMedicineDao.deleteByMedicineId(medicineId)
     }
@@ -47,18 +47,18 @@ class MedicineRepository(
         return favoriteMedicineDao.getCount()
     }
 
-    // ========== Firebase 약품 검색 (민주가 구현) ==========
-    // TODO (팀원): Firebase에서 약품 검색
+    // ========== Firebase 약 검색 (민주가 구현) ==========
+    // TODO (팀원): Firebase에서 약 검색
     // suspend fun searchMedicines(query: String): List<Medicine> {
     //     // Firebase Firestore 쿼리
     // }
 
-    // TODO (팀원): 카테고리별 약품 조회
+    // TODO (팀원): 카테고리별 약 조회
     // suspend fun getMedicinesByCategory(category: String): List<Medicine> {
     //     // Firebase Firestore 쿼리
     // }
 
-    // TODO (팀원): 약품 상세 정보 조회
+    // TODO (팀원): 약 상세 정보 조회
     // suspend fun getMedicineById(medicineId: String): Medicine? {
     //     // Firebase Firestore 쿼리
     // }

@@ -13,7 +13,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentDrugSearchBinding
 
 
-/* * 약품 검색 화면*/
+/* * 약 검색 화면*/
 class DrugSearchFragment : Fragment() {
     private var _binding: FragmentDrugSearchBinding? = null
     private val binding get() = _binding!!
@@ -21,9 +21,9 @@ class DrugSearchFragment : Fragment() {
 
     // 검색 결과 어댑터
     private lateinit var searchAdapter: DrugSearchAdapter
-    // 선택된 약품
+    // 선택된 약
     private var selectedDrug: DrugSearchResult? = null
-    // 샘플 약품 데이터
+    // 샘플 약 데이터
     private val sampleDrugs = listOf(
         DrugSearchResult("타이레놀정 500mg", "해열진통제 | 아세트아미노펜"),
         DrugSearchResult("타이레놀ER서방정 650mg", "해열진통제 | 서방형"),
@@ -121,7 +121,7 @@ class DrugSearchFragment : Fragment() {
              .replace(R.id.fragment_container, fragment)
              .addToBackStack(null)
              .commit()
-        showToast("약품 상세 입력 화면은 다음 단계에서 구현됩니다")
+        showToast("약 상세 입력 화면은 다음 단계에서 구현됩니다")
     }
 
     // 약 등록 건뛰
@@ -142,7 +142,7 @@ class DrugSearchFragment : Fragment() {
     }
 }
 
-// 약품 검색 결과 데이터 클래스
+// 약 검색 결과 데이터 클래스
 data class DrugSearchResult(
     val name: String,
     val description: String

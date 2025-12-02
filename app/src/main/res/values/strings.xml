@@ -16,9 +16,9 @@
 
     <!-- Medicine (약 검색) -->
     <string name="medicine_title">약 검색</string>
-    <string name="medicine_search_hint">약품명 또는 증상 검색</string>
-    <string name="medicine_general">일반의약품</string>
-    <string name="medicine_prescription">전문의약품</string>
+    <string name="medicine_search_hint">약명 또는 증상 검색</string>
+    <string name="medicine_general">일반의약</string>
+    <string name="medicine_prescription">전문의약</string>
     <string name="medicine_favorite">나의 상비약</string>
 
     <!-- Calendar (캘린더) -->

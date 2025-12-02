@@ -13,10 +13,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /* * 나의 약통 ViewModel
- * 처방전 및 약품 데이터 관리*/
+ * 처방전 및 약 데이터 관리*/
 
 class PrescriptionViewModel(application: Application) : AndroidViewModel(application) {
-
     private val repository: PrescriptionRepository
 
     // 모든 처방전 (LiveData로 실시간 업데이트)
@@ -90,4 +89,80 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     suspend fun getDrugCount(prescriptionId: Long): Int {
         return repository.getDrugCount(prescriptionId)
     }
+
+    // ----------처방전 등록 임시데이터를 추가하겠수다~
+    // Step 1 데이터
+    var tempDate: String = ""
+    var tempHospital: String = ""
+    var tempDepartment: String = ""
+
+    // Step 2 데이터
+    var tempDiagnosis: String = ""
+
+    // Step 3 데이터
+    var tempPharmacy: String = ""
+//    var tempPhotoPath: String? = null
+
+    // 약 리스트
+    var tempDrugs: MutableList<TempDrugData> = mutableListOf()
+
+    // 처방전 데이터 초기화
+    fun clearTempData() {
+        tempDate = ""
+        tempHospital = ""
+        tempDepartment = ""
+        tempDiagnosis = ""
+        tempPharmacy = ""
+//        tempPhotoPath = null
+        tempDrugs.clear()
+    }
+
+    // 처방전 + 약 저장
+    fun savePrescriptionWithDrugs() {
+        viewModelScope.launch {
+            try {
+                // 1. 처방전 저장
+                val prescription = PrescriptionEntity(
+                    date = tempDate,
+                    hospital = tempHospital,
+                    department = tempDepartment,
+                    diagnosis = tempDiagnosis,
+                    pharmacy = tempPharmacy,
+//                    prescriptionImagePath = tempPhotoPath
+                )
+
+                val prescriptionId = repository.insertPrescription(prescription)
+
+                // 2. 약 저장
+                tempDrugs.forEach { drug ->
+                    val drugEntity = DrugEntity(
+                        prescriptionId = prescriptionId,
+                        name = drug.name,
+                        dosage = drug.dosage,
+                        frequency = drug.frequency,
+                        days = drug.days,
+                        timing = drug.timing,
+                        memo = drug.memo,
+                        timeSlots = drug.timeSlots.joinToString(",")
+                    )
+                    repository.insertDrug(drugEntity)
+                }
+                // 3. 임시 데이터 초기화
+                clearTempData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
+
+// 임시 약 데이터 클래스
+data class TempDrugData(
+    val name: String,
+    val dosage: String,
+    val frequency: String,
+    val days: Int,
+    val timing: String,
+    val memo: String,
+    val timeSlots: List<String>
+)

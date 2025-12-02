@@ -51,18 +51,21 @@ class PrescriptionCompleteFragment : Fragment() {
              .addToBackStack(null)
              .commit()
 
-        showToast("약품 등록 기능은 Phase 5에서 구현됩니다")
+        showToast("약 등록 기능은 Phase 5에서 구현됩니다")
     }
 
     // 약 등록 건뛰
     private fun skipDrugRegistration() {
+    // 약 등록 건뛰하면, 처방전만 저장
+        viewModel.savePrescriptionWithDrugs()
+
+        showToast("처방전이 등록되었습니다")
         // 처방전 목록 화면으로 돌아가기
         // BackStack을 모두 제거하고 PrescriptionFragment로 이동
         parentFragmentManager.popBackStack(
             null,
             androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
         )
-        showToast("처방전이 등록되었습니다")
     }
 
     private fun showToast(message: String) {

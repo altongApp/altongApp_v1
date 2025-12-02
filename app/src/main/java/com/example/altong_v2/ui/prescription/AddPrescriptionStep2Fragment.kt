@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentAddPrescriptionStep2Binding
 
-/* * 처방전 추가 Step 2: 약품 정보 입력*/
+/* * 처방전 추가 Step 2: 약 정보 입력*/
 
 class AddPrescriptionStep2Fragment : Fragment() {
     private var _binding: FragmentAddPrescriptionStep2Binding? = null
@@ -62,6 +62,8 @@ class AddPrescriptionStep2Fragment : Fragment() {
         parentFragmentManager.popBackStack()
     }
     private fun navigateToNextStep() {
+        //  뷰모델에 step 2 데이터 저장
+        viewModel.tempDiagnosis = binding.etDiagnosis.text.toString()
         val fragment = AddPrescriptionStep3Fragment()
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)

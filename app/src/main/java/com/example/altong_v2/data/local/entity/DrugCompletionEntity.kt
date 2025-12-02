@@ -8,7 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-/* * 약품 복용 완료 기록 테이블
+/* * 약 복용 완료 기록 테이블
  * 캘린더에서 체크박스 체크 시 기록*/
 
 @Entity(
@@ -27,7 +27,7 @@ data class DrugCompletionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    // 약품 연결
+    // 약 연결
     @ColumnInfo(name = "drug_id")
     val drugId: Long,
 

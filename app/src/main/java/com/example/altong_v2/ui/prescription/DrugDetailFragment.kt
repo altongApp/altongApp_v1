@@ -11,7 +11,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentDrugDetailBinding
 
 
- /*약품 상세 정보 입력 화면
+ /*약 상세 정보 입력 화면
 */
 class DrugDetailFragment : Fragment() {
     private var _binding: FragmentDrugDetailBinding? = null
@@ -157,22 +157,73 @@ class DrugDetailFragment : Fragment() {
     }
 
 
-     //약품 저장하고 다른 약품 추가
+     //약 저장하고 다른 약 추가
     private fun saveDrugAndAddAnother() {
-        // TODO: ViewModel에 약품 정보 저장
+         // 1. 입력값 수집
+         val dosage = binding.etDosage.text.toString()
+         val frequency = binding.etFrequency.text.toString()
+         val days = binding.etDays.text.toString().toIntOrNull() ?: 0
+         val timing = binding.etTiming.text.toString()
+         val memo = binding.etMemo.text.toString()
 
-        showToast("약품이 추가되었습니다")
+         // 2. 선택된 시간대 수집
+         val timeSlots = mutableListOf<String>()
+         if (binding.cbMorning.isChecked) timeSlots.add("아침")
+         if (binding.cbLunch.isChecked) timeSlots.add("점심")
+         if (binding.cbDinner.isChecked) timeSlots.add("저녁")
+         if (binding.cbBedtime.isChecked) timeSlots.add("취침 전")
+
+         // 3. ViewModel에 약 추가
+         viewModel.tempDrugs.add(
+             TempDrugData(
+                 name = drugName,
+                 dosage = dosage,
+                 frequency = frequency,
+                 days = days,
+                 timing = timing,
+                 memo = memo,
+                 timeSlots = timeSlots
+             )
+         )
+
+        showToast("약이 추가되었습니다")
         // 입력 필드 초기화하고 검색 화면으로 돌아가기
         parentFragmentManager.popBackStack()
     }
 
 
-     // 약품 저장하고 등록 완료
+     // 약 저장하고 등록 완료
     private fun saveDrugAndFinish() {
-        // TODO: ViewModel에 약품 정보 저장
-        // TODO: DB에 처방전 전체 저장
+         // 1. 입력값 수집
+         val dosage = binding.etDosage.text.toString()
+         val frequency = binding.etFrequency.text.toString()
+         val days = binding.etDays.text.toString().toIntOrNull() ?: 0
+         val timing = binding.etTiming.text.toString()
+         val memo = binding.etMemo.text.toString()
 
-        showToast("약품 등록이 완료되었습니다")
+         // 2. 선택된 시간대 수집
+         val timeSlots = mutableListOf<String>()
+         if (binding.cbMorning.isChecked) timeSlots.add("아침")
+         if (binding.cbLunch.isChecked) timeSlots.add("점심")
+         if (binding.cbDinner.isChecked) timeSlots.add("저녁")
+         if (binding.cbBedtime.isChecked) timeSlots.add("취침 전")
+
+         // 3. ViewModel에 약 추가
+         viewModel.tempDrugs.add(
+             TempDrugData(
+                 name = drugName,
+                 dosage = dosage,
+                 frequency = frequency,
+                 days = days,
+                 timing = timing,
+                 memo = memo,
+                 timeSlots = timeSlots
+             )
+         )
+         // db에 처방전 + 약 전체 저장
+         viewModel.savePrescriptionWithDrugs()
+
+        showToast("약 등록이 완료되었습니다")
         // 처방전 목록 화면으로 돌아가기
         parentFragmentManager.popBackStack(
             null,

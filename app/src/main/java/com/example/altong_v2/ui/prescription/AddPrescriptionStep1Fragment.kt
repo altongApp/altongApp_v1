@@ -129,7 +129,11 @@ class AddPrescriptionStep1Fragment : Fragment() {
         return isValid
     }
     private fun navigateToNextStep() {
-        // TODO: ViewModel에 데이터 저장
+        // 뷰모델에 step 1 데이터 저장
+        viewModel.tempDate = binding.etPrescriptionDate.text.toString()
+        viewModel.tempHospital = binding.etHospitalName.text.toString()
+        viewModel.tempDepartment = binding.etDepartment.text.toString()
+
         val fragment = AddPrescriptionStep2Fragment()
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)

@@ -11,7 +11,7 @@ import com.example.altong_v2.data.local.entity.FavoriteMedicineEntity
 import kotlinx.coroutines.flow.Flow
 
 
-/* * 찜한 약품 DAO
+/* * 찜한 약 DAO
  * 찜 목록 테이블에 대한 CRUD 작업 정의*/
 
 @Dao
@@ -33,11 +33,11 @@ interface FavoriteMedicineDao {
     @Query("SELECT * FROM favorite_medicines ORDER BY created_at DESC")
     fun getAllFavorites(): Flow<List<FavoriteMedicineEntity>>
 
-    // 타입별 찜 목록 조회 (일반의약품 or 전문의약품)
+    // 타입별 찜 목록 조회 (일반의약 or 전문의약)
     @Query("SELECT * FROM favorite_medicines WHERE type = :type ORDER BY created_at DESC")
     fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>>
 
-    // 약품 ID로 찜 조회
+    // 약 ID로 찜 조회
     @Query("SELECT * FROM favorite_medicines WHERE medicine_id = :medicineId")
     suspend fun getFavoriteByMedicineId(medicineId: String): FavoriteMedicineEntity?
 
@@ -45,7 +45,7 @@ interface FavoriteMedicineDao {
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_medicines WHERE medicine_id = :medicineId)")
     suspend fun isFavorite(medicineId: String): Boolean
 
-    // 약품 ID로 찜 삭제
+    // 약 ID로 찜 삭제
     @Query("DELETE FROM favorite_medicines WHERE medicine_id = :medicineId")
     suspend fun deleteByMedicineId(medicineId: String)
 

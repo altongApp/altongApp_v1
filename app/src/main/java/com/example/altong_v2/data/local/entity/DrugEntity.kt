@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 
 
 /*
- * 약품 테이블
- * 처방전에 포함된 약품 정보를 저장
- * 처방전 삭제 시 해당 약품도 자동 삭제 (CASCADE) */
+ * 약 테이블
+ * 처방전에 포함된 약 정보를 저장
+ * 처방전 삭제 시 해당 약도 자동 삭제 (CASCADE) */
 
 
 @Entity(
@@ -20,7 +20,7 @@ import androidx.room.PrimaryKey
             entity = PrescriptionEntity::class,
             parentColumns = ["id"],
             childColumns = ["prescription_id"],
-            onDelete = ForeignKey.CASCADE  // 처방전 삭제 시 약품도 삭제됨.
+            onDelete = ForeignKey.CASCADE  // 처방전 삭제 시 약도 삭제됨.
         )
     ],
     indices = [Index(value = ["prescription_id"])]
@@ -33,8 +33,8 @@ data class DrugEntity(
     @ColumnInfo(name = "prescription_id")
     val prescriptionId: Long,
 
-    // 약품 기본 정보
-    val name: String,                // 약품명
+    // 약 기본 정보
+    val name: String,                // 약명
     val dosage: String,              // 1회 복용량 (예: "1정")
     val frequency: String,           // 1일 복용 횟수 (예: "3회")
     val days: Int,                   // 총 처방 일수

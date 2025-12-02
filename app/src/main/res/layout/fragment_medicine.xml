@@ -10,7 +10,7 @@
         android:id="@+id/text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="약 검색\n\n약품 검색 기능이 여기에 표시됩니다.\n(팀원이 작업)"
+        android:text="약 검색\n\n약 검색 기능이 여기에 표시됩니다.\n(팀원이 작업)"
         android:textSize="18sp"
         android:textColor="@color/text_primary"
         android:gravity="center"
