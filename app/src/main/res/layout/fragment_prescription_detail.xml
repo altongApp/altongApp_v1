@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_cream"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="‹"
+            android:textSize="24sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="처방전 상세"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/btn_menu"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="⋮"
+            android:textSize="24sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- 처방전 기본 정보 내용 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/border_default"
+                app:strokeWidth="1dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="처방일"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_date"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="2025-12-01"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="병원"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_hospital"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="서울대학교병원"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="진료과"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_department"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="내과"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="진단명"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_diagnosis"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="급성 상기도 감염"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_pharmacy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="80dp"
+                            android:layout_height="wrap_content"
+                            android:text="약국"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tv_pharmacy"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="15sp"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 처방전 사진  -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_prescription_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/border_default"
+                app:strokeWidth="1dp"
+                android:layout_marginBottom="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="처방전 사진"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- 사진 없을 때 -->
+                    <LinearLayout
+                        android:id="@+id/layout_no_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@color/background_olive"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🖼️"
+                            android:textSize="48sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="사진 없음"
+                            android:textSize="14sp"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+
+                    <!-- 사진 있을 때 -->
+                    <ImageView
+                        android:id="@+id/iv_prescription_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="처방전 사진" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 약 정보 확인하는 구간 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="등록된 약품"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/tv_drug_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2개"
+                    android:textSize="14sp"
+                    android:textColor="@color/primary_green_dark"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 약 리스트 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_drugs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="16dp" />
+
+            <!-- 약이 없을 때 -->
+            <LinearLayout
+                android:id="@+id/layout_empty_drugs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💊"
+                    android:textSize="48sp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="등록된 약품이 없습니다"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_drug"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="약품 추가하기"
+                    android:textSize="14sp"
+                    android:backgroundTint="@color/primary_green_dark"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

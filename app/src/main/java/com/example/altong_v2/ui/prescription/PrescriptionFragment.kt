@@ -54,15 +54,14 @@ class PrescriptionFragment : Fragment() {
     private fun setupRecyclerView() {
         prescriptionAdapter  = PrescriptionAdapter(
             onItemClick = { prescription ->
-                // 처방전 상세 화면으로 이동 (TODO)
-                // navigateToPrescriptionDetail(prescription.id)
+                // 처방전 상세 화면으로 이동
+                navigateToPrescriptionDetail(prescription.id)
             },
             onAddDrugClick = { prescriptionId ->
                 // 약 추가 화면으로 이동 (TODO)
                 // navigateToAddDrug(prescriptionId)
             }
         )
-
         binding.recyclerViewPrescriptions.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = prescriptionAdapter
@@ -253,7 +252,17 @@ class PrescriptionFragment : Fragment() {
         super.onDestroyView()
         _binding = null  // 메모리 누수 방지
     }
-    // 처방전 추가화면으로 이동
+
+    // 기존 처방전 보러가기(조회)
+    private fun navigateToPrescriptionDetail(prescriptionId: Long) {
+        val fragment = PrescriptionDetailFragment.newInstance(prescriptionId)
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+    // 새 처방전 등록하러하기(생성)
     private fun navigateToAddPrescription() {
         val fragment = AddPrescriptionStep1Fragment()
         parentFragmentManager.beginTransaction()

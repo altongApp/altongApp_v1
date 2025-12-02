@@ -11,7 +11,6 @@ import com.google.android.material.chip.Chip
 
 /* * 처방전 RecyclerView Adapter
  * DiffUtil 사용으로 효율적인 리스트 업데이트*/
-
 class PrescriptionAdapter(
     private val onItemClick: (PrescriptionEntity) -> Unit,
     private val onAddDrugClick: (Long) -> Unit  // 약 추가 버튼 클릭
@@ -85,7 +84,7 @@ class PrescriptionAdapter(
                 } else {
                     warningContainer.visibility = View.GONE
                 }
-
+                // 처방전 상세화면으로 이동하기
                 root.setOnClickListener {
                     onItemClick(prescription)
                 }
