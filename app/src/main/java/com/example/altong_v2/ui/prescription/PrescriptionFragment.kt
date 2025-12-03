@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.altong_v2.R
@@ -24,7 +24,7 @@ import kotlin.coroutines.resume
 class PrescriptionFragment : Fragment() {
     private var _binding: FragmentPrescriptionBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PrescriptionViewModel by viewModels()
+    private val viewModel: PrescriptionViewModel by activityViewModels()
     private lateinit var prescriptionAdapter: PrescriptionAdapter
 
     override fun onCreateView(
@@ -52,14 +52,13 @@ class PrescriptionFragment : Fragment() {
 
     // 리사이클러뷰 설정
     private fun setupRecyclerView() {
-        prescriptionAdapter  = PrescriptionAdapter(
+        prescriptionAdapter = PrescriptionAdapter(
             onItemClick = { prescription ->
                 // 처방전 상세 화면으로 이동
                 navigateToPrescriptionDetail(prescription.id)
             },
             onAddDrugClick = { prescriptionId ->
-                // 약 추가 화면으로 이동 (TODO)
-                // navigateToAddDrug(prescriptionId)
+                navigateToAddDrugFromList(prescriptionId)
             }
         )
         binding.recyclerViewPrescriptions.apply {
@@ -113,18 +112,20 @@ class PrescriptionFragment : Fragment() {
                     val drugCount = viewModel.getDrugCount(prescription.id)
 
                     // LiveData를 관찰하여 약명 가져오기
-                    viewModel.getDrugsByPrescription(prescription.id).observe(viewLifecycleOwner) { drugs ->
-                        val drugNames = drugs.take(3).map { it.name }
+                    viewModel.getDrugsByPrescription(prescription.id)
+                        .observe(viewLifecycleOwner) { drugs ->
+                            val drugNames = drugs.take(3).map { it.name }
 
-                        prescriptionsWithDrugs[index] = PrescriptionAdapter.PrescriptionWithDrugs(
-                            prescription = prescription,
-                            drugCount = drugCount,
-                            drugNames = drugNames
-                        )
+                            prescriptionsWithDrugs[index] =
+                                PrescriptionAdapter.PrescriptionWithDrugs(
+                                    prescription = prescription,
+                                    drugCount = drugCount,
+                                    drugNames = drugNames
+                                )
 
-                        // 리스트 업데이트
-                        prescriptionAdapter.submitList(prescriptionsWithDrugs.toList())
-                    }
+                            // 리스트 업데이트
+                            prescriptionAdapter.submitList(prescriptionsWithDrugs.toList())
+                        }
                 }
 
 // 초기 리스트 표시
@@ -132,6 +133,7 @@ class PrescriptionFragment : Fragment() {
             }
         }
     }
+
     /**
      * 테스트 데이터 추가 (UI 확인용)
      * TODO: 확인 완료 후 이 함수 전체 삭제할 것!
@@ -248,6 +250,7 @@ class PrescriptionFragment : Fragment() {
             }
         }
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null  // 메모리 누수 방지
@@ -262,6 +265,7 @@ class PrescriptionFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
+
     // 새 처방전 등록하러하기(생성)
     private fun navigateToAddPrescription() {
         val fragment = AddPrescriptionStep1Fragment()
@@ -269,5 +273,19 @@ class PrescriptionFragment : Fragment() {
             .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)  // 뒤로가기 지원
             .commit()
+    }
+
+    // 처방전 목록에서 약추가
+    private fun navigateToAddDrugFromList(prescriptionId: Long) {
+        lifecycleScope.launch {
+            viewModel.startAddDrugMode(prescriptionId)
+            // 약품 검색 화면으로 이동
+            val fragment = DrugSearchFragment()
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }

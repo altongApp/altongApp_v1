@@ -30,6 +30,12 @@ class AddPrescriptionStep2Fragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
+        if (viewModel.isEditMode) {
+            loadExistingData()
+        }
+    }
+    private fun loadExistingData() {
+        binding.etDiagnosis.setText(viewModel.tempDiagnosis)
     }
 
     private fun setupClickListeners() {

@@ -50,10 +50,13 @@ class DrugSearchFragment : Fragment() {
         setupClickListeners()
     }
 
+    private var selectedPosition: Int = -1
     private fun setupRecyclerView() {
-        searchAdapter = DrugSearchAdapter { drug ->
-            onDrugSelected(drug)
-        }
+        searchAdapter = DrugSearchAdapter(
+        { drug , position ->
+                onDrugSelected(drug,position)
+            }
+        )
         binding.rvSearchResults.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = searchAdapter
@@ -96,9 +99,11 @@ class DrugSearchFragment : Fragment() {
     }
 
     // 약 선택 처리
-    private fun onDrugSelected(drug: DrugSearchResult) {
+    private fun onDrugSelected(drug: DrugSearchResult, position: Int) {
         selectedDrug = drug
+        selectedPosition = position
         binding.btnSelectDrug.isEnabled = true
+        searchAdapter.setSelectedPosition(position)
     }
     private fun setupClickListeners() {
         binding.btnBack.setOnClickListener {
@@ -121,11 +126,13 @@ class DrugSearchFragment : Fragment() {
              .replace(R.id.fragment_container, fragment)
              .addToBackStack(null)
              .commit()
-        showToast("약 상세 입력 화면은 다음 단계에서 구현됩니다")
     }
 
     // 약 등록 건뛰
     private fun skipDrugRegistration() {
+        android.util.Log.d("DrugAdd", "=== skipDrugRegistration 호출 ===")
+        android.util.Log.d("DrugAdd", "isAddDrugMode: ${viewModel.isAddDrugMode}")
+
         parentFragmentManager.popBackStack(
             null,
             androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE

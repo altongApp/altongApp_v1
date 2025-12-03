@@ -30,6 +30,12 @@ class AddPrescriptionStep3Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
+        if (viewModel.isEditMode) {
+            loadExistingData()
+        }
+    }
+    private fun loadExistingData() {
+        binding.etPharmacy.setText(viewModel.tempPharmacy)
     }
 
     private fun setupClickListeners() {
@@ -54,14 +60,27 @@ class AddPrescriptionStep3Fragment : Fragment() {
     private fun completePrescription() {
         // 뷰모델에 step 3 데이터 저장
         viewModel.tempPharmacy = binding.etPharmacy.text.toString()
-        // Transition 화면으로 이동
-        val fragment = PrescriptionCompleteFragment()
+
+        if (viewModel.isEditMode) {
+            navigateToEditDrugs()
+        } else {
+            // Transition 화면으로 이동
+            val fragment = PrescriptionCompleteFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
+    private fun navigateToEditDrugs() {
+        val fragment = DrugEditListFragment()
+
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
     }
-
 
     private fun showToast(message: String) {
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()

@@ -174,21 +174,38 @@ class DrugDetailFragment : Fragment() {
          if (binding.cbBedtime.isChecked) timeSlots.add("취침 전")
 
          // 3. ViewModel에 약 추가
-         viewModel.tempDrugs.add(
-             TempDrugData(
-                 name = drugName,
-                 dosage = dosage,
-                 frequency = frequency,
-                 days = days,
-                 timing = timing,
-                 memo = memo,
-                 timeSlots = timeSlots
-             )
+         val drugData = TempDrugData(
+             name = drugName,
+             dosage = dosage,
+             frequency = frequency,
+             days = days,
+             timing = timing,
+             memo = memo,
+             timeSlots = timeSlots
          )
 
-        showToast("약이 추가되었습니다")
-        // 입력 필드 초기화하고 검색 화면으로 돌아가기
-        parentFragmentManager.popBackStack()
+         if (viewModel.isAddDrugMode) {
+             // 약품 추가 모드: 바로 DB에 저장
+             viewModel.addDrugToPrescription(drugData)
+             showToast("약품이 추가되었습니다")
+
+             // 상세 화면으로 돌아가기
+             parentFragmentManager.popBackStack(
+                 null,
+                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+             )
+         } else {
+             // 처방전 등록 모드: ViewModel에 추가하고 전체 저장
+             viewModel.tempDrugs.add(drugData)
+             viewModel.savePrescriptionWithDrugs()
+             showToast("처방전이 등록되었습니다")
+
+             // 처방전 목록 화면으로 돌아가기
+             parentFragmentManager.popBackStack(
+                 null,
+                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+             )
+         }
     }
 
 
@@ -209,28 +226,39 @@ class DrugDetailFragment : Fragment() {
          if (binding.cbBedtime.isChecked) timeSlots.add("취침 전")
 
          // 3. ViewModel에 약 추가
-         viewModel.tempDrugs.add(
-             TempDrugData(
-                 name = drugName,
-                 dosage = dosage,
-                 frequency = frequency,
-                 days = days,
-                 timing = timing,
-                 memo = memo,
-                 timeSlots = timeSlots
-             )
+         val drugData = TempDrugData(
+             name = drugName,
+             dosage = dosage,
+             frequency = frequency,
+             days = days,
+             timing = timing,
+             memo = memo,
+             timeSlots = timeSlots
          )
-         // db에 처방전 + 약 전체 저장
-         viewModel.savePrescriptionWithDrugs()
 
-        showToast("약 등록이 완료되었습니다")
-        // 처방전 목록 화면으로 돌아가기
-        parentFragmentManager.popBackStack(
-            null,
-            androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
+         // 4. 모드에 따라 처리
+         if (viewModel.isAddDrugMode) {
+             // 약품 추가 모드: 바로 DB에 저장
+             viewModel.addDrugToPrescription(drugData)
+             showToast("약품이 추가되었습니다")
+
+             // 상세 화면으로만 돌아가기 (2번 pop)
+             parentFragmentManager.popBackStack()  // DrugDetailFragment 제거
+             parentFragmentManager.popBackStack()  // DrugSearchFragment 제거
+             // → PrescriptionDetailFragment로 복귀
+         } else {
+             // 처방전 등록 모드: ViewModel에 추가하고 전체 저장
+             viewModel.tempDrugs.add(drugData)
+             viewModel.savePrescriptionWithDrugs()
+             showToast("처방전이 등록되었습니다")
+
+             // 처방전 목록 화면으로 돌아가기
+             parentFragmentManager.popBackStack(
+                 null,
+                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+             )
+         }
     }
-
 
     private fun showToast(message: String) {
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_SHORT).show()

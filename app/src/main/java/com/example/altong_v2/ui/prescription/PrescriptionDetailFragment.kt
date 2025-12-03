@@ -74,8 +74,7 @@ class PrescriptionDetailFragment : Fragment() {
         }
         // 약품 추가 버튼
         binding.btnAddDrug.setOnClickListener {
-            // TODO: 약품 추가 기능 구현
-            showToast("약품 추가 기능은 추후 구현 예정입니다")
+            navigateToAddDrug()
         }
     }
 
@@ -86,8 +85,7 @@ class PrescriptionDetailFragment : Fragment() {
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_edit -> {
-                    // TODO: 수정 기능
-                    showToast("수정 기능은 추후 구현 예정입니다")
+                    navigateToEdit()
                     true
                 }
                 R.id.action_delete -> {
@@ -97,8 +95,20 @@ class PrescriptionDetailFragment : Fragment() {
                 else -> false
             }
         }
-
         popup.show()
+    }
+
+    private fun navigateToAddDrug() {
+        lifecycleScope.launch {
+            // ViewModel에 추가 모드 시작
+            viewModel.startAddDrugMode(prescriptionId) 
+            // 약품 검색 화면으로 이동
+            val fragment = DrugSearchFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
 // 삭제 확인 다이얼
@@ -122,6 +132,21 @@ class PrescriptionDetailFragment : Fragment() {
                 showToast("처방전이 삭제되었습니다")
                 parentFragmentManager.popBackStack()
             }
+        }
+    }
+// 처방전 수정하러가기
+    private fun navigateToEdit() {
+        lifecycleScope.launch {
+            // ViewModel에 수정 모드 시작
+            viewModel.startEditMode(prescriptionId)
+
+            // Step 1 화면으로 이동 (수정 모드)
+            val fragment = AddPrescriptionStep1Fragment()
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
     }
 

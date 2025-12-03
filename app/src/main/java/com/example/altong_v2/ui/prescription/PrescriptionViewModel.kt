@@ -108,6 +108,9 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
 
     // 처방전 데이터 초기화
     fun clearTempData() {
+        android.util.Log.d("DrugAdd", "=== clearTempData 호출 ===")
+        android.util.Log.d("DrugAdd", "호출 스택: ${Thread.currentThread().stackTrace[3]}")
+
         tempDate = ""
         tempHospital = ""
         tempDepartment = ""
@@ -132,7 +135,6 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                 )
 
                 val prescriptionId = repository.insertPrescription(prescription)
-
                 // 2. 약 저장
                 tempDrugs.forEach { drug ->
                     val drugEntity = DrugEntity(
@@ -150,6 +152,122 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                 // 3. 임시 데이터 초기화
                 clearTempData()
             } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    // 수정 모드 플래그
+    var isEditMode: Boolean = false
+    var editingPrescriptionId: Long = -1L
+
+// 수정모드 on - 일단 기존 처방전 불러오기
+    suspend fun startEditMode(prescriptionId: Long) {
+        isEditMode = true
+        editingPrescriptionId = prescriptionId
+
+        // 기존 처방전 데이터 로드
+        val prescription = getPrescriptionById(prescriptionId)
+        prescription?.let {
+            tempDate = it.date
+            tempHospital = it.hospital.orEmpty()
+            tempDepartment = it.department.orEmpty()
+            tempDiagnosis = it.diagnosis
+            tempPharmacy = it.pharmacy.orEmpty()
+        }
+
+        // 기존 약품 데이터 로드
+        val drugs = getDrugsList(prescriptionId)
+        tempDrugs.clear()
+        drugs.forEach { drug ->
+            tempDrugs.add(
+                TempDrugData(
+                    name = drug.name,
+                    dosage = drug.dosage,
+                    frequency = drug.frequency,
+                    days = drug.days,
+                    timing = drug.timing.orEmpty(),
+                    memo = drug.memo.orEmpty(),
+                    timeSlots = drug.timeSlots.split(",")
+                )
+            )
+        }
+    }
+
+// 처방전 수정하고 저장하기
+    fun updatePrescriptionWithDrugs() {
+        viewModelScope.launch {
+            try {
+                // 1. 처방전 업데이트
+                val prescription = PrescriptionEntity(
+                    id = editingPrescriptionId,
+                    date = tempDate,
+                    hospital = tempHospital,
+                    department = tempDepartment,
+                    diagnosis = tempDiagnosis,
+                    pharmacy = tempPharmacy
+                )
+                repository.updatePrescription(prescription)
+                // 2. 기존 약품 전체 삭제
+                val oldDrugs = getDrugsList(editingPrescriptionId)
+                oldDrugs.forEach { drug ->
+                    repository.deleteDrug(drug)
+                }
+                // 3. 새로운 약품 전체 추가
+                tempDrugs.forEach { drug ->
+                    val drugEntity = DrugEntity(
+                        prescriptionId = editingPrescriptionId,
+                        name = drug.name,
+                        dosage = drug.dosage,
+                        frequency = drug.frequency,
+                        days = drug.days,
+                        timing = drug.timing,
+                        memo = drug.memo,
+                        timeSlots = drug.timeSlots.joinToString(",")
+                    )
+                    repository.insertDrug(drugEntity)
+                }
+                // 4. 수정 모드 종료
+                isEditMode = false
+                editingPrescriptionId = -1L
+                clearTempData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // 약품 추가 모드 플래그
+    var isAddDrugMode: Boolean = false
+    var addingToPrescriptionId: Long = -1L
+
+    // 약품추가모드
+    suspend fun startAddDrugMode(prescriptionId: Long) {
+        isAddDrugMode = true
+        addingToPrescriptionId = prescriptionId
+        // 임시 약품 리스트 초기화
+        tempDrugs.clear()
+    }
+    // 기존 처방전에 약품만 추가하는
+    fun addDrugToPrescription(drug: TempDrugData) {
+        viewModelScope.launch {
+            try {
+                val drugEntity = DrugEntity(
+                    prescriptionId = addingToPrescriptionId,
+                    name = drug.name,
+                    dosage = drug.dosage,
+                    frequency = drug.frequency,
+                    days = drug.days,
+                    timing = drug.timing,
+                    memo = drug.memo,
+                    timeSlots = drug.timeSlots.joinToString(",")
+                )
+
+                repository.insertDrug(drugEntity)
+                // 추가 모드 종료
+                isAddDrugMode = false
+                addingToPrescriptionId = -1L
+            } catch (e: Exception) {
+                android.util.Log.e("DrugAdd", "약품 추가 실패!", e)
                 e.printStackTrace()
             }
         }

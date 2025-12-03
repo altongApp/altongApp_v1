@@ -42,6 +42,14 @@ class AddPrescriptionStep1Fragment : Fragment() {
         setupDatePicker()
         setupClickListeners()
         setDefaultDate()
+        if (viewModel.isEditMode) {
+            loadExistingData()
+        }
+    }
+    private fun loadExistingData() {
+        binding.etPrescriptionDate.setText(viewModel.tempDate)
+        binding.etHospitalName.setText(viewModel.tempHospital)
+        binding.etDepartment.setText(viewModel.tempDepartment)
     }
 
     private fun setupDatePicker() {
