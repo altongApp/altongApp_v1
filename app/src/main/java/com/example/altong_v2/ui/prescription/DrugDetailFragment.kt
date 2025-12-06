@@ -44,6 +44,30 @@ class DrugDetailFragment : Fragment() {
         setupDrugInfo()
         setupTimeSlots()
         setupClickListeners()
+        //수정 모드일 때 기존 데이터 로드
+        if (viewModel.isEditDrugMode) {
+            loadExistingDrugData()
+            binding.btnAddAnother.visibility = View.GONE
+        }
+    }
+    private fun loadExistingDrugData() {
+        val index = viewModel.editingDrugIndex
+        if (index >= 0 && index < viewModel.tempDrugs.size) {
+            val drug = viewModel.tempDrugs[index]
+
+            // 입력 필드에 기존 데이터 채우기
+            binding.etDosage.setText(drug.dosage)
+            binding.etFrequency.setText(drug.frequency)
+            binding.etDays.setText(drug.days.toString())
+            binding.etTiming.setText(drug.timing)
+            binding.etMemo.setText(drug.memo)
+
+            // 시간대 체크박스 설정
+            binding.cbMorning.isChecked = drug.timeSlots.contains("아침")
+            binding.cbLunch.isChecked = drug.timeSlots.contains("점심")
+            binding.cbDinner.isChecked = drug.timeSlots.contains("저녁")
+            binding.cbBedtime.isChecked = drug.timeSlots.contains("취침 전")
+     }
     }
 
     private fun setupDrugInfo() {
@@ -184,30 +208,33 @@ class DrugDetailFragment : Fragment() {
              timeSlots = timeSlots
          )
 
-         if (viewModel.isAddDrugMode) {
-             // 약품 추가 모드: 바로 DB에 저장
-             viewModel.addDrugToPrescription(drugData)
-             showToast("약품이 추가되었습니다")
+         // 4. 모드 확인 및 처리
+         when {
+             // 약 추가 모드 (기존 처방전에 추가)
+             viewModel.isAddDrugMode -> {
+                 // DB에 바로 저장
+                 viewModel.addDrugToPrescription(drugData)
+                 showToast("약이 추가되었습니다. 다른 약을 선택하세요")
 
-             // 상세 화면으로 돌아가기
-             parentFragmentManager.popBackStack(
-                 null,
-                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-             )
-         } else {
-             // 처방전 등록 모드: ViewModel에 추가하고 전체 저장
-             viewModel.tempDrugs.add(drugData)
-             viewModel.savePrescriptionWithDrugs()
-             showToast("처방전이 등록되었습니다")
+                 // 약 검색 화면으로 돌아가기
+                 parentFragmentManager.popBackStack()
+             }
+             // 처방전 수정 모드 (약품 리스트에 추가)
+             viewModel.isEditMode -> {
+                 // 임시 리스트에 추가
+                 viewModel.tempDrugs.add(drugData)
+                 showToast("약이 추가되었습니다. 다른 약을 선택하세요")
+                 parentFragmentManager.popBackStack()
+             }
 
-             // 처방전 목록 화면으로 돌아가기
-             parentFragmentManager.popBackStack(
-                 null,
-                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-             )
+             // 처방전 등록 모드 (새 처방전 + 약들)
+             else -> {
+                 viewModel.tempDrugs.add(drugData)
+                 showToast("약이 추가되었습니다. 다른 약을 선택하세요")
+                 parentFragmentManager.popBackStack()
+             }
          }
-    }
-
+     }
 
      // 약 저장하고 등록 완료
     private fun saveDrugAndFinish() {
@@ -237,26 +264,43 @@ class DrugDetailFragment : Fragment() {
          )
 
          // 4. 모드에 따라 처리
-         if (viewModel.isAddDrugMode) {
-             // 약품 추가 모드: 바로 DB에 저장
-             viewModel.addDrugToPrescription(drugData)
-             showToast("약품이 추가되었습니다")
+         when {
+             // 약 수정 모드
+             viewModel.isEditDrugMode -> {
+                 viewModel.updateDrugInList(drugData)
+                 showToast("약이 수정되었습니다")
+                 // 약 수정 리스트로 돌아가기
+                 parentFragmentManager.popBackStack()
+             }
 
-             // 상세 화면으로만 돌아가기 (2번 pop)
-             parentFragmentManager.popBackStack()  // DrugDetailFragment 제거
-             parentFragmentManager.popBackStack()  // DrugSearchFragment 제거
-             // → PrescriptionDetailFragment로 복귀
-         } else {
-             // 처방전 등록 모드: ViewModel에 추가하고 전체 저장
-             viewModel.tempDrugs.add(drugData)
-             viewModel.savePrescriptionWithDrugs()
-             showToast("처방전이 등록되었습니다")
+             // 약 추가 모드 (기존 처방전에)
+             viewModel.isAddDrugMode -> {
+                 viewModel.addDrugToPrescription(drugData)
+                 showToast("약이 추가되었습니다")
+                 // 상세 화면으로 돌아가기 (2번 pop)
+                 parentFragmentManager.popBackStack()
+                 parentFragmentManager.popBackStack()
+             }
+             // 처방전 수정 모드 (약품 리스트에 추가)
+             viewModel.isEditMode && viewModel.editingPrescriptionId != -1L -> {
+                 // 임시 리스트에만 추가 (DB 저장 X)
+                 viewModel.tempDrugs.add(drugData)
+                 showToast("약이 추가되었습니다")
+                 parentFragmentManager.popBackStack()
+                 parentFragmentManager.popBackStack()
+             }
 
-             // 처방전 목록 화면으로 돌아가기
-             parentFragmentManager.popBackStack(
-                 null,
-                 androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-             )
+             // 처방전 등록 모드
+             else -> {
+                 viewModel.tempDrugs.add(drugData)
+                 viewModel.savePrescriptionWithDrugs()
+                 showToast("처방전이 등록되었습니다")
+                 // 처방전 목록으로 돌아가기
+                 parentFragmentManager.popBackStack(
+                     null,
+                     androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+                 )
+             }
          }
     }
 

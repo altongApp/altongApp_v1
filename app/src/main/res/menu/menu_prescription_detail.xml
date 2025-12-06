@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_edit"
-        android:title="수정" />
+        android:id="@+id/action_edit_prescription"
+        android:title="처방전 정보 수정" />
+
+    <item
+        android:id="@+id/action_edit_drugs"
+        android:title="약 수정" />
 
     <item
         android:id="@+id/action_delete"

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.data.local.entity.DrugEntity
 import com.example.altong_v2.databinding.ItemDrugDetailBinding
 
-/* * 약품 상세 정보 어댑터*/
+/* * 약 상세 정보 어댑터*/
 class DrugDetailAdapter : ListAdapter<DrugEntity, DrugDetailAdapter.DrugViewHolder>(DrugDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrugViewHolder {
         val binding = ItemDrugDetailBinding.inflate(
@@ -23,14 +23,21 @@ class DrugDetailAdapter : ListAdapter<DrugEntity, DrugDetailAdapter.DrugViewHold
     override fun onBindViewHolder(holder: DrugViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+
+    override fun getItemCount(): Int {
+        val count = super.getItemCount()
+        android.util.Log.d("DrugDebug", "Adapter.getItemCount(): $count")
+        return count
+    }
+
     class DrugViewHolder(
         private val binding: ItemDrugDetailBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(drug: DrugEntity) {
-            // 약품명
+            // 약명
             binding.tvDrugName.text = drug.name
-            // !~~~!~! 약품 이미지 처리 (추가해야함)
+            // !~~~!~! 약 이미지 처리 (추가해야함)
             // TODO: 나중에 약 DB에서 이미지 URL 가져올 때 처리
             // if (!drug.imageUrl.isNullOrEmpty()) {
             //     binding.tvDrugEmoji.visibility = View.GONE
@@ -68,6 +75,7 @@ class DrugDetailAdapter : ListAdapter<DrugEntity, DrugDetailAdapter.DrugViewHold
             } else {
                 binding.layoutMemo.visibility = View.GONE
             }
+            android.util.Log.d("DrugDebug", "ViewHolder.bind() 완료")
         }
     }
 

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.databinding.ItemDrugEditBinding
 
-/* * 약품 수정 어댑터*/
+/* * 약 수정 어댑터*/
 
 class DrugEditAdapter(
     private val onEditClick: (Int) -> Unit,
@@ -33,7 +33,7 @@ class DrugEditAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(drug: TempDrugData, position: Int) {
-            // 약품명
+            // 약명
             binding.tvDrugName.text = drug.name
             // 복용 정보
             binding.tvDosageInfo.text = "1회 ${drug.dosage}, 1일 ${drug.frequency}"

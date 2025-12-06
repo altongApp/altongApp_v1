@@ -35,7 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="약품 수정"
+            android:text="약 수정"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
@@ -87,7 +87,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="약품을 수정하거나 추가할 수 있습니다"
+                        android:text="약을 수정하거나 추가할 수 있습니다"
                         android:textSize="14sp"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
@@ -105,7 +105,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="등록된 약품"
+                    android:text="등록된 약"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary" />
@@ -148,7 +148,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="등록된 약품이 없습니다"
+                    android:text="등록된 약이 없습니다"
                     android:textSize="16sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="8dp" />
@@ -156,7 +156,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="약품을 추가해주세요"
+                    android:text="약을 추가해주세요"
                     android:textSize="14sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
@@ -181,7 +181,7 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:text="+ 약품 추가"
+            android:text="+ 약 추가"
             android:textSize="14sp"
             android:textStyle="bold"
             android:backgroundTint="@color/secondary_blue_dark"

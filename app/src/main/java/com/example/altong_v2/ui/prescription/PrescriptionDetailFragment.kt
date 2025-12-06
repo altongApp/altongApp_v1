@@ -22,7 +22,7 @@ class PrescriptionDetailFragment : Fragment() {
 
     private var prescriptionId: Long = -1
 
-    // 약품 리스트 어댑터
+    // 약 리스트 어댑터
     private lateinit var drugAdapter: DrugDetailAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +60,9 @@ class PrescriptionDetailFragment : Fragment() {
         binding.rvDrugs.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = drugAdapter
+
+            setHasFixedSize(false)
+            itemAnimator = null
         }
     }
 
@@ -72,7 +75,7 @@ class PrescriptionDetailFragment : Fragment() {
         binding.btnMenu.setOnClickListener {
             showPopupMenu(it)
         }
-        // 약품 추가 버튼
+        // 약 추가 버튼
         binding.btnAddDrug.setOnClickListener {
             navigateToAddDrug()
         }
@@ -84,8 +87,12 @@ class PrescriptionDetailFragment : Fragment() {
 
         popup.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                R.id.action_edit -> {
-                    navigateToEdit()
+                R.id.action_edit_prescription  -> {
+                    navigateToEditPrescription()
+                    true
+                }
+                R.id.action_edit_drugs -> {
+                    navigateToEditDrugs()
                     true
                 }
                 R.id.action_delete -> {
@@ -102,7 +109,7 @@ class PrescriptionDetailFragment : Fragment() {
         lifecycleScope.launch {
             // ViewModel에 추가 모드 시작
             viewModel.startAddDrugMode(prescriptionId) 
-            // 약품 검색 화면으로 이동
+            // 약 검색 화면으로 이동
             val fragment = DrugSearchFragment()
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -115,7 +122,7 @@ class PrescriptionDetailFragment : Fragment() {
     private fun showDeleteDialog() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle("처방전 삭제")
-            .setMessage("이 처방전을 삭제하시겠습니까?\n등록된 약품 정보도 함께 삭제됩니다.")
+            .setMessage("이 처방전을 삭제하시겠습니까?\n등록된 약 정보도 함께 삭제됩니다.")
             .setPositiveButton("삭제") { _, _ ->
                 deletePrescription()
             }
@@ -135,13 +142,25 @@ class PrescriptionDetailFragment : Fragment() {
         }
     }
 // 처방전 수정하러가기
-    private fun navigateToEdit() {
+    private fun navigateToEditPrescription() {
         lifecycleScope.launch {
             // ViewModel에 수정 모드 시작
             viewModel.startEditMode(prescriptionId)
-
             // Step 1 화면으로 이동 (수정 모드)
             val fragment = AddPrescriptionStep1Fragment()
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+// 약 수정하러가기
+    private fun navigateToEditDrugs() {
+        lifecycleScope.launch {
+            viewModel.startEditModeForDrugsOnly(prescriptionId)
+            // 약 수정 리스트로 바로 이동
+            val fragment = DrugEditListFragment()
 
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, fragment)
@@ -187,28 +206,70 @@ class PrescriptionDetailFragment : Fragment() {
             // 현재는 항상 "사진 없음" 표시
             binding.layoutNoImage.visibility = View.VISIBLE
             binding.ivPrescriptionImage.visibility = View.GONE
-            // 3. 약품 정보 로드
+            // 3. 약 정보 로드
             loadDrugs()
         }
     }
 
-// 약품 정보 로드
+// 약 정보 로드
     private fun loadDrugs() {
-        viewModel.getDrugsByPrescription(prescriptionId).observe(viewLifecycleOwner) { drugs ->
-            if (drugs.isEmpty()) {
-                // 약품 없음
-                binding.rvDrugs.visibility = View.GONE
-                binding.layoutEmptyDrugs.visibility = View.VISIBLE
-                binding.tvDrugCount.text = "0개"
-            } else {
-                // 약품 있음
-                binding.rvDrugs.visibility = View.VISIBLE
-                binding.layoutEmptyDrugs.visibility = View.GONE
-                binding.tvDrugCount.text = "${drugs.size}개"
+    android.util.Log.d("DrugDebug", "=== loadDrugs() 시작 ===")
+    android.util.Log.d("DrugDebug", "prescriptionId: $prescriptionId")
 
-                drugAdapter.submitList(drugs)
-            }
+    viewModel.getDrugsByPrescription(prescriptionId).observe(viewLifecycleOwner) { drugs ->
+        android.util.Log.d("DrugDebug", "=== LiveData 콜백 호출 ===")
+        android.util.Log.d("DrugDebug", "약품 개수: ${drugs.size}")
+        drugs.forEachIndexed { index, drug ->
+            android.util.Log.d(
+                "DrugDebug",
+                "[$index] id=${drug.id}, name=${drug.name}, prescriptionId=${drug.prescriptionId}"
+            )
         }
+        if (drugs.isEmpty()) {
+            android.util.Log.d("DrugDebug", "약 없음 - 빈 상태 표시")
+            // 약 없음
+            binding.rvDrugs.visibility = View.GONE
+            binding.layoutEmptyDrugs.visibility = View.VISIBLE
+            binding.tvDrugCount.text = "0개"
+        } else {
+            android.util.Log.d("DrugDebug", "약 있음 - RecyclerView 표시")
+            binding.rvDrugs.visibility = View.VISIBLE
+            binding.layoutEmptyDrugs.visibility = View.GONE
+            binding.tvDrugCount.text = "${drugs.size}개"
+
+            android.util.Log.d("DrugDebug", "submitList 호출 전")
+
+            // ✅ 수정: submitList에 콜백 추가
+            drugAdapter.submitList(drugs) {
+                android.util.Log.d("DrugDebug", "submitList 완료 콜백")
+
+                // ✅ RecyclerView 강제 레이아웃 재계산
+                binding.rvDrugs.requestLayout()
+
+                binding.rvDrugs.post {
+                    android.util.Log.d(
+                        "DrugDebug",
+                        "RecyclerView.childCount: ${binding.rvDrugs.childCount}"
+                    )
+                    android.util.Log.d(
+                        "DrugDebug",
+                        "RecyclerView.height: ${binding.rvDrugs.height}"
+                    )
+                    android.util.Log.d(
+                        "DrugDebug",
+                        "RecyclerView.visibility: ${binding.rvDrugs.visibility}"
+                    )
+
+                    for (i in 0 until binding.rvDrugs.childCount) {
+                        val child = binding.rvDrugs.getChildAt(i)
+                        android.util.Log.d("DrugDebug", "Child[$i] height: ${child.height}")
+                    }
+                }
+            }
+
+            android.util.Log.d("DrugDebug", "submitList 호출 후")
+        }
+    }
     }
 
     private fun showToast(message: String) {

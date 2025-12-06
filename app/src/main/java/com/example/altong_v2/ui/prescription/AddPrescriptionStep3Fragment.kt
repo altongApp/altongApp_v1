@@ -62,7 +62,13 @@ class AddPrescriptionStep3Fragment : Fragment() {
         viewModel.tempPharmacy = binding.etPharmacy.text.toString()
 
         if (viewModel.isEditMode) {
-            navigateToEditDrugs()
+            viewModel.updatePrescriptionInfoOnly()
+            showToast("처방전 정보가 수정되었습니다")
+            // 상세 화면으로 복귀
+            parentFragmentManager.popBackStack(
+                null,
+                androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
         } else {
             // Transition 화면으로 이동
             val fragment = PrescriptionCompleteFragment()

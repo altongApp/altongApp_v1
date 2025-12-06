@@ -156,11 +156,13 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
             }
         }
     }
+
+// ~~ 처방전 정보 수정 ~~
     // 수정 모드 플래그
     var isEditMode: Boolean = false
     var editingPrescriptionId: Long = -1L
 
-// 수정모드 on - 일단 기존 처방전 불러오기
+    // 수정모드 on - 일단 기존 처방전 불러오기
     suspend fun startEditMode(prescriptionId: Long) {
         isEditMode = true
         editingPrescriptionId = prescriptionId
@@ -174,8 +176,38 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
             tempDiagnosis = it.diagnosis
             tempPharmacy = it.pharmacy.orEmpty()
         }
+    }
 
-        // 기존 약품 데이터 로드
+// 처방전 수정하고 저장하기
+    fun updatePrescriptionInfoOnly() {
+        viewModelScope.launch {
+            try {
+                // 1. 처방전 업데이트
+                val prescription = PrescriptionEntity(
+                    id = editingPrescriptionId,
+                    date = tempDate,
+                    hospital = tempHospital,
+                    department = tempDepartment,
+                    diagnosis = tempDiagnosis,
+                    pharmacy = tempPharmacy
+                )
+                repository.updatePrescription(prescription)
+
+                isEditMode = false
+                editingPrescriptionId = -1L
+                clearTempData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    // 약 수정하러하기
+    suspend fun startEditModeForDrugsOnly(prescriptionId: Long) {
+        isEditMode = true
+        editingPrescriptionId = prescriptionId
+
+        // 약 데이터만 로드
         val drugs = getDrugsList(prescriptionId)
         tempDrugs.clear()
         drugs.forEach { drug ->
@@ -192,27 +224,16 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
             )
         }
     }
-
-// 처방전 수정하고 저장하기
-    fun updatePrescriptionWithDrugs() {
+    // 약만 업뎃
+    fun updateDrugsOnly() {
         viewModelScope.launch {
             try {
-                // 1. 처방전 업데이트
-                val prescription = PrescriptionEntity(
-                    id = editingPrescriptionId,
-                    date = tempDate,
-                    hospital = tempHospital,
-                    department = tempDepartment,
-                    diagnosis = tempDiagnosis,
-                    pharmacy = tempPharmacy
-                )
-                repository.updatePrescription(prescription)
-                // 2. 기존 약품 전체 삭제
+                // 1. 기존 약품 전체 삭제
                 val oldDrugs = getDrugsList(editingPrescriptionId)
                 oldDrugs.forEach { drug ->
                     repository.deleteDrug(drug)
                 }
-                // 3. 새로운 약품 전체 추가
+                // 2. 새로운 약품 전체 추가
                 tempDrugs.forEach { drug ->
                     val drugEntity = DrugEntity(
                         prescriptionId = editingPrescriptionId,
@@ -226,28 +247,28 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                     )
                     repository.insertDrug(drugEntity)
                 }
-                // 4. 수정 모드 종료
                 isEditMode = false
                 editingPrescriptionId = -1L
                 clearTempData()
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    // 약품 추가 모드 플래그
+    // 약 추가 모드 플래그
     var isAddDrugMode: Boolean = false
     var addingToPrescriptionId: Long = -1L
 
-    // 약품추가모드
+    // 약추가모드
     suspend fun startAddDrugMode(prescriptionId: Long) {
         isAddDrugMode = true
         addingToPrescriptionId = prescriptionId
-        // 임시 약품 리스트 초기화
+        // 임시 약 리스트 초기화
         tempDrugs.clear()
     }
-    // 기존 처방전에 약품만 추가하는
+    // 기존 처방전에 약만 추가하는
     fun addDrugToPrescription(drug: TempDrugData) {
         viewModelScope.launch {
             try {
@@ -267,10 +288,26 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                 isAddDrugMode = false
                 addingToPrescriptionId = -1L
             } catch (e: Exception) {
-                android.util.Log.e("DrugAdd", "약품 추가 실패!", e)
                 e.printStackTrace()
             }
         }
+    }
+
+    // 약 수정 모드 플래그
+    var isEditDrugMode: Boolean = false
+    var editingDrugIndex: Int = -1  // tempDrugs 리스트의 인덱스
+
+    fun startEditDrugMode(index: Int) {
+        isEditDrugMode = true
+        editingDrugIndex = index
+    }
+    // 약 수정 저장
+    fun updateDrugInList(drug: TempDrugData) {
+        if (editingDrugIndex >= 0 && editingDrugIndex < tempDrugs.size) {
+            tempDrugs[editingDrugIndex] = drug
+        }
+        isEditDrugMode = false
+        editingDrugIndex = -1
     }
 }
 

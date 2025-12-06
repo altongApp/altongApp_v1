@@ -82,55 +82,52 @@ class PrescriptionFragment : Fragment() {
     }
 
     private fun updateUI(prescriptions: List<PrescriptionEntity>) {
-        lifecycleScope.launch {
-            // 통계 업데이트
-            val totalCount = prescriptions.size
-            binding.tvStatTotal.text = "${totalCount} 건"
-            binding.tvStatTaking.text = "${totalCount} 건"
-            binding.tvListCount.text = "${totalCount}건"
+        // 통계 업데이트
+        val totalCount = prescriptions.size
+        binding.tvStatTotal.text = "${totalCount} 건"
+        binding.tvStatTaking.text = "${totalCount} 건"
+        binding.tvListCount.text = "${totalCount}건"
 
-            // 빈 상태 처리
-            if (prescriptions.isEmpty()) {
-                binding.emptyState.visibility = View.VISIBLE
-                binding.recyclerViewPrescriptions.visibility = View.GONE
-            } else {
-                binding.emptyState.visibility = View.GONE
-                binding.recyclerViewPrescriptions.visibility = View.VISIBLE
+        // 빈 상태 처리
+        if (prescriptions.isEmpty()) {
+            binding.emptyState.visibility = View.VISIBLE
+            binding.recyclerViewPrescriptions.visibility = View.GONE
+        } else {
+            binding.emptyState.visibility = View.GONE
+            binding.recyclerViewPrescriptions.visibility = View.VISIBLE
 
-// 각 처방전의 약 정보를 비동기로 조회
-                val prescriptionsWithDrugs = prescriptions.map { prescription ->
-                    // 먼저 기본 정보로 생성
-                    PrescriptionAdapter.PrescriptionWithDrugs(
-                        prescription = prescription,
-                        drugCount = 0,
-                        drugNames = emptyList()
-                    )
-                }.toMutableList()
+            // 수정: 각 처방전의 약 정보를 LiveData로 관찰
+            val prescriptionsWithDrugsMap = mutableMapOf<Long, PrescriptionAdapter.PrescriptionWithDrugs>()
 
-// 약 정보를 순차적으로 조회하여 업데이트
-                prescriptions.forEachIndexed { index, prescription ->
-                    val drugCount = viewModel.getDrugCount(prescription.id)
+            prescriptions.forEach { prescription ->
+                // 초기값 설정
+                prescriptionsWithDrugsMap[prescription.id] = PrescriptionAdapter.PrescriptionWithDrugs(
+                    prescription = prescription,
+                    drugCount = 0,
+                    drugNames = emptyList()
+                )
 
-                    // LiveData를 관찰하여 약명 가져오기
-                    viewModel.getDrugsByPrescription(prescription.id)
-                        .observe(viewLifecycleOwner) { drugs ->
-                            val drugNames = drugs.take(3).map { it.name }
-
-                            prescriptionsWithDrugs[index] =
-                                PrescriptionAdapter.PrescriptionWithDrugs(
-                                    prescription = prescription,
-                                    drugCount = drugCount,
-                                    drugNames = drugNames
-                                )
-
-                            // 리스트 업데이트
-                            prescriptionAdapter.submitList(prescriptionsWithDrugs.toList())
+                // LiveData로 약 정보 관찰
+                viewModel.getDrugsByPrescription(prescription.id)
+                    .observe(viewLifecycleOwner) { drugs ->
+                        // 약 정보 업데이트
+                        prescriptionsWithDrugsMap[prescription.id] = PrescriptionAdapter.PrescriptionWithDrugs(
+                            prescription = prescription,
+                            drugCount = drugs.size,
+                            drugNames = drugs.take(3).map { it.name }
+                        )
+                        // 전체 리스트 다시 제출
+                        val updatedList = prescriptions.mapNotNull { p ->
+                            prescriptionsWithDrugsMap[p.id]
                         }
-                }
-
-// 초기 리스트 표시
-                prescriptionAdapter.submitList(prescriptionsWithDrugs)
+                        prescriptionAdapter.submitList(updatedList)
+                    }
             }
+            //초기 리스트 표시 (약 정보 없는 상태)
+            val initialList = prescriptions.map { prescription ->
+                prescriptionsWithDrugsMap[prescription.id]!!
+            }
+            prescriptionAdapter.submitList(initialList)
         }
     }
 
@@ -279,7 +276,7 @@ class PrescriptionFragment : Fragment() {
     private fun navigateToAddDrugFromList(prescriptionId: Long) {
         lifecycleScope.launch {
             viewModel.startAddDrugMode(prescriptionId)
-            // 약품 검색 화면으로 이동
+            // 약 검색 화면으로 이동
             val fragment = DrugSearchFragment()
 
             parentFragmentManager.beginTransaction()

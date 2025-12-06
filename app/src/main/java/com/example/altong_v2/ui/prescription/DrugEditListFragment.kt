@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,12 +39,12 @@ class DrugEditListFragment : Fragment() {
     private fun setupRecyclerView() {
         drugEditAdapter = DrugEditAdapter(
             onEditClick = { position ->
-                // TODO: 약품 수정
-                showToast("약품 수정 기능은 다음 단계에서")
+                // 약수정
+                editDrug(position)
             },
             onDeleteClick = { position ->
-                // TODO: 약품 삭제
-                showToast("약품 삭제 기능은 다음 단계에서")
+                // 약삭제
+                deleteDrug(position)
             }
         )
 
@@ -53,12 +54,50 @@ class DrugEditListFragment : Fragment() {
         }
     }
 
+    //약수정 펑션
+    private fun editDrug(position: Int) {
+        // ViewModel에 수정 모드 시작
+        viewModel.startEditDrugMode(position)
+        // 선택한 약 데이터 가져오기
+        val drug = viewModel.tempDrugs[position]
+        // DrugDetailFragment로 이동 (수정 모드)
+        val fragment = DrugDetailFragment.newInstance(
+            drugName = drug.name,
+            drugDescription = ""  // 설명은 필요 없음
+        )
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+    // 약삭제 펑션
+    private fun deleteDrug(position: Int) {
+        val drugName = viewModel.tempDrugs[position].name
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("약품 삭제")
+            .setMessage("'${drugName}'을(를) 삭제하시겠습니까?")
+            .setPositiveButton("삭제") { _, _ ->
+                // 리스트에서 삭제
+                viewModel.tempDrugs.removeAt(position)
+
+                // UI 업데이트
+                loadDrugs()
+
+                showToast("약품이 삭제되었습니다")
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+
     private fun setupClickListeners() {
         // 뒤로가기
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
-        // 약품 추가
+        // 약 추가
         binding.btnAddDrug.setOnClickListener {
             navigateToAddDrug()
         }
@@ -91,15 +130,24 @@ class DrugEditListFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-    // 처방전 수정 저장
+    // 처방전 수정 저장이였던.. 약 수정 저장
     private fun savePrescription() {
-        viewModel.updatePrescriptionWithDrugs()
-        showToast("처방전이 수정되었습니다")
-        // 상세 화면으로 돌아가기
-        parentFragmentManager.popBackStack(
-            null,
-            androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
+        // 약이 0개일때
+        if (viewModel.tempDrugs.isEmpty()) {
+            AlertDialog.Builder(requireContext())
+                .setTitle("약품 없음")
+                .setMessage("등록된 약품이 없습니다.\n약품을 추가하시겠습니까?")
+                .setPositiveButton("추가") { _, _ ->
+                    navigateToAddDrug()
+                }
+                .setNegativeButton("취소", null)
+                .show()
+            return
+        }
+
+        viewModel.updateDrugsOnly()
+        showToast("약품이 수정되었습니다")
+        parentFragmentManager.popBackStack()
     }
 
     private fun showToast(message: String) {
