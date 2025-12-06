@@ -82,4 +82,7 @@ dependencies {
 
     // WorkManager (알림용)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Glide (이미지 로딩)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

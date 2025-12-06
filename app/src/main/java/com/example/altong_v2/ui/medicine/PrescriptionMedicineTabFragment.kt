@@ -91,9 +91,21 @@ class PrescriptionMedicineTabFragment : Fragment() {
      */
     private fun setupFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
-            // 찜 목록 화면으로 이동
-            // TODO: FavoriteMedicineFragment로 이동 (type = "prescription")
+            // 찜 목록 화면으로 이동 (병원약 탭으로)
+            navigateToFavoriteList()
         }
+    }
+
+    /**
+     * 찜 목록 화면으로 이동
+     */
+    private fun navigateToFavoriteList() {
+        val fragment = FavoriteMedicineFragment.newInstance()
+
+        parentFragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**

@@ -268,6 +268,20 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     // ========== 찜 기능 관련 ==========
 
     /**
+     * 약품 ID로 일반의약품 조회
+     */
+    suspend fun getMedicineById(medicineId: String): Medicine? {
+        return repository.getMedicineById(medicineId)
+    }
+
+    /**
+     * 약품 ID로 전문의약품 조회
+     */
+    suspend fun getPrescriptionMedicineById(medicineId: String): PrescriptionMedicine? {
+        return repository.getPrescriptionMedicineById(medicineId)
+    }
+
+    /**
      * 찜 여부 확인
      */
     suspend fun isFavorite(medicineId: String): Boolean {

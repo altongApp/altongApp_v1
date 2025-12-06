@@ -6,96 +6,84 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
-import com.example.altong_v2.data.model.MedicineCategory
+import com.example.altong_v2.databinding.FragmentCategoryMedicineListBinding
 
 /**
- * 일반의약품 탭 Fragment
- * 카테고리 그리드 + 약품 리스트
+ * 카테고리별 약품 리스트 Fragment
+ * 선택한 카테고리에 속하는 일반의약품만 표시
  */
-class GeneralMedicineTabFragment : Fragment() {
+class CategoryMedicineListFragment : Fragment() {
 
-    private var _binding: FragmentGeneralMedicineTabBinding? = null
+    private var _binding: FragmentCategoryMedicineListBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: MedicineViewModel
+    private var categoryName: String = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Arguments로 전달받은 카테고리명
+        categoryName = arguments?.getString(ARG_CATEGORY) ?: ""
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentGeneralMedicineTabBinding.inflate(inflater, container, false)
+        _binding = FragmentCategoryMedicineListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 부모 Fragment의 ViewModel 공유
-        viewModel = ViewModelProvider(requireParentFragment())[MedicineViewModel::class.java]
+        // 부모 Activity의 ViewModel 공유
+        viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
 
-        setupCategoryGrid()
+        setupToolbar()
         setupMedicineList()
         observeViewModel()
 
-        // 초기 데이터 로드
-        viewModel.loadGeneralMedicines()
+        // 카테고리별 약품 로드
+        viewModel.loadMedicinesByCategory(categoryName)
     }
 
     /**
-     * 카테고리 그리드 설정
+     * 툴바 설정 (뒤로가기 + 카테고리명)
      */
-    private fun setupCategoryGrid() {
-        val categoryAdapter = CategoryAdapter { category: String ->
-            // 카테고리 클릭 시 해당 카테고리 약품 목록 화면으로 이동
-            navigateToCategoryList(category)
+    private fun setupToolbar() {
+        binding.toolbar.apply {
+            title = categoryName
+            setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
         }
-
-        binding.categoryRecyclerView.apply {
-            layoutManager = GridLayoutManager(requireContext(), 3)
-            adapter = categoryAdapter
-        }
-
-        // 카테고리 데이터 설정
-        categoryAdapter.submitList(MedicineCategory.ALL_CATEGORIES)
-    }
-
-    /**
-     * 카테고리별 약품 리스트 화면으로 이동
-     */
-    private fun navigateToCategoryList(category: String) {
-        val fragment = CategoryMedicineListFragment.newInstance(category)
-
-        parentFragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment)
-            .addToBackStack(null)
-            .commit()
     }
 
     /**
      * 약품 리스트 설정
      */
     private fun setupMedicineList() {
-        val medicineAdapter = MedicineAdapter(
+        val adapter = MedicineAdapter(
             onItemClick = { medicine ->
-                // 약품 클릭 시 상세 화면으로 이동
+                // 약품 상세 화면으로 이동
                 // TODO: MedicineDetailFragment로 이동
             },
             onFavoriteClick = { medicine ->
-                // 찜 버튼 클릭
                 viewModel.addFavorite(medicine)
             }
         )
 
         binding.medicineRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = medicineAdapter
+            this.adapter = adapter
 
-            // 페이지네이션: 스크롤 리스너 추가
+            // 페이지네이션 스크롤 리스너
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
@@ -105,14 +93,12 @@ class GeneralMedicineTabFragment : Fragment() {
                     val totalItemCount = layoutManager.itemCount
                     val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                    // 스크롤이 끝에 가까워지면 다음 페이지 로드
+                    // 끝에 가까워지면 다음 페이지 로드
                     if (!viewModel.isLoadingGeneral.value!! &&
                         (visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5 &&
                         firstVisibleItemPosition >= 0) {
 
-                        // 현재 상태에 따라 적절한 로딩 함수 호출
-                        // TODO: 카테고리 필터 상태 추적 필요
-                        viewModel.loadMoreGeneralMedicines()
+                        viewModel.loadMoreMedicinesByCategory(categoryName)
                     }
                 }
             })
@@ -123,27 +109,47 @@ class GeneralMedicineTabFragment : Fragment() {
      * ViewModel 관찰
      */
     private fun observeViewModel() {
-        // 일반의약품 리스트 관찰
+        // 약품 리스트 관찰
         viewModel.generalMedicines.observe(viewLifecycleOwner) { medicines ->
             val adapter = binding.medicineRecyclerView.adapter as? MedicineAdapter
             adapter?.submitList(medicines)
+
+            // 결과 개수 표시
+            binding.resultCount.text = "총 ${medicines.size}개"
+
+            // 빈 화면 처리
+            if (medicines.isEmpty()) {
+                binding.emptyView.visibility = View.VISIBLE
+                binding.medicineRecyclerView.visibility = View.GONE
+            } else {
+                binding.emptyView.visibility = View.GONE
+                binding.medicineRecyclerView.visibility = View.VISIBLE
+            }
         }
 
         // 로딩 상태 관찰
         viewModel.isLoadingGeneral.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
-
-        // 에러 메시지 관찰
-        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
-            message?.let {
-                // TODO: Snackbar 또는 Toast로 에러 표시
-            }
-        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val ARG_CATEGORY = "category"
+
+        /**
+         * Fragment 생성 (Bundle로 카테고리 전달)
+         */
+        fun newInstance(category: String): CategoryMedicineListFragment {
+            return CategoryMedicineListFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_CATEGORY, category)
+                }
+            }
+        }
     }
 }
