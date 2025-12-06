@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_cream">
 
-    <!-- 툴바 (뒤로가기 + 카테고리명) -->
+    <!-- 툴바 -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"

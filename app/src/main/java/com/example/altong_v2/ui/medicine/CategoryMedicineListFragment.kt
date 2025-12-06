@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.databinding.FragmentCategoryMedicineListBinding
@@ -60,7 +58,7 @@ class CategoryMedicineListFragment : Fragment() {
         binding.toolbar.apply {
             title = categoryName
             setNavigationOnClickListener {
-                findNavController().navigateUp()
+                parentFragmentManager.popBackStack()
             }
         }
     }

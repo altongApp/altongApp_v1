@@ -22,9 +22,16 @@ data class FavoriteMedicineEntity(
     @ColumnInfo(name = "medicine_id")
     val medicineId: String,          // Firebase의 약품 ID
 
-    val name: String,                // 약품명
-    val company: String,             // 제조사
-    val type: String,                // 약품 유형(일반의약품 or 전문의약품)
+    @ColumnInfo(name = "medicine_name")
+    val medicineName: String,        // 약품명
+
+    val manufacturer: String,        // 제조사
+
+    @ColumnInfo(name = "medicine_type")
+    val medicineType: String,        // 약품 유형 ("otc" or "prescription")
+
+    @ColumnInfo(name = "image_url")
+    val imageUrl: String = "",       // 이미지 URL
 
     // 개인 메모
     val memo: String? = null,
@@ -32,7 +39,3 @@ data class FavoriteMedicineEntity(
     @ColumnInfo(name = "created_at")
     val createdAt: Long = System.currentTimeMillis()
 )
-
-
-
-

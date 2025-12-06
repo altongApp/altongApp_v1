@@ -296,9 +296,10 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
             try {
                 val favorite = FavoriteMedicineEntity(
                     medicineId = medicine.medicine_id,
-                    name = medicine.medicine_name,
-                    company = medicine.manufacturer,
-                    type = "otc"  // 일반의약품
+                    medicineName = medicine.medicine_name,
+                    manufacturer = medicine.manufacturer,
+                    medicineType = "otc",  // 일반의약품
+                    imageUrl = medicine.image_url ?: ""
                 )
                 repository.addFavorite(favorite)
                 Log.d(TAG, "찜 추가: ${medicine.medicine_name}")
@@ -317,9 +318,10 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
             try {
                 val favorite = FavoriteMedicineEntity(
                     medicineId = medicine.medicine_id,
-                    name = medicine.medicine_name,
-                    company = medicine.manufacturer,
-                    type = "prescription"  // 전문의약품
+                    medicineName = medicine.medicine_name,
+                    manufacturer = medicine.manufacturer,
+                    medicineType = "prescription",  // 전문의약품
+                    imageUrl = medicine.image_url ?: ""
                 )
                 repository.addFavorite(favorite)
                 Log.d(TAG, "찜 추가: ${medicine.medicine_name}")

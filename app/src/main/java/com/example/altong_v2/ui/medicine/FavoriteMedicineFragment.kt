@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.altong_v2.databinding.FragmentFavoriteMedicineBinding
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.launch
 
 /**
  * 찜 목록 Fragment

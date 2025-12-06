@@ -34,7 +34,7 @@ interface FavoriteMedicineDao {
     fun getAllFavorites(): Flow<List<FavoriteMedicineEntity>>
 
     // 타입별 찜 목록 조회 (일반의약품 or 전문의약품)
-    @Query("SELECT * FROM favorite_medicines WHERE type = :type ORDER BY created_at DESC")
+    @Query("SELECT * FROM favorite_medicines WHERE medicine_type = :type ORDER BY created_at DESC")
     fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>>
 
     // 약품 ID로 찜 조회
@@ -57,7 +57,3 @@ interface FavoriteMedicineDao {
     @Query("SELECT COUNT(*) FROM favorite_medicines")
     suspend fun getCount(): Int
 }
-
-
-
-
