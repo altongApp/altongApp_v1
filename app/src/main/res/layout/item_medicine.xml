@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -9,39 +10,67 @@
     app:cardElevation="4dp"
     android:foreground="?attr/selectableItemBackground">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- 약품 이미지 -->
+        <ImageView
+            android:id="@+id/medicine_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/medicine_image_placeholder"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:src="@drawable/medicine_image_placeholder" />
+
+        <!-- 약품명 -->
         <TextView
             android:id="@+id/medicine_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="약품명"
+            android:layout_marginStart="12dp"
+            android:text="타이레놀정 500mg"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/text_primary" />
+            android:textColor="@color/text_primary"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@id/medicine_image"
+            app:layout_constraintStart_toEndOf="@id/medicine_image"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- 제조사 -->
         <TextView
             android:id="@+id/medicine_company"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="제조사"
+            android:layout_marginTop="4dp"
+            android:text="존슨앤드존슨"
             android:textSize="13sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginTop="4dp" />
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@id/medicine_name"
+            app:layout_constraintStart_toStartOf="@id/medicine_name"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- 효능/효과 -->
         <TextView
             android:id="@+id/medicine_efficacy"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="효능/효과"
+            android:layout_marginTop="12dp"
+            android:text="두통, 발열, 근육통 등의 완화"
             android:textSize="13sp"
             android:textColor="@color/text_secondary"
-            android:layout_marginTop="8dp"
             android:maxLines="2"
-            android:ellipsize="end" />
-    </LinearLayout>
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@id/medicine_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

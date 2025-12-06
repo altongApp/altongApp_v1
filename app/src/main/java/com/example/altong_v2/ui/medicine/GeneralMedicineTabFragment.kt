@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
 import com.example.altong_v2.data.model.MedicineCategory
 
@@ -81,6 +82,28 @@ class GeneralMedicineTabFragment : Fragment() {
         binding.medicineRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = medicineAdapter
+
+            // 페이지네이션: 스크롤 리스너 추가
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                    // 스크롤이 끝에 가까워지면 다음 페이지 로드
+                    if (!viewModel.isLoadingGeneral.value!! &&
+                        (visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5 &&
+                        firstVisibleItemPosition >= 0) {
+
+                        // 현재 상태에 따라 적절한 로딩 함수 호출
+                        // TODO: 카테고리 필터 상태 추적 필요
+                        viewModel.loadMoreGeneralMedicines()
+                    }
+                }
+            })
         }
     }
 

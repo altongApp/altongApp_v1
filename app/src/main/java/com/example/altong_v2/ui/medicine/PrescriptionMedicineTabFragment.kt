@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.databinding.FragmentPrescriptionMedicineTabBinding
 
 /**
@@ -61,6 +62,27 @@ class PrescriptionMedicineTabFragment : Fragment() {
         binding.medicineRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = adapter
+
+            // 페이지네이션: 스크롤 리스너 추가
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+                    // 스크롤이 끝에 가까워지면 다음 페이지 로드
+                    // 마지막 5개 아이템이 보이면 다음 페이지를 미리 로드
+                    if (!viewModel.isLoadingPrescription.value!! &&
+                        (visibleItemCount + firstVisibleItemPosition) >= totalItemCount - 5 &&
+                        firstVisibleItemPosition >= 0) {
+
+                        viewModel.loadMorePrescriptionMedicines()
+                    }
+                }
+            })
         }
     }
 
