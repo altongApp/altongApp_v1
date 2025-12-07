@@ -50,6 +50,12 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      * 일반의약품 목록 로드 (첫 페이지)
      */
     fun loadGeneralMedicines() {
+        // 이미 로딩 중이면 무시
+        if (_isLoadingGeneral.value == true) {
+            Log.d(TAG, "⚠️ 이미 로딩 중 - 중복 요청 무시")
+            return
+        }
+
         viewModelScope.launch {
             try {
                 _isLoadingGeneral.value = true
@@ -74,6 +80,9 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      */
     fun loadMoreGeneralMedicines() {
         if (_isLoadingGeneral.value == true) return  // 이미 로딩 중이면 무시
+
+        // 비동기 시작 전에 즉시 로딩 상태 변경 - 안 할 경우 무한로딩...
+        _isLoadingGeneral.value = true
 
         viewModelScope.launch {
             try {
@@ -216,6 +225,9 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      */
     fun loadMorePrescriptionMedicines() {
         if (_isLoadingPrescription.value == true) return
+
+        // 비동기 시작 전에 즉시 로딩 상태 변경 - 안 할 경우 무한로딩...
+        _isLoadingGeneral.value = true
 
         viewModelScope.launch {
             try {

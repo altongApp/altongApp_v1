@@ -29,7 +29,7 @@ class MedicineRepository(
 
     // ========== Firebase 일반의약품 조회 ==========
 
-    /**
+    /** 제미니제미니
      * 일반의약품 목록 조회 (페이지네이션)
      * @param lastDocument 마지막 문서 (다음 페이지 로드용)
      * @return Pair<약품 리스트, 마지막 문서>
@@ -41,7 +41,6 @@ class MedicineRepository(
             Log.d(TAG, "🔍 일반의약품 Firebase 쿼리 시작...")
 
             var query: Query = firestore.collection(COLLECTION_MEDICINES)
-                // medicine_type 필드가 Firebase에 없으므로 조건 제거
                 .orderBy("medicine_name")
                 .limit(PAGE_SIZE.toLong())
 
@@ -50,26 +49,39 @@ class MedicineRepository(
                 query = query.startAfter(lastDocument)
             }
 
-            Log.d(TAG, "📡 Firebase 데이터 요청 중...")
+            Log.d(TAG, "📡 Firebase 데이터 요청 보냄... (응답 대기 중)")
+
+            // 1. 여기서 멈추는지 확인
             val snapshot = query.get().await()
 
-            Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+            Log.d(TAG, "📦 [디버그] 응답 도착! 문서 개수: ${snapshot.documents.size}")
 
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
-                    Log.d(TAG, "✅ 문서 파싱: ${doc.id}")
-                    doc.toObject(Medicine::class.java)
+                    // 2. 파싱 직전 로그
+                    Log.d(TAG, "👉 [디버그] 파싱 시도 ID: ${doc.id}")
+
+                    // 3. 가장 의심되는 'categories' 필드의 실체 확인 (타입이 뭔지 찍어봄)
+                    val rawCats = doc.get("categories")
+                    Log.d(TAG, "🧐 [디버그] categories 값: $rawCats / 타입: ${rawCats?.javaClass?.simpleName}")
+
+                    // 4. 객체 변환 시도
+                    val parsed = doc.toObject(Medicine::class.java)
+                    Log.d(TAG, "✅ [디버그] 파싱 성공: ${parsed?.medicine_name}")
+                    parsed
                 } catch (e: Exception) {
-                    Log.e(TAG, "❌ 파싱 실패: ${doc.id}", e)
+                    // 5. 에러 발생 시 빨간 로그 출력
+                    Log.e(TAG, "❌ [디버그] 파싱 대실패!!! ID: ${doc.id} / 에러: ${e.message}", e)
                     null
                 }
             }
 
-            Log.d(TAG, "🎉 최종 약품 개수: ${medicines.size}")
+            Log.d(TAG, "🎉 최종 리스트에 담긴 약품 개수: ${medicines.size}")
             val last = snapshot.documents.lastOrNull()
             Pair(medicines, last)
         } catch (e: Exception) {
-            Log.e(TAG, "💥 Firebase 에러!!!", e)
+            // 6. 아예 통신 자체가 실패했을 때
+            Log.e(TAG, "💥 [디버그] Firebase 통신 자체 에러!!!", e)
             Pair(emptyList(), null)
         }
     }

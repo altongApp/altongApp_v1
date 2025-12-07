@@ -1,6 +1,7 @@
 package com.example.altong_v2.ui.medicine
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,7 +34,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ViewModel 초기화 (Activity 레벨)
+        // ViewModel 초기화 (Acti₩vity 레벨)
         viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
 
         android.util.Log.d("PrescriptionMedicineTab", "Fragment onViewCreated")
@@ -42,9 +43,15 @@ class PrescriptionMedicineTabFragment : Fragment() {
         setupFavoriteButton()
         observeViewModel()
 
-        // 초기 데이터 로드
-        android.util.Log.d("PrescriptionMedicineTab", "Loading prescription medicines...")
-        viewModel.loadPrescriptionMedicines()
+        // 초기 데이터 로드 (데이터가 없을 때만)
+        Log.d("PrescriptionMedicineTab", "현재 약품 개수: ${viewModel.prescriptionMedicines.value?.size ?: 0}")
+
+        if (viewModel.prescriptionMedicines.value.isNullOrEmpty()) {
+            Log.d("PrescriptionMedicineTab", "데이터 없음 - Firebase 로드 시작")
+            viewModel.loadPrescriptionMedicines()
+        } else {
+            Log.d("PrescriptionMedicineTab", "데이터 이미 있음 - 로드 스킵")
+        }
     }
 
     /**
