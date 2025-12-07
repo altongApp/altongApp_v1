@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
 import com.example.altong_v2.data.model.MedicineCategory
+import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
 
 /**
  * 일반의약품 탭 Fragment
@@ -35,14 +35,17 @@ class GeneralMedicineTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 부모 Fragment의 ViewModel 공유
-        viewModel = ViewModelProvider(requireParentFragment())[MedicineViewModel::class.java]
+        // ViewModel 초기화 (Activity 레벨)
+        viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
+
+        android.util.Log.d("GeneralMedicineTab", "Fragment onViewCreated")
 
         setupCategoryGrid()
         setupMedicineList()
         observeViewModel()
 
         // 초기 데이터 로드
+        android.util.Log.d("GeneralMedicineTab", "Loading general medicines...")
         viewModel.loadGeneralMedicines()
     }
 
@@ -50,6 +53,9 @@ class GeneralMedicineTabFragment : Fragment() {
      * 카테고리 그리드 설정
      */
     private fun setupCategoryGrid() {
+        android.util.Log.d("GeneralMedicineTab", "🎨 setupCategoryGrid 호출됨!")
+        android.util.Log.d("GeneralMedicineTab", "📦 카테고리 개수: ${MedicineCategory.ALL_CATEGORIES.size}")
+
         val categoryAdapter = CategoryAdapter { category: String ->
             // 카테고리 클릭 시 해당 카테고리 약품 목록 화면으로 이동
             navigateToCategoryList(category)
@@ -125,18 +131,21 @@ class GeneralMedicineTabFragment : Fragment() {
     private fun observeViewModel() {
         // 일반의약품 리스트 관찰
         viewModel.generalMedicines.observe(viewLifecycleOwner) { medicines ->
+            android.util.Log.d("GeneralMedicineTab", "Medicines received: ${medicines.size}")
             val adapter = binding.medicineRecyclerView.adapter as? MedicineAdapter
             adapter?.submitList(medicines)
         }
 
         // 로딩 상태 관찰
         viewModel.isLoadingGeneral.observe(viewLifecycleOwner) { isLoading ->
+            android.util.Log.d("GeneralMedicineTab", "Loading: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
 
         // 에러 메시지 관찰
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
+                android.util.Log.e("GeneralMedicineTab", "Error: $it")
                 // TODO: Snackbar 또는 Toast로 에러 표시
             }
         }

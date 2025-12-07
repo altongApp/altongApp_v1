@@ -38,8 +38,10 @@ class MedicineRepository(
         lastDocument: DocumentSnapshot? = null
     ): Pair<List<Medicine>, DocumentSnapshot?> {
         return try {
+            Log.d(TAG, "🔍 일반의약품 Firebase 쿼리 시작...")
+
             var query: Query = firestore.collection(COLLECTION_MEDICINES)
-                .whereEqualTo("medicine_type", "otc")
+                // medicine_type 필드가 Firebase에 없으므로 조건 제거
                 .orderBy("medicine_name")
                 .limit(PAGE_SIZE.toLong())
 
@@ -48,20 +50,26 @@ class MedicineRepository(
                 query = query.startAfter(lastDocument)
             }
 
+            Log.d(TAG, "📡 Firebase 데이터 요청 중...")
             val snapshot = query.get().await()
+
+            Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
+                    Log.d(TAG, "✅ 문서 파싱: ${doc.id}")
                     doc.toObject(Medicine::class.java)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing medicine: ${doc.id}", e)
+                    Log.e(TAG, "❌ 파싱 실패: ${doc.id}", e)
                     null
                 }
             }
 
+            Log.d(TAG, "🎉 최종 약품 개수: ${medicines.size}")
             val last = snapshot.documents.lastOrNull()
             Pair(medicines, last)
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting general medicines", e)
+            Log.e(TAG, "💥 Firebase 에러!!!", e)
             Pair(emptyList(), null)
         }
     }
@@ -75,8 +83,9 @@ class MedicineRepository(
         lastDocument: DocumentSnapshot? = null
     ): Pair<List<Medicine>, DocumentSnapshot?> {
         return try {
+            Log.d(TAG, "🔍 카테고리 검색: $category")
+
             var query: Query = firestore.collection(COLLECTION_MEDICINES)
-                .whereEqualTo("medicine_type", "otc")
                 .whereArrayContains("categories", category)
                 .orderBy("medicine_name")
                 .limit(PAGE_SIZE.toLong())
@@ -111,11 +120,11 @@ class MedicineRepository(
         lastDocument: DocumentSnapshot? = null
     ): Pair<List<Medicine>, DocumentSnapshot?> {
         return try {
+            Log.d(TAG, "🔍 검색 쿼리: $query")
+
             // Firestore는 부분 문자열 검색 불가능
-            // 전체 데이터를 가져와서 클라이언트에서 필터링하는 방식 사용
-            // 또는 검색어 시작 문자로 범위 검색
+            // 검색어 시작 문자로 범위 검색
             var firestoreQuery: Query = firestore.collection(COLLECTION_MEDICINES)
-                .whereEqualTo("medicine_type", "otc")
                 .orderBy("medicine_name")
                 .startAt(query)
                 .endAt(query + "\uf8ff")
@@ -125,7 +134,11 @@ class MedicineRepository(
                 firestoreQuery = firestoreQuery.startAfter(lastDocument)
             }
 
+            Log.d(TAG, "📡 검색 데이터 요청 중...")
             val snapshot = firestoreQuery.get().await()
+
+            Log.d(TAG, "📦 검색 결과: ${snapshot.documents.size}개")
+
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
                     doc.toObject(Medicine::class.java)
@@ -152,8 +165,9 @@ class MedicineRepository(
         lastDocument: DocumentSnapshot? = null
     ): Pair<List<PrescriptionMedicine>, DocumentSnapshot?> {
         return try {
+            Log.d(TAG, "🔍 전문의약품 Firebase 쿼리 시작...")
+
             var query: Query = firestore.collection(COLLECTION_PRESCRIPTION)
-                .whereEqualTo("medicine_type", "prescription")
                 .orderBy("medicine_name")
                 .limit(PAGE_SIZE.toLong())
 
@@ -161,15 +175,22 @@ class MedicineRepository(
                 query = query.startAfter(lastDocument)
             }
 
+            Log.d(TAG, "📡 전문의약품 데이터 요청 중...")
             val snapshot = query.get().await()
+
+            Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
+                    Log.d(TAG, "✅ 문서 파싱: ${doc.id}")
                     doc.toObject(PrescriptionMedicine::class.java)
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing prescription medicine: ${doc.id}", e)
+                    Log.e(TAG, "❌ 파싱 실패: ${doc.id}", e)
                     null
                 }
             }
+
+            Log.d(TAG, "🎉 최종 약품 개수: ${medicines.size}")
 
             val last = snapshot.documents.lastOrNull()
             Pair(medicines, last)
@@ -187,8 +208,9 @@ class MedicineRepository(
         lastDocument: DocumentSnapshot? = null
     ): Pair<List<PrescriptionMedicine>, DocumentSnapshot?> {
         return try {
+            Log.d(TAG, "🔍 전문의약품 검색 쿼리: $query")
+
             var firestoreQuery: Query = firestore.collection(COLLECTION_PRESCRIPTION)
-                .whereEqualTo("medicine_type", "prescription")
                 .orderBy("medicine_name")
                 .startAt(query)
                 .endAt(query + "\uf8ff")
@@ -198,7 +220,11 @@ class MedicineRepository(
                 firestoreQuery = firestoreQuery.startAfter(lastDocument)
             }
 
+            Log.d(TAG, "📡 전문의약품 검색 데이터 요청 중...")
             val snapshot = firestoreQuery.get().await()
+
+            Log.d(TAG, "📦 검색 결과: ${snapshot.documents.size}개")
+
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
                     doc.toObject(PrescriptionMedicine::class.java)

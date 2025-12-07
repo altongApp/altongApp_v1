@@ -33,14 +33,17 @@ class PrescriptionMedicineTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 부모 Fragment의 ViewModel 공유
-        viewModel = ViewModelProvider(requireParentFragment())[MedicineViewModel::class.java]
+        // ViewModel 초기화 (Activity 레벨)
+        viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
+
+        android.util.Log.d("PrescriptionMedicineTab", "Fragment onViewCreated")
 
         setupMedicineList()
         setupFavoriteButton()
         observeViewModel()
 
         // 초기 데이터 로드
+        android.util.Log.d("PrescriptionMedicineTab", "Loading prescription medicines...")
         viewModel.loadPrescriptionMedicines()
     }
 
@@ -114,18 +117,21 @@ class PrescriptionMedicineTabFragment : Fragment() {
     private fun observeViewModel() {
         // 전문의약품 리스트 관찰
         viewModel.prescriptionMedicines.observe(viewLifecycleOwner) { medicines ->
+            android.util.Log.d("PrescriptionMedicineTab", "Medicines received: ${medicines.size}")
             val adapter = binding.medicineRecyclerView.adapter as? PrescriptionMedicineAdapter
             adapter?.submitList(medicines)
         }
 
         // 로딩 상태 관찰
         viewModel.isLoadingPrescription.observe(viewLifecycleOwner) { isLoading ->
+            android.util.Log.d("PrescriptionMedicineTab", "Loading: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         }
 
         // 에러 메시지 관찰
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
+                android.util.Log.e("PrescriptionMedicineTab", "Error: $it")
                 // TODO: Snackbar 또는 Toast로 에러 표시
             }
         }
