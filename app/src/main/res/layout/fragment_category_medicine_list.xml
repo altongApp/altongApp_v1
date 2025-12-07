@@ -7,17 +7,31 @@
     android:background="@color/background_cream">
 
     <!-- 툴바 -->
+<!--    뒤로가기가 넘 높아서!-->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="56dp"
         android:background="@color/white"
         android:elevation="4dp"
+        android:fitsSystemWindows="true"
         app:navigationIcon="@drawable/ic_back"
         app:titleTextColor="@color/text_primary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+<!--    <com.google.android.material.appbar.MaterialToolbar-->
+<!--        android:id="@+id/toolbar"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="@color/white"-->
+<!--        android:elevation="4dp"-->
+<!--        app:navigationIcon="@drawable/ic_back"-->
+<!--        app:titleTextColor="@color/text_primary"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
     <!-- 결과 개수 -->
     <TextView

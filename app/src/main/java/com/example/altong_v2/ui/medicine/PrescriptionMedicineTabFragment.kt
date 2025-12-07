@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentPrescriptionMedicineTabBinding
 
 /**
@@ -112,8 +113,8 @@ class PrescriptionMedicineTabFragment : Fragment() {
     private fun navigateToFavoriteList() {
         val fragment = FavoriteMedicineFragment.newInstance()
 
-        parentFragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
     }

@@ -8,8 +8,14 @@ import com.example.altong_v2.data.model.PrescriptionMedicine
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+// 카테고리 재시도 추가 import
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.delay
+
 
 /**
  * 약품 검색 Repository
@@ -90,15 +96,19 @@ class MedicineRepository(
      * 카테고리별 일반의약품 조회
      * @param category 카테고리명 (예: "감기/호흡기")
      */
+    // rhkd과연
     suspend fun getMedicinesByCategory(
         category: String,
         lastDocument: DocumentSnapshot? = null
-    ): Pair<List<Medicine>, DocumentSnapshot?> {
-        return try {
+    ): Pair<List<Medicine>, DocumentSnapshot?> = coroutineScope {
+        try {
             Log.d(TAG, "🔍 카테고리 검색: $category")
 
+            // ⭐ 작은따옴표 포함해서 쿼리
+            val categoryWithQuotes = "'$category'"
+
             var query: Query = firestore.collection(COLLECTION_MEDICINES)
-                .whereArrayContains("categories", category)
+                .whereArrayContains("categories", categoryWithQuotes)  // ← 작은따옴표 포함!
                 .orderBy("medicine_name")
                 .limit(PAGE_SIZE.toLong())
 
@@ -107,22 +117,191 @@ class MedicineRepository(
             }
 
             val snapshot = query.get().await()
+
+            Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+
             val medicines = snapshot.documents.mapNotNull { doc ->
                 try {
-                    doc.toObject(Medicine::class.java)
+                    val medicine = doc.toObject(Medicine::class.java)
+
+                    // 파싱 시 작은따옴표 제거
+                    medicine?.copy(
+                        categories = medicine.categories.map { cat ->
+                            cat.trim().trim('\'').trim('"')
+                        }
+                    )
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error parsing medicine by category: ${doc.id}", e)
                     null
                 }
             }
 
-            val last = snapshot.documents.lastOrNull()
-            Pair(medicines, last)
+            Pair(medicines, snapshot.documents.lastOrNull())
+
         } catch (e: Exception) {
-            Log.e(TAG, "Error getting medicines by category: $category", e)
+            Log.e(TAG, "에러", e)
             Pair(emptyList(), null)
         }
     }
+
+    // 애뮬레이터 네트워크 문제라면서 재시도 코드 추가한 거
+//    suspend fun getMedicinesByCategory(
+//        category: String,
+//        lastDocument: DocumentSnapshot? = null,
+//        retryCount: Int = 3
+//    ): Pair<List<Medicine>, DocumentSnapshot?> = coroutineScope {
+//        var attempt = 0
+//        var lastException: Exception? = null
+//
+//        while (attempt < retryCount) {
+//            try {
+//                Log.d(TAG, "🔍 카테고리 검색 (시도 ${attempt + 1}/$retryCount): $category")
+//
+//                var query: Query = firestore.collection(COLLECTION_MEDICINES)
+//                    .whereArrayContains("categories", category)
+//                    .orderBy("medicine_name")
+//                    .limit(PAGE_SIZE.toLong())
+//
+//                if (lastDocument != null) {
+//                    query = query.startAfter(lastDocument)
+//                }
+//
+//                Log.d(TAG, "📡 Firebase 쿼리 시작...")
+//
+//                // 타임아웃 설정 (10초)
+//                val snapshot = withTimeout(10000) {
+//                    query.get().await()
+//                }
+//
+//                Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+//
+//                if (snapshot.documents.isNotEmpty()) {
+//                    val firstDoc = snapshot.documents[0]
+//                    val categories = firstDoc.get("categories")
+//                    Log.d(TAG, "🧐 첫 문서의 categories: $categories")
+//                }
+//
+//                val medicines = snapshot.documents.mapNotNull { doc ->
+//                    try {
+//                        doc.toObject(Medicine::class.java)
+//                    } catch (e: Exception) {
+//                        Log.e(TAG, "❌ 파싱 실패: ${doc.id}", e)
+//                        null
+//                    }
+//                }
+//
+//                Log.d(TAG, "✅ 최종 약품 개수: ${medicines.size}")
+//                val last = snapshot.documents.lastOrNull()
+//
+//                return@coroutineScope Pair(medicines, last)
+//
+//            } catch (e: TimeoutCancellationException) {
+//                Log.w(TAG, "⏰ 타임아웃 (시도 ${attempt + 1}/$retryCount)")
+//                lastException = e
+//                attempt++
+//                if (attempt < retryCount) {
+//                    delay(1000L * attempt)  // ← 이제 작동!
+//                }
+//
+//            } catch (e: Exception) {
+//                Log.e(TAG, "💥 카테고리 검색 에러 (시도 ${attempt + 1}/$retryCount): $category", e)
+//                lastException = e
+//
+//                // 네트워크 에러면 재시도
+//                if (e.message?.contains("Unable to resolve host") == true ||
+//                    e.message?.contains("UNAVAILABLE") == true) {
+//                    attempt++
+//                    if (attempt < retryCount) {
+//                        delay(1000L * attempt)  // ← 이제 작동!
+//                    }
+//                } else {
+//                    // 다른 에러는 즉시 실패
+//                    return@coroutineScope Pair(emptyList(), null)
+//                }
+//            }
+//        }
+//
+//        Log.e(TAG, "❌ 최대 재시도 횟수 초과", lastException)
+//        Pair(emptyList(), null)
+//    }
+    // 로그 추가버전, 아래에 주석처리된건 로그 없는 거
+//    suspend fun getMedicinesByCategory(
+//        category: String,
+//        lastDocument: DocumentSnapshot? = null
+//    ): Pair<List<Medicine>, DocumentSnapshot?> {
+//        return try {
+//            Log.d(TAG, "🔍 카테고리 검색: $category")
+//
+//            var query: Query = firestore.collection(COLLECTION_MEDICINES)
+//                .whereArrayContains("categories", category)
+//                .orderBy("medicine_name")
+//                .limit(PAGE_SIZE.toLong())
+//
+//            if (lastDocument != null) {
+//                query = query.startAfter(lastDocument)
+//            }
+//
+//            Log.d(TAG, "📡 Firebase 쿼리 시작...")
+//            val snapshot = query.get().await()
+//
+//            Log.d(TAG, "📦 받은 문서 개수: ${snapshot.documents.size}")
+//
+//            // 첫 번째 문서의 categories 확인
+//            if (snapshot.documents.isNotEmpty()) {
+//                val firstDoc = snapshot.documents[0]
+//                val categories = firstDoc.get("categories")
+//                Log.d(TAG, "🧐 첫 문서의 categories: $categories")
+//            }
+//
+//            val medicines = snapshot.documents.mapNotNull { doc ->
+//                try {
+//                    doc.toObject(Medicine::class.java)
+//                } catch (e: Exception) {
+//                    Log.e(TAG, "❌ 파싱 실패: ${doc.id}", e)
+//                    null
+//                }
+//            }
+//
+//            Log.d(TAG, "✅ 최종 약품 개수: ${medicines.size}")
+//            val last = snapshot.documents.lastOrNull()
+//            Pair(medicines, last)
+//        } catch (e: Exception) {
+//            Log.e(TAG, "💥 카테고리 검색 에러: $category", e)
+//            Pair(emptyList(), null)
+//        }
+//    }
+//    suspend fun getMedicinesByCategory(
+//        category: String,
+//        lastDocument: DocumentSnapshot? = null
+//    ): Pair<List<Medicine>, DocumentSnapshot?> {
+//        return try {
+//            Log.d(TAG, "🔍 카테고리 검색: $category")
+//
+//            var query: Query = firestore.collection(COLLECTION_MEDICINES)
+//                .whereArrayContains("categories", category)
+//                .orderBy("medicine_name")
+//                .limit(PAGE_SIZE.toLong())
+//
+//            if (lastDocument != null) {
+//                query = query.startAfter(lastDocument)
+//            }
+//
+//            val snapshot = query.get().await()
+//            val medicines = snapshot.documents.mapNotNull { doc ->
+//                try {
+//                    doc.toObject(Medicine::class.java)
+//                } catch (e: Exception) {
+//                    Log.e(TAG, "Error parsing medicine by category: ${doc.id}", e)
+//                    null
+//                }
+//            }
+//
+//            val last = snapshot.documents.lastOrNull()
+//            Pair(medicines, last)
+//        } catch (e: Exception) {
+//            Log.e(TAG, "Error getting medicines by category: $category", e)
+//            Pair(emptyList(), null)
+//        }
+//    }
 
     /**
      * 일반의약품 검색 (약품명, 제조사)

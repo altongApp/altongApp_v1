@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.altong_v2.R
 import com.example.altong_v2.data.model.MedicineCategory
 import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
 
@@ -91,8 +92,8 @@ class GeneralMedicineTabFragment : Fragment() {
     private fun navigateToCategoryList(category: String) {
         val fragment = CategoryMedicineListFragment.newInstance(category)
 
-        parentFragmentManager.beginTransaction()
-            .replace(android.R.id.content, fragment)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
     }

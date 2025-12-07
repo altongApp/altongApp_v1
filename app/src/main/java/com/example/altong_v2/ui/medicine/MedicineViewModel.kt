@@ -35,6 +35,9 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     private val _generalMedicines = MutableLiveData<List<Medicine>>(emptyList())
     val generalMedicines: LiveData<List<Medicine>> = _generalMedicines
 
+    // ⭐ 전체 데이터 백업 (필터링용)
+    private var allGeneralMedicines: List<Medicine> = emptyList()
+
     // 마지막 문서 (페이지네이션용)
     private var lastGeneralDocument: DocumentSnapshot? = null
 
@@ -62,6 +65,10 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _errorMessage.value = null
 
                 val (medicines, lastDoc) = repository.getGeneralMedicines()
+
+                // ⭐ 전체 데이터 백업
+                allGeneralMedicines = medicines
+
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
@@ -79,18 +86,18 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      * 일반의약품 다음 페이지 로드 (스크롤 시)
      */
     fun loadMoreGeneralMedicines() {
-        if (_isLoadingGeneral.value == true) return  // 이미 로딩 중이면 무시
+        if (_isLoadingGeneral.value == true) return
 
-        // 비동기 시작 전에 즉시 로딩 상태 변경 - 안 할 경우 무한로딩...
         _isLoadingGeneral.value = true
 
         viewModelScope.launch {
             try {
-                _isLoadingGeneral.value = true
-
                 val (medicines, lastDoc) = repository.getGeneralMedicines(lastGeneralDocument)
 
                 if (medicines.isNotEmpty()) {
+                    // ⭐ 백업에도 추가
+                    allGeneralMedicines = allGeneralMedicines + medicines
+
                     val currentList = _generalMedicines.value ?: emptyList()
                     _generalMedicines.value = currentList + medicines
                     lastGeneralDocument = lastDoc
@@ -105,22 +112,33 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 카테고리별 일반의약품 로드
+     * ⭐ 카테고리별 필터링 (클라이언트 필터링)
      */
     fun loadMedicinesByCategory(category: String) {
         viewModelScope.launch {
             try {
                 _isLoadingGeneral.value = true
-                _errorMessage.value = null
 
+                // ⭐ Firebase 쿼리 (전체 데이터)
                 val (medicines, lastDoc) = repository.getMedicinesByCategory(category)
+
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
-                Log.d(TAG, "카테고리 [$category] 약품 로드: ${medicines.size}개")
+                Log.d(TAG, "✅ Firebase 로드: ${medicines.size}개")
+
             } catch (e: Exception) {
-                Log.e(TAG, "카테고리별 약품 로드 실패", e)
-                _errorMessage.value = "약품을 불러오는데 실패했습니다."
+                Log.e(TAG, "Firebase 실패, 백업 사용", e)
+
+                // 백업: 클라이언트 필터링
+                if (allGeneralMedicines.isNotEmpty()) {
+                    val filtered = allGeneralMedicines.filter { medicine ->
+                        medicine.categories.any { cat ->
+                            cat.trim().trim('\'').trim('"') == category
+                        }
+                    }
+                    _generalMedicines.value = filtered
+                }
             } finally {
                 _isLoadingGeneral.value = false
             }
@@ -133,9 +151,11 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     fun loadMoreMedicinesByCategory(category: String) {
         if (_isLoadingGeneral.value == true) return
 
+        _isLoadingGeneral.value = true
+
         viewModelScope.launch {
             try {
-                _isLoadingGeneral.value = true
+                Log.d(TAG, "📄 카테고리 [$category] 추가 로드 시도...")
 
                 val (medicines, lastDoc) = repository.getMedicinesByCategory(
                     category,
@@ -146,10 +166,14 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     val currentList = _generalMedicines.value ?: emptyList()
                     _generalMedicines.value = currentList + medicines
                     lastGeneralDocument = lastDoc
-                    Log.d(TAG, "카테고리 [$category] 추가 로드: ${medicines.size}개")
+
+                    Log.d(TAG, "✅ 추가 로드 완료: ${medicines.size}개 (총 ${_generalMedicines.value?.size}개)")
+                } else {
+                    Log.d(TAG, "⚠️ 더 이상 데이터 없음")
                 }
+
             } catch (e: Exception) {
-                Log.e(TAG, "카테고리별 약품 추가 로드 실패", e)
+                Log.e(TAG, "카테고리 추가 로드 실패", e)
             } finally {
                 _isLoadingGeneral.value = false
             }
@@ -157,11 +181,19 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
+     * ⭐ 필터 초기화 (전체 보기)
+     */
+    fun clearCategoryFilter() {
+        _generalMedicines.value = allGeneralMedicines
+        Log.d(TAG, "✅ 필터 해제: ${allGeneralMedicines.size}개 표시")
+    }
+
+    /**
      * 일반의약품 검색
      */
     fun searchGeneralMedicines(query: String) {
         if (query.isBlank()) {
-            loadGeneralMedicines()  // 검색어 없으면 전체 목록
+            loadGeneralMedicines()
             return
         }
 
@@ -226,7 +258,6 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     fun loadMorePrescriptionMedicines() {
         if (_isLoadingPrescription.value == true) return
 
-        // 비동기 시작 전에 즉시 로딩 상태 변경 - 안 할 경우 무한로딩...
         _isLoadingGeneral.value = true
 
         viewModelScope.launch {
@@ -310,7 +341,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     medicineId = medicine.medicine_id,
                     medicineName = medicine.medicine_name,
                     manufacturer = medicine.manufacturer,
-                    medicineType = "otc",  // 일반의약품
+                    medicineType = "otc",
                     imageUrl = medicine.image_url ?: ""
                 )
                 repository.addFavorite(favorite)
@@ -332,7 +363,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     medicineId = medicine.medicine_id,
                     medicineName = medicine.medicine_name,
                     manufacturer = medicine.manufacturer,
-                    medicineType = "prescription",  // 전문의약품
+                    medicineType = "prescription",
                     imageUrl = medicine.image_url ?: ""
                 )
                 repository.addFavorite(favorite)
