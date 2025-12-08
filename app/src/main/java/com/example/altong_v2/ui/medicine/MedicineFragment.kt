@@ -1,12 +1,16 @@
 package com.example.altong_v2.ui.medicine
 
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentMedicineBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -26,40 +30,38 @@ class MedicineFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        android.util.Log.d("MedicineFragment", "🎨 onCreateView 호출")
+        Log.d(TAG, "🎨 onCreateView 호출")
         _binding = FragmentMedicineBinding.inflate(inflater, container, false)
-        android.util.Log.d("MedicineFragment", "✅ Binding 생성 완료")
+        Log.d(TAG, "✅ Binding 생성 완료")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        android.util.Log.d("MedicineFragment", "🎯 onViewCreated 호출")
+        Log.d(TAG, "🎯 onViewCreated 호출")
 
         // ViewModel 초기화
-        viewModel = ViewModelProvider(this)[MedicineViewModel::class.java]
-        android.util.Log.d("MedicineFragment", "✅ ViewModel 생성 완료")
+        viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
+        Log.d(TAG, "✅ ViewModel 생성 완료")
 
         setupViewPager()
         setupSearchBar()
 
-        android.util.Log.d("MedicineFragment", "✅ 모든 설정 완료")
+        Log.d(TAG, "✅ 모든 설정 완료")
     }
 
     /**
      * ViewPager2 + TabLayout 설정
      */
     private fun setupViewPager() {
-        android.util.Log.d("MedicineFragment", "📱 ViewPager 어댑터 설정 중...")
+        Log.d(TAG, "📱 ViewPager 어댑터 설정 중...")
 
-        // ViewPager2 어댑터 설정
         val adapter = MedicineViewPagerAdapter(this)
         binding.viewPager.adapter = adapter
 
-        android.util.Log.d("MedicineFragment", "📑 TabLayout 연결 중...")
+        Log.d(TAG, "📑 TabLayout 연결 중...")
 
-        // TabLayout과 ViewPager2 연결
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "💊 일반의약품"
@@ -68,57 +70,110 @@ class MedicineFragment : Fragment() {
             }
         }.attach()
 
-        android.util.Log.d("MedicineFragment", "✅ ViewPager 설정 완료!")
+        Log.d(TAG, "✅ ViewPager 설정 완료!")
     }
 
     /**
-     * 검색바 설정
+     * ⭐ 검색바 설정 (버튼 + 엔터 둘 다 지원)
      */
     private fun setupSearchBar() {
-        binding.searchEditText.setOnEditorActionListener { textView, actionId, _ ->
-            val query = textView.text.toString()
+        Log.d(TAG, "🔧 setupSearchBar 호출됨")
+
+        // ⭐ 검색 버튼 클릭
+        binding.searchButton.setOnClickListener {
+            val query = binding.searchEditText.text.toString().trim()
+            Log.d(TAG, "🔍 검색 버튼 클릭: $query")
+
             if (query.isNotBlank()) {
                 performSearch(query)
+                hideKeyboard()
+            } else {
+                Log.w(TAG, "⚠️ 검색어가 비어있습니다")
             }
-            true
+        }
+
+        // 엔터 키 (보조 기능)
+        binding.searchEditText.setOnEditorActionListener { textView, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                actionId == EditorInfo.IME_ACTION_DONE ||
+                (event?.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)
+            ) {
+                val query = textView.text.toString().trim()
+                Log.d(TAG, "⌨️ 엔터 키 입력: $query")
+
+                if (query.isNotBlank()) {
+                    performSearch(query)
+                    hideKeyboard()
+                }
+                return@setOnEditorActionListener true
+            }
+            false
         }
     }
 
     /**
-     * 검색 실행
+     * ⭐ 검색 실행 (검색 결과 화면으로 이동)
      */
     private fun performSearch(query: String) {
         val currentTab = binding.viewPager.currentItem
-        when (currentTab) {
-            0 -> viewModel.searchGeneralMedicines(query)
-            1 -> viewModel.searchPrescriptionMedicines(query)
+
+        // 검색 타입 결정
+        val searchType = when (currentTab) {
+            0 -> SearchResultFragment.TYPE_GENERAL
+            1 -> SearchResultFragment.TYPE_PRESCRIPTION
+            else -> SearchResultFragment.TYPE_GENERAL
         }
+
+        Log.d(TAG, "🔍 검색 실행: $query (타입: $searchType)")
+
+        // 검색 결과 Fragment로 이동
+        val fragment = SearchResultFragment.newInstance(
+            query = query,
+            type = searchType
+        )
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    /**
+     * 키보드 숨기기
+     */
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
+                as android.view.inputmethod.InputMethodManager
+        imm.hideSoftInputFromWindow(binding.searchEditText.windowToken, 0)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    companion object {
+        private const val TAG = "MedicineFragment"
+    }
 }
 
 /**
  * ViewPager2 Adapter
- * 일반의약품 탭 / 전문의약품 탭
  */
 class MedicineViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
-        android.util.Log.d("MedicineViewPagerAdapter", "🔨 Fragment 생성 중... position=$position")
+        Log.d("MedicineViewPagerAdapter", "🔨 Fragment 생성 중... position=$position")
 
         return when (position) {
             0 -> {
-                android.util.Log.d("MedicineViewPagerAdapter", "✅ GeneralMedicineTabFragment 생성!")
+                Log.d("MedicineViewPagerAdapter", "✅ GeneralMedicineTabFragment 생성!")
                 GeneralMedicineTabFragment()
             }
             1 -> {
-                android.util.Log.d("MedicineViewPagerAdapter", "✅ PrescriptionMedicineTabFragment 생성!")
+                Log.d("MedicineViewPagerAdapter", "✅ PrescriptionMedicineTabFragment 생성!")
                 PrescriptionMedicineTabFragment()
             }
             else -> GeneralMedicineTabFragment()

@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentPrescriptionMedicineTabBinding
+
 
 /**
  * 전문의약품 탭 Fragment
@@ -111,12 +111,21 @@ class PrescriptionMedicineTabFragment : Fragment() {
      * 찜 목록 화면으로 이동
      */
     private fun navigateToFavoriteList() {
-        val fragment = FavoriteMedicineFragment.newInstance()
+//        val fragment = FavoriteMedicineFragment.newInstance()
+//
+//        parentFragmentManager.beginTransaction()
+//            .replace(android.R.id.content, fragment)
+//            .addToBackStack(null)
+//            .commit()
+        // TODO: FavoriteMedicineFragment 구현 필요
+        Log.d("PrescriptionMedicineTab", "찜 목록 기능 - 추후 구현")
 
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+        // 임시로 주석 처리
+        // val fragment = FavoriteMedicineFragment.newInstance()
+        // parentFragmentManager.beginTransaction()
+        //     .replace(android.R.id.content, fragment)
+        //     .addToBackStack(null)
+        //     .commit()
     }
 
     /**

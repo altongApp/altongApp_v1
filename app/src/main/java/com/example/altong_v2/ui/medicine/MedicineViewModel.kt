@@ -31,21 +31,15 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
     // ========== 일반의약품 관련 ==========
 
-    // 일반의약품 리스트
     private val _generalMedicines = MutableLiveData<List<Medicine>>(emptyList())
     val generalMedicines: LiveData<List<Medicine>> = _generalMedicines
 
-    // ⭐ 전체 데이터 백업 (필터링용)
     private var allGeneralMedicines: List<Medicine> = emptyList()
-
-    // 마지막 문서 (페이지네이션용)
     private var lastGeneralDocument: DocumentSnapshot? = null
 
-    // 로딩 상태
     private val _isLoadingGeneral = MutableLiveData<Boolean>(false)
     val isLoadingGeneral: LiveData<Boolean> = _isLoadingGeneral
 
-    // 에러 메시지
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
@@ -53,7 +47,6 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      * 일반의약품 목록 로드 (첫 페이지)
      */
     fun loadGeneralMedicines() {
-        // 이미 로딩 중이면 무시
         if (_isLoadingGeneral.value == true) {
             Log.d(TAG, "⚠️ 이미 로딩 중 - 중복 요청 무시")
             return
@@ -65,10 +58,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _errorMessage.value = null
 
                 val (medicines, lastDoc) = repository.getGeneralMedicines()
-
-                // ⭐ 전체 데이터 백업
                 allGeneralMedicines = medicines
-
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
@@ -83,7 +73,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 일반의약품 다음 페이지 로드 (스크롤 시)
+     * 일반의약품 다음 페이지 로드
      */
     fun loadMoreGeneralMedicines() {
         if (_isLoadingGeneral.value == true) return
@@ -95,9 +85,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 val (medicines, lastDoc) = repository.getGeneralMedicines(lastGeneralDocument)
 
                 if (medicines.isNotEmpty()) {
-                    // ⭐ 백업에도 추가
                     allGeneralMedicines = allGeneralMedicines + medicines
-
                     val currentList = _generalMedicines.value ?: emptyList()
                     _generalMedicines.value = currentList + medicines
                     lastGeneralDocument = lastDoc
@@ -112,33 +100,22 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * ⭐ 카테고리별 필터링 (클라이언트 필터링)
+     * 카테고리별 약품 로드
      */
     fun loadMedicinesByCategory(category: String) {
         viewModelScope.launch {
             try {
                 _isLoadingGeneral.value = true
 
-                // ⭐ Firebase 쿼리 (전체 데이터)
                 val (medicines, lastDoc) = repository.getMedicinesByCategory(category)
-
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
                 Log.d(TAG, "✅ Firebase 로드: ${medicines.size}개")
 
             } catch (e: Exception) {
-                Log.e(TAG, "Firebase 실패, 백업 사용", e)
-
-                // 백업: 클라이언트 필터링
-                if (allGeneralMedicines.isNotEmpty()) {
-                    val filtered = allGeneralMedicines.filter { medicine ->
-                        medicine.categories.any { cat ->
-                            cat.trim().trim('\'').trim('"') == category
-                        }
-                    }
-                    _generalMedicines.value = filtered
-                }
+                Log.e(TAG, "Firebase 실패", e)
+                _errorMessage.value = "약품을 불러오는데 실패했습니다."
             } finally {
                 _isLoadingGeneral.value = false
             }
@@ -146,7 +123,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 카테고리별 약품 다음 페이지 로드
+     * 카테고리별 약품 추가 로드
      */
     fun loadMoreMedicinesByCategory(category: String) {
         if (_isLoadingGeneral.value == true) return
@@ -155,8 +132,6 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                Log.d(TAG, "📄 카테고리 [$category] 추가 로드 시도...")
-
                 val (medicines, lastDoc) = repository.getMedicinesByCategory(
                     category,
                     lastGeneralDocument
@@ -167,11 +142,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     _generalMedicines.value = currentList + medicines
                     lastGeneralDocument = lastDoc
 
-                    Log.d(TAG, "✅ 추가 로드 완료: ${medicines.size}개 (총 ${_generalMedicines.value?.size}개)")
-                } else {
-                    Log.d(TAG, "⚠️ 더 이상 데이터 없음")
+                    Log.d(TAG, "✅ 추가 로드: ${medicines.size}개")
                 }
-
             } catch (e: Exception) {
                 Log.e(TAG, "카테고리 추가 로드 실패", e)
             } finally {
@@ -181,15 +153,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * ⭐ 필터 초기화 (전체 보기)
-     */
-    fun clearCategoryFilter() {
-        _generalMedicines.value = allGeneralMedicines
-        Log.d(TAG, "✅ 필터 해제: ${allGeneralMedicines.size}개 표시")
-    }
-
-    /**
-     * 일반의약품 검색
+     * 일반의약품 검색 (첫 페이지)
      */
     fun searchGeneralMedicines(query: String) {
         if (query.isBlank()) {
@@ -206,10 +170,40 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
-                Log.d(TAG, "검색 결과: ${medicines.size}개")
+                Log.d(TAG, "🔍 검색 결과: ${medicines.size}개 (검색어: $query)")
             } catch (e: Exception) {
-                Log.e(TAG, "약품 검색 실패", e)
+                Log.e(TAG, "검색 실패", e)
                 _errorMessage.value = "검색에 실패했습니다."
+            } finally {
+                _isLoadingGeneral.value = false
+            }
+        }
+    }
+
+    /**
+     * 일반의약품 검색 (추가 페이지)
+     */
+    fun searchMoreGeneralMedicines(query: String) {
+        if (_isLoadingGeneral.value == true) return
+
+        _isLoadingGeneral.value = true
+
+        viewModelScope.launch {
+            try {
+                val (medicines, lastDoc) = repository.searchGeneralMedicines(
+                    query,
+                    lastGeneralDocument
+                )
+
+                if (medicines.isNotEmpty()) {
+                    val currentList = _generalMedicines.value ?: emptyList()
+                    _generalMedicines.value = currentList + medicines
+                    lastGeneralDocument = lastDoc
+
+                    Log.d(TAG, "🔍 검색 추가 로드: ${medicines.size}개")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "검색 추가 로드 실패", e)
             } finally {
                 _isLoadingGeneral.value = false
             }
@@ -218,14 +212,11 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
     // ========== 전문의약품 관련 ==========
 
-    // 전문의약품 리스트
     private val _prescriptionMedicines = MutableLiveData<List<PrescriptionMedicine>>(emptyList())
     val prescriptionMedicines: LiveData<List<PrescriptionMedicine>> = _prescriptionMedicines
 
-    // 마지막 문서 (페이지네이션용)
     private var lastPrescriptionDocument: DocumentSnapshot? = null
 
-    // 로딩 상태
     private val _isLoadingPrescription = MutableLiveData<Boolean>(false)
     val isLoadingPrescription: LiveData<Boolean> = _isLoadingPrescription
 
@@ -253,17 +244,15 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 전문의약품 다음 페이지 로드 (스크롤 시)
+     * 전문의약품 다음 페이지 로드
      */
     fun loadMorePrescriptionMedicines() {
         if (_isLoadingPrescription.value == true) return
 
-        _isLoadingGeneral.value = true
+        _isLoadingPrescription.value = true
 
         viewModelScope.launch {
             try {
-                _isLoadingPrescription.value = true
-
                 val (medicines, lastDoc) = repository.getPrescriptionMedicines(lastPrescriptionDocument)
 
                 if (medicines.isNotEmpty()) {
@@ -281,7 +270,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 전문의약품 검색
+     * 전문의약품 검색 (첫 페이지)
      */
     fun searchPrescriptionMedicines(query: String) {
         if (query.isBlank()) {
@@ -298,10 +287,38 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _prescriptionMedicines.value = medicines
                 lastPrescriptionDocument = lastDoc
 
-                Log.d(TAG, "전문의약품 검색 결과: ${medicines.size}개")
+                Log.d(TAG, "🔍 전문의약품 검색 결과: ${medicines.size}개")
             } catch (e: Exception) {
                 Log.e(TAG, "전문의약품 검색 실패", e)
                 _errorMessage.value = "검색에 실패했습니다."
+            } finally {
+                _isLoadingPrescription.value = false
+            }
+        }
+    }
+
+    /**
+     * 전문의약품 검색 (추가 페이지)
+     */
+    fun searchMorePrescriptionMedicines(query: String) {
+        if (_isLoadingPrescription.value == true) return
+
+        _isLoadingPrescription.value = true
+
+        viewModelScope.launch {
+            try {
+                val (medicines, lastDoc) = repository.searchPrescriptionMedicines(
+                    query,
+                    lastPrescriptionDocument
+                )
+
+                if (medicines.isNotEmpty()) {
+                    val currentList = _prescriptionMedicines.value ?: emptyList()
+                    _prescriptionMedicines.value = currentList + medicines
+                    lastPrescriptionDocument = lastDoc
+
+                    Log.d(TAG, "🔍 전문의약품 검색 추가: ${medicines.size}개")
+                }
             } finally {
                 _isLoadingPrescription.value = false
             }
@@ -391,7 +408,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     /**
-     * 타입별 찜 목록 조회 (일반의약품 or 전문의약품)
+     * 타입별 찜 목록 조회
      */
     suspend fun getFavoritesByType(type: String): List<FavoriteMedicineEntity> {
         return repository.getFavoritesByType(type).first()

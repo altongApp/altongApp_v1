@@ -12,14 +12,12 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.ItemMedicineBinding
 import com.example.altong_v2.data.model.PrescriptionMedicine
 
-/**
- * 전문의약품 리스트 Adapter
- * Glide를 사용한 이미지 로딩 포함
- */
 class PrescriptionMedicineAdapter(
     private val onItemClick: (PrescriptionMedicine) -> Unit,
     private val onFavoriteClick: (PrescriptionMedicine) -> Unit
-) : ListAdapter<PrescriptionMedicine, PrescriptionMedicineAdapter.ViewHolder>(PrescriptionMedicineDiffCallback()) {
+) : ListAdapter<PrescriptionMedicine, PrescriptionMedicineAdapter.ViewHolder>(
+    PrescriptionMedicineDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemMedicineBinding.inflate(
@@ -41,13 +39,9 @@ class PrescriptionMedicineAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(medicine: PrescriptionMedicine) {
-            // 약품명
             binding.medicineName.text = medicine.medicine_name
-
-            // 제조사
             binding.medicineCompany.text = medicine.manufacturer
 
-            // 효능/효과 (최대 2줄)
             if (medicine.efficacy.isNullOrBlank()) {
                 binding.medicineEfficacy.visibility = View.GONE
             } else {
@@ -55,7 +49,6 @@ class PrescriptionMedicineAdapter(
                 binding.medicineEfficacy.text = medicine.efficacy
             }
 
-            // 이미지 로딩 (Glide)
             if (!medicine.image_url.isNullOrBlank()) {
                 Glide.with(binding.root.context)
                     .load(medicine.image_url)
@@ -65,11 +58,9 @@ class PrescriptionMedicineAdapter(
                     .centerCrop()
                     .into(binding.medicineImage)
             } else {
-                // 이미지 없으면 placeholder
                 binding.medicineImage.setImageResource(R.drawable.medicine_image_placeholder)
             }
 
-            // 클릭 이벤트
             binding.root.setOnClickListener {
                 onItemClick(medicine)
             }
@@ -77,9 +68,14 @@ class PrescriptionMedicineAdapter(
     }
 
     class PrescriptionMedicineDiffCallback : DiffUtil.ItemCallback<PrescriptionMedicine>() {
-        override fun areItemsTheSame(oldItem: PrescriptionMedicine, newItem: PrescriptionMedicine) =
-            oldItem.medicine_id == newItem.medicine_id
-        override fun areContentsTheSame(oldItem: PrescriptionMedicine, newItem: PrescriptionMedicine) =
-            oldItem == newItem
+        override fun areItemsTheSame(
+            oldItem: PrescriptionMedicine,
+            newItem: PrescriptionMedicine
+        ) = oldItem.medicine_id == newItem.medicine_id
+
+        override fun areContentsTheSame(
+            oldItem: PrescriptionMedicine,
+            newItem: PrescriptionMedicine
+        ) = oldItem == newItem
     }
 }
