@@ -107,6 +107,7 @@ class GeneralMedicineTabFragment : Fragment() {
             onItemClick = { medicine ->
                 // 약품 클릭 시 상세 화면으로 이동
                 // TODO: MedicineDetailFragment로 이동
+                navigateToDetail(medicine.medicine_id, MedicineDetailFragment.TYPE_GENERAL)
             },
             onFavoriteClick = { medicine ->
                 // 찜 버튼 클릭
@@ -146,6 +147,17 @@ class GeneralMedicineTabFragment : Fragment() {
                 }
             }
         }
+    }
+    /**
+     * ⭐ 상세 화면으로 이동
+     */
+    private fun navigateToDetail(medicineId: String, type: String) {
+        val fragment = MedicineDetailFragment.newInstance(medicineId, type)
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**

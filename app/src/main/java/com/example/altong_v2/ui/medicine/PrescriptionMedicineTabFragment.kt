@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentPrescriptionMedicineTabBinding
 
 
@@ -63,6 +64,8 @@ class PrescriptionMedicineTabFragment : Fragment() {
             onItemClick = { medicine ->
                 // 약품 클릭 시 상세 화면으로 이동
                 // TODO: MedicineDetailFragment로 이동
+                navigateToDetail(medicine.medicine_id, MedicineDetailFragment.TYPE_PRESCRIPTION)
+
             },
             onFavoriteClick = { medicine ->
                 // 찜 버튼 클릭
@@ -95,6 +98,18 @@ class PrescriptionMedicineTabFragment : Fragment() {
                 }
             })
         }
+    }
+
+    /**
+     * ⭐ 상세 화면으로 이동
+     */
+    private fun navigateToDetail(medicineId: String, type: String) {
+        val fragment = MedicineDetailFragment.newInstance(medicineId, type)
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**

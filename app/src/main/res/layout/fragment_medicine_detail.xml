@@ -6,246 +6,132 @@
     android:layout_height="match_parent"
     android:background="@color/background_cream">
 
-    <!-- 스크롤 가능한 콘텐츠 -->
-    <androidx.core.widget.NestedScrollView
+    <!-- 메인 콘텐츠 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <LinearLayout
+        <!-- 툴바 -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:fitsSystemWindows="true"
+            android:minHeight="56dp"
+            app:navigationIcon="@drawable/ic_back"
+            app:title="약품 상세" />
 
-            <!-- 툴바 -->
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:elevation="4dp"
-                app:navigationIcon="@drawable/ic_back"
-                app:title="약품 상세" />
+        <!-- 약품 이미지 -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_margin="0dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp">
 
-            <!-- 약품 이미지 -->
             <ImageView
                 android:id="@+id/medicine_image"
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/medicine_image_placeholder" />
+                android:contentDescription="약품 이미지" />
+        </androidx.cardview.widget.CardView>
 
-            <!-- 약품 기본 정보 -->
+        <!-- 약품 기본 정보 헤더 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:background="@color/white">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/medicine_name"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/medicine_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="타이레놀정 500mg"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/medicine_company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="한국안센"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- 내 메모 버튼 -->
+                <Button
+                    android:id="@+id/memo_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="타이레놀정 500mg"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/medicine_company"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="존슨앤드존슨"
-                    android:textSize="15sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="8dp" />
+                    android:text="📝 내 메모"
+                    android:textSize="13sp"
+                    android:textColor="@color/white"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:backgroundTint="@color/primary_green_dark"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
             </LinearLayout>
-
-            <!-- 효능/효과 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="효능/효과"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/efficacy_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="두통, 발열, 근육통 완화"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4" />
-            </LinearLayout>
-
-            <!-- 용법/용량 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="용법/용량"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/usage_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1일 3회, 1회 1정"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4" />
-            </LinearLayout>
-
-            <!-- 사용상 주의사항 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="사용상 주의사항"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary" />
-
-                <TextView
-                    android:id="@+id/precautions_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="주의사항"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4" />
-            </LinearLayout>
-
-            <!-- 경고/부작용 (선택적 표시) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/warning_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="경고"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/warning_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/side_effects_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="부작용"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/side_effects_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4"
-                    android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- 저장방법 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/white"
-                android:layout_marginTop="8dp">
-
-                <TextView
-                    android:id="@+id/storage_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="저장방법"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/storage_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginTop="12dp"
-                    android:lineSpacingMultiplier="1.4"
-                    android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- 하단 여백 (버튼 공간) -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="80dp" />
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
 
-    <!-- 고정 찜 버튼 -->
+        <!-- 탭 레이아웃 -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:tabSelectedTextColor="@color/primary_green_dark"
+            app:tabTextColor="@color/text_secondary"
+            app:tabIndicatorColor="@color/primary_green_dark"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed" />
+
+        <!-- ViewPager2 (탭 내용) -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingBottom="100dp"
+            android:clipToPadding="false"
+            android:background="@color/white"
+             />
+
+    </LinearLayout>
+
+    <!-- 하단 고정 찜 버튼 -->
     <Button
         android:id="@+id/favorite_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="💙 약국약 찜하기"
+        android:text="❤️ 약국약 찜에 추가"
         android:textSize="16sp"
         android:padding="16dp"
         android:backgroundTint="@color/primary_green_dark"
         android:layout_gravity="bottom" />
 
-    <!-- 로딩 프로그레스 -->
+    <!-- 로딩 -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"

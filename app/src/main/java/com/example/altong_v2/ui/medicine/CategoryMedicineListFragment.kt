@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentCategoryMedicineListBinding
 
 /**
@@ -71,6 +72,8 @@ class CategoryMedicineListFragment : Fragment() {
             onItemClick = { medicine ->
                 // 약품 상세 화면으로 이동
                 // TODO: MedicineDetailFragment로 이동
+                navigateToDetail(medicine.medicine_id, MedicineDetailFragment.TYPE_GENERAL)
+
             },
             onFavoriteClick = { medicine ->
                 viewModel.addFavorite(medicine)
@@ -101,6 +104,17 @@ class CategoryMedicineListFragment : Fragment() {
                 }
             })
         }
+    }
+    /**
+     * ⭐ 상세 화면으로 이동
+     */
+    private fun navigateToDetail(medicineId: String, type: String) {
+        val fragment = MedicineDetailFragment.newInstance(medicineId, type)
+
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**
