@@ -1,10 +1,15 @@
 package com.example.altong_v2.ui.medicine
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +21,7 @@ import com.example.altong_v2.data.model.Medicine
 import com.example.altong_v2.data.model.PrescriptionMedicine
 import com.example.altong_v2.databinding.FragmentMedicineDetailBinding
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
 class MedicineDetailFragment : Fragment() {
@@ -108,10 +114,8 @@ class MedicineDetailFragment : Fragment() {
         binding.medicineName.text = medicine.medicine_name
         binding.medicineCompany.text = medicine.manufacturer
 
-        binding.memoButton.setOnClickListener {
-            Log.d(TAG, "메모 버튼 클릭")
-            Toast.makeText(requireContext(), "메모 기능은 추후 구현 예정입니다", Toast.LENGTH_SHORT).show()
-        }
+        // ⭐ 메모 버튼 설정 (일반의약품만)
+        setupMemoButton(medicine)
 
         setupTabsForGeneral(medicine)
     }
@@ -130,10 +134,8 @@ class MedicineDetailFragment : Fragment() {
         binding.medicineName.text = medicine.medicine_name
         binding.medicineCompany.text = medicine.manufacturer
 
-        binding.memoButton.setOnClickListener {
-            Log.d(TAG, "메모 버튼 클릭")
-            Toast.makeText(requireContext(), "메모 기능은 추후 구현 예정입니다", Toast.LENGTH_SHORT).show()
-        }
+        // ⭐ 메모 버튼 숨김 (전문의약품)
+        binding.memoButton.visibility = View.GONE
 
         setupTabsForPrescription(medicine)
     }
@@ -209,7 +211,7 @@ class MedicineDetailFragment : Fragment() {
     }
 
     /**
-     *  찜 상태 확인
+     * ⭐ 찜 상태 확인
      */
     private fun checkFavoriteStatus() {
         lifecycleScope.launch {
@@ -219,7 +221,7 @@ class MedicineDetailFragment : Fragment() {
     }
 
     /**
-     *  찜 버튼 설정
+     * ⭐ 찜 버튼 설정
      */
     private fun setupFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
@@ -228,7 +230,7 @@ class MedicineDetailFragment : Fragment() {
     }
 
     /**
-     *  찜 토글 (추가/취소)
+     * ⭐ 찜 토글 (추가/취소)
      */
     private fun toggleFavorite() {
         lifecycleScope.launch {
@@ -257,13 +259,98 @@ class MedicineDetailFragment : Fragment() {
     }
 
     /**
-     *  찜 버튼 UI 업데이트
+     * ⭐ 찜 버튼 UI 업데이트
      */
     private fun updateFavoriteButton() {
         binding.favoriteButton.text = if (isFavorite) {
             if (medicineType == TYPE_GENERAL) "💙 약국약 찜 취소" else "❤️ 병원약 찜 취소"
         } else {
             if (medicineType == TYPE_GENERAL) "💙 약국약 찜에 추가" else "❤️ 병원약 찜에 추가"
+        }
+    }
+
+    /**
+     * ⭐ 메모 버튼 설정 (일반의약품 전용)
+     */
+    private fun setupMemoButton(medicine: Medicine) {
+        lifecycleScope.launch {
+            // 메모 여부 확인
+            val hasMemo = viewModel.hasMemo(medicine.medicine_id)
+            updateMemoButtonText(hasMemo)
+
+            // 버튼 클릭 리스너
+            binding.memoButton.setOnClickListener {
+                showMemoDialog(medicine)
+            }
+        }
+    }
+
+    /**
+     * ⭐ 메모 버튼 텍스트 업데이트
+     */
+    private fun updateMemoButtonText(hasMemo: Boolean) {
+        binding.memoButton.text = if (hasMemo) "📝 메모 보기" else "📝 메모 하기"
+    }
+
+    /**
+     * ⭐ 메모 다이얼로그 표시
+     */
+    private fun showMemoDialog(medicine: Medicine) {
+        lifecycleScope.launch {
+            // 기존 메모 조회
+            val existingMemo = viewModel.getMemo(medicine.medicine_id) ?: ""
+
+            // 다이얼로그 생성
+            val dialog = Dialog(requireContext())
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setContentView(R.layout.dialog_medicine_memo)
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+            // 뷰 참조
+            val medicineNameText = dialog.findViewById<TextView>(R.id.medicine_name)
+            val memoInput = dialog.findViewById<TextInputEditText>(R.id.memo_input)
+            val saveButton = dialog.findViewById<Button>(R.id.save_button)
+            val closeButton = dialog.findViewById<ImageButton>(R.id.close_button)
+
+            // 약품명 설정
+            medicineNameText.text = medicine.medicine_name
+
+            // 기존 메모 표시
+            memoInput.setText(existingMemo)
+            memoInput.setSelection(existingMemo.length)
+
+            // 저장 버튼
+            saveButton.setOnClickListener {
+                val memo = memoInput.text.toString().trim()
+
+                // 메모 저장
+                viewModel.saveMemo(medicine, memo)
+
+                // Toast 메시지
+                if (memo.isBlank()) {
+                    Toast.makeText(requireContext(), "메모가 삭제되었습니다", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "메모가 저장되었습니다", Toast.LENGTH_SHORT).show()
+                }
+
+                // 버튼 텍스트 업데이트
+                updateMemoButtonText(memo.isNotBlank())
+
+                // 찜 상태 재확인
+                checkFavoriteStatus()
+
+                dialog.dismiss()
+            }
+
+            // 닫기 버튼
+            closeButton.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
         }
     }
 

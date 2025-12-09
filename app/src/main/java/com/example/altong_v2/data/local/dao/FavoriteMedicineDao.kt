@@ -56,4 +56,18 @@ interface FavoriteMedicineDao {
     // 찜 개수 조회
     @Query("SELECT COUNT(*) FROM favorite_medicines")
     suspend fun getCount(): Int
+
+    // FavoriteMedicineDao.kt에 추가할 함수
+
+    /**
+     * 메모 업데이트 (메모 수정)
+     */
+    @Query("UPDATE favorite_medicines SET memo = :memo WHERE medicine_id = :medicineId")
+    suspend fun updateMemo(medicineId: String, memo: String?)
+
+    /**
+     * 메모 조회
+     */
+    @Query("SELECT memo FROM favorite_medicines WHERE medicine_id = :medicineId")
+    suspend fun getMemo(medicineId: String): String?
 }

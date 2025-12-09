@@ -358,4 +358,39 @@ class MedicineRepository(
     suspend fun getFavoriteCount(): Int {
         return favoriteMedicineDao.getCount()
     }
+
+    // MedicineRepository.kt에 추가할 함수
+
+    /**
+     * 메모 저장/수정 (찜 자동 추가)
+     * @param medicine 약품 정보
+     * @param memo 메모 내용 (빈 문자열 = 메모 삭제)
+     */
+    suspend fun saveMemo(medicine: Medicine, memo: String) {
+        // 1. 찜 여부 확인
+        val favorite = favoriteMedicineDao.getFavoriteByMedicineId(medicine.medicine_id)
+
+        if (favorite != null) {
+            // 2-A. 이미 찜한 약 → 메모만 업데이트
+            favoriteMedicineDao.updateMemo(medicine.medicine_id, memo.ifBlank { null })
+        } else {
+            // 2-B. 찜하지 않은 약 → 찜 추가 + 메모 저장
+            val newFavorite = FavoriteMedicineEntity(
+                medicineId = medicine.medicine_id,
+                medicineName = medicine.medicine_name,
+                manufacturer = medicine.manufacturer,
+                medicineType = "general",
+                imageUrl = medicine.image_url ?: "",
+                memo = memo.ifBlank { null }
+            )
+            favoriteMedicineDao.insert(newFavorite)
+        }
+    }
+
+    /**
+     * 메모 조회
+     */
+    suspend fun getMemo(medicineId: String): String? {
+        return favoriteMedicineDao.getMemo(medicineId)
+    }
 }

@@ -48,7 +48,18 @@
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="4dp" />
 
-            <!-- 메모 -->
+            <!-- ⭐ 메모 상태 표시 -->
+            <TextView
+                android:id="@+id/memo_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📝 메모 있음"
+                android:textSize="12sp"
+                android:textColor="@color/primary_green_dark"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
+
+            <!-- 메모 내용 (접힌 상태) -->
             <TextView
                 android:id="@+id/memo_text"
                 android:layout_width="wrap_content"

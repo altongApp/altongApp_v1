@@ -42,11 +42,16 @@ class FavoriteMedicineAdapter(
             binding.medicineName.text = favorite.medicineName
             binding.medicineCompany.text = favorite.manufacturer
 
-            // 메모 표시
+            // ⭐ 메모 상태 표시
             if (!favorite.memo.isNullOrBlank()) {
+                binding.memoStatus.visibility = View.VISIBLE
+                binding.memoStatus.text = "📝 메모 있음"
+
+                // 메모 내용 표시 (선택적)
                 binding.memoText.visibility = View.VISIBLE
-                binding.memoText.text = "📝 ${favorite.memo}"
+                binding.memoText.text = favorite.memo
             } else {
+                binding.memoStatus.visibility = View.GONE
                 binding.memoText.visibility = View.GONE
             }
 

@@ -414,4 +414,41 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>> {
         return repository.getFavoritesByType(type)
     }
+
+    // MedicineViewModel.kt에 추가할 함수
+
+    /**
+     *  메모 저장/수정 (일반의약품만)
+     */
+    fun saveMemo(medicine: Medicine, memo: String) {
+        viewModelScope.launch {
+            try {
+                repository.saveMemo(medicine, memo)
+
+                if (memo.isBlank()) {
+                    Log.d(TAG, "메모 삭제: ${medicine.medicine_name}")
+                } else {
+                    Log.d(TAG, "메모 저장: ${medicine.medicine_name}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "메모 저장 실패", e)
+                _errorMessage.value = "메모 저장에 실패했습니다."
+            }
+        }
+    }
+
+    /**
+     * 메모 조회
+     */
+    suspend fun getMemo(medicineId: String): String? {
+        return repository.getMemo(medicineId)
+    }
+
+    /**
+     * 메모 있는지 확인
+     */
+    suspend fun hasMemo(medicineId: String): Boolean {
+        val memo = repository.getMemo(medicineId)
+        return !memo.isNullOrBlank()
+    }
 }
