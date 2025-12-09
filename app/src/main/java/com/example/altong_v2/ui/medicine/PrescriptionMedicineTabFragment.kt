@@ -101,7 +101,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
     }
 
     /**
-     * ⭐ 상세 화면으로 이동
+     * 상세 화면으로 이동
      */
     private fun navigateToDetail(medicineId: String, type: String) {
         val fragment = MedicineDetailFragment.newInstance(medicineId, type)
@@ -126,21 +126,12 @@ class PrescriptionMedicineTabFragment : Fragment() {
      * 찜 목록 화면으로 이동
      */
     private fun navigateToFavoriteList() {
-//        val fragment = FavoriteMedicineFragment.newInstance()
-//
-//        parentFragmentManager.beginTransaction()
-//            .replace(android.R.id.content, fragment)
-//            .addToBackStack(null)
-//            .commit()
-        // TODO: FavoriteMedicineFragment 구현 필요
-        Log.d("PrescriptionMedicineTab", "찜 목록 기능 - 추후 구현")
+        val fragment = FavoriteMedicineFragment.newInstance(1)  // 병원약 탭
 
-        // 임시로 주석 처리
-        // val fragment = FavoriteMedicineFragment.newInstance()
-        // parentFragmentManager.beginTransaction()
-        //     .replace(android.R.id.content, fragment)
-        //     .addToBackStack(null)
-        //     .commit()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     /**

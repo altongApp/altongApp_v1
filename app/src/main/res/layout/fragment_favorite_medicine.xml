@@ -6,43 +6,49 @@
     android:layout_height="match_parent"
     android:background="@color/background_cream">
 
-    <!-- 툴바: 뒤로가기 + 제목 -->
+    <!-- 툴바 -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:elevation="4dp"
-        app:title="나의 상비약"
+        android:fitsSystemWindows="true"
+        android:minHeight="56dp"
         app:navigationIcon="@drawable/ic_back"
-        app:titleTextColor="@color/text_primary"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:title="찜 목록"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 탭: [약국약 찜] [병원약 찜] -->
+    <!-- 탭 레이아웃 -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:tabMode="fixed"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/primary_green_dark"
         app:tabSelectedTextColor="@color/primary_green_dark"
         app:tabTextColor="@color/text_secondary"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:tabIndicatorColor="@color/primary_green_dark"
+        app:tabIndicatorHeight="3dp"
+        app:tabMode="fixed"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-    <!-- ViewPager: 탭 클릭하면 내용이 바뀌는 영역 -->
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💊 약국약" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🏥 병원약" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- ViewPager2 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/tab_layout"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

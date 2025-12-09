@@ -14,6 +14,7 @@ import com.example.altong_v2.data.repository.MedicineRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 /**
  * 약품 검색 ViewModel
@@ -358,7 +359,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     medicineId = medicine.medicine_id,
                     medicineName = medicine.medicine_name,
                     manufacturer = medicine.manufacturer,
-                    medicineType = "otc",
+                    medicineType = "general",
                     imageUrl = medicine.image_url ?: ""
                 )
                 repository.addFavorite(favorite)
@@ -410,7 +411,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     /**
      * 타입별 찜 목록 조회
      */
-    suspend fun getFavoritesByType(type: String): List<FavoriteMedicineEntity> {
-        return repository.getFavoritesByType(type).first()
+    fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>> {
+        return repository.getFavoritesByType(type)
     }
 }

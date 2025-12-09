@@ -6,29 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/background_cream">
 
-    <!-- 결과 개수 -->
-    <TextView
-        android:id="@+id/result_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="총 0개"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"
-        android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- 찜 목록 -->
+    <!-- 찜 목록 리스트 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favorite_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:padding="16dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/result_count"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <!-- 빈 화면 -->
     <LinearLayout
@@ -46,27 +32,20 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="💊"
-            android:textSize="64sp" />
+            android:text="💔"
+            android:textSize="64sp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="찜한 약품이 없습니다"
             android:textSize="16sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginTop="16dp" />
+            android:textColor="@color/text_secondary" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="자주 사용하는 약을 찜해보세요!"
-            android:textSize="14sp"
-            android:textColor="@color/text_tertiary"
-            android:layout_marginTop="8dp" />
     </LinearLayout>
 
-    <!-- 로딩 프로그레스 -->
+    <!-- 로딩 -->
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"

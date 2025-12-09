@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +27,11 @@ class MedicineDetailFragment : Fragment() {
 
     private var medicineId: String? = null
     private var medicineType: String = TYPE_GENERAL
+    private var isFavorite: Boolean = false
+
+    // 현재 약품 정보 저장
+    private var currentMedicine: Medicine? = null
+    private var currentPrescriptionMedicine: PrescriptionMedicine? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +57,7 @@ class MedicineDetailFragment : Fragment() {
 
         setupToolbar()
         loadMedicineData()
+        setupFavoriteButton()
     }
 
     private fun setupToolbar() {
@@ -67,12 +74,16 @@ class MedicineDetailFragment : Fragment() {
                 if (medicineType == TYPE_GENERAL) {
                     val medicine = viewModel.getMedicineById(medicineId ?: "")
                     if (medicine != null) {
+                        currentMedicine = medicine
                         displayGeneralMedicine(medicine)
+                        checkFavoriteStatus()
                     }
                 } else {
                     val medicine = viewModel.getPrescriptionMedicineById(medicineId ?: "")
                     if (medicine != null) {
+                        currentPrescriptionMedicine = medicine
                         displayPrescriptionMedicine(medicine)
+                        checkFavoriteStatus()
                     }
                 }
             } catch (e: Exception) {
@@ -97,14 +108,9 @@ class MedicineDetailFragment : Fragment() {
         binding.medicineName.text = medicine.medicine_name
         binding.medicineCompany.text = medicine.manufacturer
 
-        binding.favoriteButton.text = "❤️ 약국약 찜에 추가"
-        binding.favoriteButton.setOnClickListener {
-            viewModel.addFavorite(medicine)
-            Log.d(TAG, "찜 추가: ${medicine.medicine_name}")
-        }
-
         binding.memoButton.setOnClickListener {
             Log.d(TAG, "메모 버튼 클릭")
+            Toast.makeText(requireContext(), "메모 기능은 추후 구현 예정입니다", Toast.LENGTH_SHORT).show()
         }
 
         setupTabsForGeneral(medicine)
@@ -124,14 +130,9 @@ class MedicineDetailFragment : Fragment() {
         binding.medicineName.text = medicine.medicine_name
         binding.medicineCompany.text = medicine.manufacturer
 
-        binding.favoriteButton.text = "❤️ 병원약 찜에 추가"
-        binding.favoriteButton.setOnClickListener {
-            viewModel.addPrescriptionFavorite(medicine)
-            Log.d(TAG, "찜 추가: ${medicine.medicine_name}")
-        }
-
         binding.memoButton.setOnClickListener {
             Log.d(TAG, "메모 버튼 클릭")
+            Toast.makeText(requireContext(), "메모 기능은 추후 구현 예정입니다", Toast.LENGTH_SHORT).show()
         }
 
         setupTabsForPrescription(medicine)
@@ -205,6 +206,65 @@ class MedicineDetailFragment : Fragment() {
                 else -> ""
             }
         }.attach()
+    }
+
+    /**
+     *  찜 상태 확인
+     */
+    private fun checkFavoriteStatus() {
+        lifecycleScope.launch {
+            isFavorite = viewModel.isFavorite(medicineId ?: "")
+            updateFavoriteButton()
+        }
+    }
+
+    /**
+     *  찜 버튼 설정
+     */
+    private fun setupFavoriteButton() {
+        binding.favoriteButton.setOnClickListener {
+            toggleFavorite()
+        }
+    }
+
+    /**
+     *  찜 토글 (추가/취소)
+     */
+    private fun toggleFavorite() {
+        lifecycleScope.launch {
+            if (isFavorite) {
+                // 찜 해제
+                viewModel.removeFavorite(medicineId ?: "")
+                isFavorite = false
+                Toast.makeText(requireContext(), "찜이 해제되었습니다", Toast.LENGTH_SHORT).show()
+            } else {
+                // 찜 추가
+                if (medicineType == TYPE_GENERAL) {
+                    currentMedicine?.let {
+                        viewModel.addFavorite(it)
+                        Toast.makeText(requireContext(), "약국약 찜에 추가되었습니다", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    currentPrescriptionMedicine?.let {
+                        viewModel.addPrescriptionFavorite(it)
+                        Toast.makeText(requireContext(), "병원약 찜에 추가되었습니다", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                isFavorite = true
+            }
+            updateFavoriteButton()
+        }
+    }
+
+    /**
+     *  찜 버튼 UI 업데이트
+     */
+    private fun updateFavoriteButton() {
+        binding.favoriteButton.text = if (isFavorite) {
+            if (medicineType == TYPE_GENERAL) "💙 약국약 찜 취소" else "❤️ 병원약 찜 취소"
+        } else {
+            if (medicineType == TYPE_GENERAL) "💙 약국약 찜에 추가" else "❤️ 병원약 찜에 추가"
+        }
     }
 
     override fun onDestroyView() {

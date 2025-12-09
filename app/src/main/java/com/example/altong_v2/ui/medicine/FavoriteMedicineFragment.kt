@@ -5,22 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.altong_v2.databinding.FragmentFavoriteMedicineBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
 /**
- * 찜 목록 Fragment
- * Tab 1: 약국약 찜 (일반의약품)
- * Tab 2: 병원약 찜 (전문의약품)
+ * 찜 목록 Fragment (메인)
+ * 탭: 약국약 / 병원약
  */
 class FavoriteMedicineFragment : Fragment() {
 
     private var _binding: FragmentFavoriteMedicineBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: MedicineViewModel
+    private var initialTab: Int = 0  // ⭐ 초기 탭 (0=약국약, 1=병원약)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initialTab = arguments?.getInt(ARG_INITIAL_TAB) ?: 0
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,10 +37,11 @@ class FavoriteMedicineFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
-
         setupToolbar()
         setupViewPager()
+
+        // ⭐ 초기 탭 설정
+        binding.viewPager.setCurrentItem(initialTab, false)
     }
 
     /**
@@ -45,12 +49,12 @@ class FavoriteMedicineFragment : Fragment() {
      */
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
-            parentFragmentManager.popBackStack()
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
     /**
-     * ViewPager + TabLayout 설정
+     * ViewPager 설정
      */
     private fun setupViewPager() {
         val adapter = FavoriteViewPagerAdapter(this)
@@ -58,8 +62,8 @@ class FavoriteMedicineFragment : Fragment() {
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "💙 약국약 찜"
-                1 -> "❤️ 병원약 찜"
+                0 -> "💊 약국약"
+                1 -> "🏥 병원약"
                 else -> ""
             }
         }.attach()
@@ -71,14 +75,31 @@ class FavoriteMedicineFragment : Fragment() {
     }
 
     companion object {
+        private const val ARG_INITIAL_TAB = "initial_tab"
+
+        /**
+         * ⭐ 약국약 탭부터 보기 (기본)
+         */
         fun newInstance(): FavoriteMedicineFragment {
-            return FavoriteMedicineFragment()
+            return newInstance(0)
+        }
+
+        /**
+         * ⭐ 특정 탭부터 보기
+         * @param tabIndex 0=약국약, 1=병원약
+         */
+        fun newInstance(tabIndex: Int): FavoriteMedicineFragment {
+            return FavoriteMedicineFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_INITIAL_TAB, tabIndex)
+                }
+            }
         }
     }
 }
 
 /**
- * 찜 목록 ViewPager Adapter
+ * ViewPager2 Adapter
  */
 class FavoriteViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
@@ -86,9 +107,9 @@ class FavoriteViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FavoriteListTabFragment.newInstance("otc")  // 약국약
-            1 -> FavoriteListTabFragment.newInstance("prescription")  // 병원약
-            else -> FavoriteListTabFragment.newInstance("otc")
+            0 -> FavoriteListTabFragment.newInstance("general")  // ⭐ "otc" → "general"
+            1 -> FavoriteListTabFragment.newInstance("prescription")
+            else -> FavoriteListTabFragment.newInstance("general")
         }
     }
 }

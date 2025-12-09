@@ -1,18 +1,18 @@
 package com.example.altong_v2.ui.medicine
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.altong_v2.R
-import com.example.altong_v2.databinding.ItemFavoriteMedicineBinding
 import com.example.altong_v2.data.local.entity.FavoriteMedicineEntity
+import com.example.altong_v2.databinding.ItemFavoriteMedicineBinding
 
 /**
- * 찜 목록 Adapter
+ * 찜한 약품 목록 Adapter
  */
 class FavoriteMedicineAdapter(
     private val onItemClick: (FavoriteMedicineEntity) -> Unit,
@@ -39,22 +39,23 @@ class FavoriteMedicineAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(favorite: FavoriteMedicineEntity) {
-            // 약품명
             binding.medicineName.text = favorite.medicineName
-
-            // 제조사
             binding.medicineCompany.text = favorite.manufacturer
 
-            // 타입 표시
-            binding.medicineType.text = if (favorite.medicineType == "otc") "💙 약국약" else "❤️ 병원약"
+            // 메모 표시
+            if (!favorite.memo.isNullOrBlank()) {
+                binding.memoText.visibility = View.VISIBLE
+                binding.memoText.text = "📝 ${favorite.memo}"
+            } else {
+                binding.memoText.visibility = View.GONE
+            }
 
-            // 이미지 로딩
+            // 이미지
             if (favorite.imageUrl.isNotBlank()) {
                 Glide.with(binding.root.context)
                     .load(favorite.imageUrl)
                     .placeholder(R.drawable.medicine_image_placeholder)
                     .error(R.drawable.medicine_image_placeholder)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .centerCrop()
                     .into(binding.medicineImage)
             } else {
