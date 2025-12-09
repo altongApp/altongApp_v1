@@ -4,15 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.altong_v2.databinding.FragmentMypageBinding
 
 /* * 마이페이지 Fragment
- * 설정, 알림 설정, 앱 정보*/
+ * 설정, 알림 설정, 앱 정보 */
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMypageBinding? = null
     private val binding get() = _binding!!
+    private lateinit var alarmSettings: AlarmSettings
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -24,10 +27,46 @@ class MyPageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // AlarmSettings 초기화
+        alarmSettings = AlarmSettings(requireContext())
 
-        // TODO: 메뉴 리스트 설정
-        // TODO: 알림 설정 화면 이동
-        // TODO: 시간 설정 화면 이동
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
+        // 알림 설정
+        binding.menuAlarmSettings.setOnClickListener {
+            navigateToAlarmSettings()
+        }
+        // 알림 기록
+        binding.menuAlarmHistory.setOnClickListener {
+            navigateToAlarmHistory()
+        }
+
+        // 이용약관
+        binding.menuTerms.setOnClickListener {
+            showToast("이용약관")
+        }
+        // 개인정보처리방침
+        binding.menuPrivacy.setOnClickListener {
+            showToast("개인정보처리방침")
+        }
+        // 로그아웃
+        binding.menuLogout.setOnClickListener {
+            showToast("로그아웃 되었습니다")
+        }
+    }
+
+    private fun navigateToAlarmSettings() {
+        showToast("알림 설정 화면으로 이동 ")
+    }
+
+    private fun navigateToAlarmHistory() {
+        showToast("알림 기록 화면으로 이동")
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {
