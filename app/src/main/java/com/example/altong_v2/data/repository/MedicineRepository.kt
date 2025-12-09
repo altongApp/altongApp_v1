@@ -320,8 +320,16 @@ class MedicineRepository(
     /**
      * 찜 추가
      */
-    suspend fun addFavorite(favorite: FavoriteMedicineEntity): Long {
-        return favoriteMedicineDao.insert(favorite)
+    suspend fun addFavorite(favorite: FavoriteMedicineEntity) {
+        val existing = favoriteMedicineDao.getFavoriteByMedicineId(favorite.medicineId)
+
+        if (existing != null) {
+            // 이미 있으면 찜만 활성화
+            favoriteMedicineDao.refavorite(favorite.medicineId)
+        } else {
+            // 없으면 새로 추가
+            favoriteMedicineDao.insert(favorite)
+        }
     }
 
     /**
@@ -333,9 +341,20 @@ class MedicineRepository(
 
     /**
      * 약품 ID로 찜 삭제
-     */
+     찜 해제 (메모는 유지)
+     **/
     suspend fun removeFavoriteById(medicineId: String) {
-        favoriteMedicineDao.deleteByMedicineId(medicineId)
+        val favorite = favoriteMedicineDao.getFavoriteByMedicineId(medicineId)
+
+        if (favorite != null) {
+            if (favorite.memo.isNullOrBlank()) {
+                // 메모 없으면 완전 삭제
+                favoriteMedicineDao.deleteByMedicineId(medicineId)
+            } else {
+                // 메모 있으면 찜만 해제 (isFavorite = false)
+                favoriteMedicineDao.unfavorite(medicineId)
+            }
+        }
     }
 
     /**
@@ -362,25 +381,30 @@ class MedicineRepository(
     // MedicineRepository.kt에 추가할 함수
 
     /**
-     * 메모 저장/수정 (찜 자동 추가)
+     * 메모 저장/수정 (찜 자동 추가 - isFavorite = true)
      * @param medicine 약품 정보
      * @param memo 메모 내용 (빈 문자열 = 메모 삭제)
      */
     suspend fun saveMemo(medicine: Medicine, memo: String) {
-        // 1. 찜 여부 확인
         val favorite = favoriteMedicineDao.getFavoriteByMedicineId(medicine.medicine_id)
 
         if (favorite != null) {
-            // 2-A. 이미 찜한 약 → 메모만 업데이트
+            // 이미 있으면 메모만 업데이트
             favoriteMedicineDao.updateMemo(medicine.medicine_id, memo.ifBlank { null })
+
+            // 메모 추가 시 찜도 자동 활성화
+            if (memo.isNotBlank()) {
+                favoriteMedicineDao.refavorite(medicine.medicine_id)
+            }
         } else {
-            // 2-B. 찜하지 않은 약 → 찜 추가 + 메모 저장
+            // 없으면 새로 추가 (자동 찜)
             val newFavorite = FavoriteMedicineEntity(
                 medicineId = medicine.medicine_id,
                 medicineName = medicine.medicine_name,
                 manufacturer = medicine.manufacturer,
                 medicineType = "general",
                 imageUrl = medicine.image_url ?: "",
+                isFavorite = true,  // ⭐ 메모 작성 시 자동 찜
                 memo = memo.ifBlank { null }
             )
             favoriteMedicineDao.insert(newFavorite)

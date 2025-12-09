@@ -36,7 +36,9 @@
                 android:id="@+id/medicine_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
+                android:padding="16dp"
+                android:background="@color/background_cream"
                 android:contentDescription="약품 이미지" />
         </androidx.cardview.widget.CardView>
 

@@ -9,9 +9,15 @@ import androidx.room.PrimaryKey
  * 찜한 약품 테이블
  * 일반의약품 또는 전문의약품을 찜한 목록 저장
  *
- * ⭐ medicineType 값:
+ *  medicineType 값:
  * - "general" : 일반의약품 (약국약)
  * - "prescription" : 전문의약품 (병원약)
+ *
+ *  isFavorite vs memo:
+ * - isFavorite = true, memo = null → 찜만
+ * - isFavorite = true, memo = "..." → 찜 + 메모
+ * - isFavorite = false, memo = "..." → 메모만 (찜 해제됨)
+ * - isFavorite = false, memo = null → 삭제 대상
  */
 @Entity(
     tableName = "favorite_medicines",
@@ -31,10 +37,14 @@ data class FavoriteMedicineEntity(
     val manufacturer: String,        // 제조사
 
     @ColumnInfo(name = "medicine_type")
-    val medicineType: String,        // "general" or "prescription" (수정됨!)
+    val medicineType: String,        //  "general" or "prescription"
 
     @ColumnInfo(name = "image_url")
     val imageUrl: String = "",       // 이미지 URL
+
+    //  찜 상태 플래그 (새로 추가!)
+    @ColumnInfo(name = "is_favorite")
+    val isFavorite: Boolean = true,  // true=찜, false=찜 해제 (메모만 남음)
 
     // 개인 메모
     val memo: String? = null,

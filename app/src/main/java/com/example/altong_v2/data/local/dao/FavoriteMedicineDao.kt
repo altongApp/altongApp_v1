@@ -33,17 +33,9 @@ interface FavoriteMedicineDao {
     @Query("SELECT * FROM favorite_medicines ORDER BY created_at DESC")
     fun getAllFavorites(): Flow<List<FavoriteMedicineEntity>>
 
-    // 타입별 찜 목록 조회 (일반의약품 or 전문의약품)
-    @Query("SELECT * FROM favorite_medicines WHERE medicine_type = :type ORDER BY created_at DESC")
-    fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>>
-
     // 약품 ID로 찜 조회
     @Query("SELECT * FROM favorite_medicines WHERE medicine_id = :medicineId")
     suspend fun getFavoriteByMedicineId(medicineId: String): FavoriteMedicineEntity?
-
-    // 찜 여부 확인
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_medicines WHERE medicine_id = :medicineId)")
-    suspend fun isFavorite(medicineId: String): Boolean
 
     // 약품 ID로 찜 삭제
     @Query("DELETE FROM favorite_medicines WHERE medicine_id = :medicineId")
@@ -70,4 +62,36 @@ interface FavoriteMedicineDao {
      */
     @Query("SELECT memo FROM favorite_medicines WHERE medicine_id = :medicineId")
     suspend fun getMemo(medicineId: String): String?
+
+    // FavoriteMedicineDao.kt 수정/추가할 함수들
+
+    /**
+     * 타입별 찜 목록 조회 (isFavorite = true인 것만)
+     */
+    @Query("SELECT * FROM favorite_medicines WHERE medicine_type = :type AND is_favorite = 1 ORDER BY created_at DESC")
+    fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>>
+
+    /**
+     * ⭐ 찜 여부 확인 (isFavorite = true)
+     */
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_medicines WHERE medicine_id = :medicineId AND is_favorite = 1)")
+    suspend fun isFavorite(medicineId: String): Boolean
+
+    /**
+     * ⭐ 찜 상태 업데이트 (찜 해제)
+     */
+    @Query("UPDATE favorite_medicines SET is_favorite = 0 WHERE medicine_id = :medicineId")
+    suspend fun unfavorite(medicineId: String)
+
+    /**
+     * ⭐ 찜 상태 업데이트 (찜 추가)
+     */
+    @Query("UPDATE favorite_medicines SET is_favorite = 1 WHERE medicine_id = :medicineId")
+    suspend fun refavorite(medicineId: String)
+
+    /**
+     * ⭐ 메모 없고 찜도 해제된 항목 삭제 (청소용)
+     */
+    @Query("DELETE FROM favorite_medicines WHERE is_favorite = 0 AND (memo IS NULL OR memo = '')")
+    suspend fun cleanupUnused()
 }

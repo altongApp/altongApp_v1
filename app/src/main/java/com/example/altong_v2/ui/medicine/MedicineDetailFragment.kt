@@ -339,8 +339,12 @@ class MedicineDetailFragment : Fragment() {
                 // 버튼 텍스트 업데이트
                 updateMemoButtonText(memo.isNotBlank())
 
-                // 찜 상태 재확인
-                checkFavoriteStatus()
+                // ⭐ 찜 상태 재확인 (메모 작성 시 자동 찜되므로)
+                lifecycleScope.launch {
+                    // 약간의 지연 (DB 저장 완료 대기)
+                    kotlinx.coroutines.delay(100)
+                    checkFavoriteStatus()
+                }
 
                 dialog.dismiss()
             }

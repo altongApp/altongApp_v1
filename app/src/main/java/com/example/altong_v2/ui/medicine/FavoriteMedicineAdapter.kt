@@ -1,5 +1,6 @@
 package com.example.altong_v2.ui.medicine
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +48,7 @@ class FavoriteMedicineAdapter(
                 binding.memoStatus.visibility = View.VISIBLE
                 binding.memoStatus.text = "📝 메모 있음"
 
-                // 메모 내용 표시 (선택적)
+                // 메모 내용 표시
                 binding.memoText.visibility = View.VISIBLE
                 binding.memoText.text = favorite.memo
             } else {
@@ -72,9 +73,18 @@ class FavoriteMedicineAdapter(
                 onItemClick(favorite)
             }
 
-            // 삭제 버튼
+            // ⭐ 삭제 버튼 - 확인 다이얼로그
             binding.deleteButton.setOnClickListener {
-                onDeleteClick(favorite)
+                AlertDialog.Builder(binding.root.context)
+                    .setTitle("찜 해제")
+                    .setMessage("'${favorite.medicineName}'을(를) 찜 목록에서 삭제하시겠습니까?${
+                        if (!favorite.memo.isNullOrBlank()) "\n\n⚠️ 메모는 유지됩니다." else ""
+                    }")
+                    .setPositiveButton("삭제") { _, _ ->
+                        onDeleteClick(favorite)
+                    }
+                    .setNegativeButton("취소", null)
+                    .show()
             }
         }
     }
