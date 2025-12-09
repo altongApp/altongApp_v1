@@ -64,6 +64,7 @@
                     android:textSize="13sp"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="8dp"
+                    android:backgroundTint="@android:color/white"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
             </LinearLayout>
 

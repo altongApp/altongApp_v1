@@ -21,4 +21,6 @@
     <color name="black">#000000</color>
     <color name="error">#D32F2F</color>
     <color name="success">#4CAF50</color>
+
+    <color name="favorite_cancel_red">#E57373</color>
 </resources>

@@ -262,10 +262,20 @@ class MedicineDetailFragment : Fragment() {
      * ⭐ 찜 버튼 UI 업데이트
      */
     private fun updateFavoriteButton() {
-        binding.favoriteButton.text = if (isFavorite) {
-            if (medicineType == TYPE_GENERAL) "💙 약국약 찜 취소" else "❤️ 병원약 찜 취소"
+        if (isFavorite) {
+            // 찜 취소 상태
+            binding.favoriteButton.apply {
+                text = if (medicineType == TYPE_GENERAL) "💙 약국약 찜 취소" else "❤️ 병원약 찜 취소"
+                setBackgroundResource(R.drawable.button_favorite_cancel)  // ⭐ 빨간색
+                setTextColor(resources.getColor(android.R.color.white, null))
+            }
         } else {
-            if (medicineType == TYPE_GENERAL) "💙 약국약 찜에 추가" else "❤️ 병원약 찜에 추가"
+            // 찜 추가 상태
+            binding.favoriteButton.apply {
+                text = if (medicineType == TYPE_GENERAL) "💙 약국약 찜에 추가" else "❤️ 병원약 찜에 추가"
+                setBackgroundResource(R.drawable.button_favorite_add)  // ⭐ 초록색
+                setTextColor(resources.getColor(android.R.color.white, null))
+            }
         }
     }
 
@@ -286,10 +296,19 @@ class MedicineDetailFragment : Fragment() {
     }
 
     /**
-     * ⭐ 메모 버튼 텍스트 업데이트
+     *  메모 버튼 텍스트 업데이트
      */
     private fun updateMemoButtonText(hasMemo: Boolean) {
-        binding.memoButton.text = if (hasMemo) "📝 메모 보기" else "📝 메모 하기"
+        binding.memoButton.apply {
+            if (hasMemo) {
+                text = "📝 메모 보기"
+                setBackgroundResource(R.drawable.button_memo_view)  // ⭐ 주황색
+            } else {
+                text = "📝 메모 하기"
+                setBackgroundResource(R.drawable.button_memo_write)  // ⭐ 파란색
+            }
+            setTextColor(resources.getColor(android.R.color.white, null))
+        }
     }
 
     /**
