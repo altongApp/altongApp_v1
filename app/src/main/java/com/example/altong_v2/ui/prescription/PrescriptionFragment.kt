@@ -41,13 +41,6 @@ class PrescriptionFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
         observeViewModel()
-
-        // 테스트용 - 데이터가 없을 때만 추가
-        viewModel.allPrescriptions.observe(viewLifecycleOwner) { prescriptions ->
-            if (prescriptions.isEmpty()) {
-                addTestData()
-            }
-        }
     }
 
     // 리사이클러뷰 설정
@@ -128,123 +121,6 @@ class PrescriptionFragment : Fragment() {
                 prescriptionsWithDrugsMap[prescription.id]!!
             }
             prescriptionAdapter.submitList(initialList)
-        }
-    }
-
-    /**
-     * 테스트 데이터 추가 (UI 확인용)
-     * TODO: 확인 완료 후 이 함수 전체 삭제할 것!
-     */
-    private fun addTestData() {
-        lifecycleScope.launch {
-            // 샘플 처방전 1: 약 있음
-            val prescription1 = PrescriptionEntity(
-                date = "2024-01-15",
-                hospital = "서울대학교병원",
-                department = "내과",
-                diagnosis = "감기",
-                pharmacy = "온누리약국"
-            )
-
-            // suspendCoroutine으로 콜백을 suspend 함수로 변환
-            val id1 = suspendCancellableCoroutine<Long> { continuation ->
-                viewModel.insertPrescription(prescription1) { id ->
-                    continuation.resume(id)
-                }
-            }
-
-            // 약 추가 (순차적으로)
-            viewModel.insertDrug(
-                DrugEntity(
-                    prescriptionId = id1,
-                    name = "타이레놀정 500mg",
-                    dosage = "1정",
-                    frequency = "3회",
-                    days = 7,
-                    timing = "식후 30분",
-                    memo = "공복 피하기",
-                    timeSlots = "아침,점심,저녁"
-                )
-            )
-            viewModel.insertDrug(
-                DrugEntity(
-                    prescriptionId = id1,
-                    name = "코푸시럽",
-                    dosage = "10ml",
-                    frequency = "2회",
-                    days = 5,
-                    timing = "식후",
-                    memo = null,
-                    timeSlots = "아침,저녁"
-                )
-            )
-
-            // 샘플 처방전 2: 약 많음
-            val prescription2 = PrescriptionEntity(
-                date = "2024-01-10",
-                hospital = "연세세브란스병원",
-                department = "정형외과",
-                diagnosis = "허리 통증",
-                pharmacy = "건강약국"
-            )
-
-            val id2 = suspendCancellableCoroutine<Long> { continuation ->
-                viewModel.insertPrescription(prescription2) { id ->
-                    continuation.resume(id)
-                }
-            }
-
-            viewModel.insertDrug(
-                DrugEntity(
-                    prescriptionId = id2,
-                    name = "게보린정",
-                    dosage = "1정",
-                    frequency = "3회",
-                    days = 14,
-                    timing = "식후",
-                    memo = "증상 심할 때만",
-                    timeSlots = "아침,점심,저녁"
-                )
-            )
-            viewModel.insertDrug(
-                DrugEntity(
-                    prescriptionId = id2,
-                    name = "근육이완제",
-                    dosage = "1정",
-                    frequency = "2회",
-                    days = 10,
-                    timing = "식후",
-                    memo = null,
-                    timeSlots = "아침,저녁"
-                )
-            )
-            viewModel.insertDrug(
-                DrugEntity(
-                    prescriptionId = id2,
-                    name = "소염진통제",
-                    dosage = "1정",
-                    frequency = "3회",
-                    days = 14,
-                    timing = "식후 30분",
-                    memo = "위장 보호제와 함께",
-                    timeSlots = "아침,점심,저녁"
-                )
-            )
-
-            // 샘플 처방전 3: 약 없음 (경고 표시용)
-            val prescription3 = PrescriptionEntity(
-                date = "2024-01-05",
-                hospital = "서울아산병원",
-                department = "이비인후과",
-                diagnosis = "중이염",
-                pharmacy = null
-            )
-
-            suspendCancellableCoroutine<Long> { continuation ->
-                viewModel.insertPrescription(prescription3) { id ->
-                    continuation.resume(id)
-                }
-            }
         }
     }
 

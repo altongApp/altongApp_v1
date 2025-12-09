@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="12dp"
     app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="8dp"
@@ -17,15 +17,28 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="12dp">
 
-        <TextView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:text="💊"
-            android:textSize="24sp"
-            android:gravity="center"
-            android:background="@color/secondary_blue_light"
-            android:layout_marginEnd="12dp" />
+            <!-- 기본 이모지 (이미지 로딩 전 또는 이미지 없을 때) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="💊"
+                android:textSize="40sp"
+                android:gravity="center"
+                android:background="@color/secondary_blue_light" />
+
+            <!-- 약 이미지 (DB에서 불러올 때) -->
+            <ImageView
+                android:id="@+id/iv_drug_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="약품 이미지" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -37,19 +50,19 @@
                 android:id="@+id/tv_drug_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="타이레놀정 500mg"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
-                android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="4dp"
+                tools:text="타이레놀정 500mg" />
 
             <TextView
                 android:id="@+id/tv_drug_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="해열진통제 | 아세트아미노펜"
                 android:textSize="14sp"
-                android:textColor="@color/text_secondary" />
+                android:textColor="@color/text_secondary"
+                tools:text="해열진통제 | 아세트아미노펜" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

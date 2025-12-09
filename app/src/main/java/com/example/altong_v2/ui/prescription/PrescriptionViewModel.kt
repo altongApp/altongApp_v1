@@ -61,7 +61,7 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     fun getDrugsByPrescription(prescriptionId: Long): LiveData<List<DrugEntity>> {
         return repository.getDrugsByPrescription(prescriptionId).asLiveData()
     }
-    //테스트하면서 추가
+
     suspend fun getDrugsList(prescriptionId: Long): List<DrugEntity> {
         return repository.getDrugsByPrescription(prescriptionId).first()
     }
@@ -145,7 +145,8 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                         days = drug.days,
                         timing = drug.timing,
                         memo = drug.memo,
-                        timeSlots = drug.timeSlots.joinToString(",")
+                        timeSlots = drug.timeSlots.joinToString(","),
+                        imageUrl = drug.imageUrl
                     )
                     repository.insertDrug(drugEntity)
                 }
@@ -219,7 +220,8 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                     days = drug.days,
                     timing = drug.timing.orEmpty(),
                     memo = drug.memo.orEmpty(),
-                    timeSlots = drug.timeSlots.split(",")
+                    timeSlots = drug.timeSlots.split(","),
+                    imageUrl = drug.imageUrl
                 )
             )
         }
@@ -243,7 +245,8 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                         days = drug.days,
                         timing = drug.timing,
                         memo = drug.memo,
-                        timeSlots = drug.timeSlots.joinToString(",")
+                        timeSlots = drug.timeSlots.joinToString(","),
+                        imageUrl = drug.imageUrl
                     )
                     repository.insertDrug(drugEntity)
                 }
@@ -280,7 +283,8 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                     days = drug.days,
                     timing = drug.timing,
                     memo = drug.memo,
-                    timeSlots = drug.timeSlots.joinToString(",")
+                    timeSlots = drug.timeSlots.joinToString(","),
+                    imageUrl = drug.imageUrl
                 )
 
                 repository.insertDrug(drugEntity)
@@ -319,5 +323,6 @@ data class TempDrugData(
     val days: Int,
     val timing: String,
     val memo: String,
-    val timeSlots: List<String>
+    val timeSlots: List<String>,
+    val imageUrl: String? = null
 )

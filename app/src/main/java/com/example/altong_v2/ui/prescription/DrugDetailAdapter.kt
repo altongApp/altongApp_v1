@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.altong_v2.R
 import com.example.altong_v2.data.local.entity.DrugEntity
 import com.example.altong_v2.databinding.ItemDrugDetailBinding
 
@@ -37,23 +39,21 @@ class DrugDetailAdapter : ListAdapter<DrugEntity, DrugDetailAdapter.DrugViewHold
         fun bind(drug: DrugEntity) {
             // 약명
             binding.tvDrugName.text = drug.name
-            // !~~~!~! 약 이미지 처리 (추가해야함)
-            // TODO: 나중에 약 DB에서 이미지 URL 가져올 때 처리
-            // if (!drug.imageUrl.isNullOrEmpty()) {
-            //     binding.tvDrugEmoji.visibility = View.GONE
-            //     binding.ivDrugImage.visibility = View.VISIBLE
-            //     // Glide 또는 Coil로 이미지 로드
-            //     Glide.with(binding.root.context)
-            //         .load(drug.imageUrl)
-            //         .into(binding.ivDrugImage)
-            // } else {
-            //     binding.tvDrugEmoji.visibility = View.VISIBLE
-            //     binding.ivDrugImage.visibility = View.GONE
-            // }
-
-            // 현재는 항상 이모지 표시
-            binding.tvDrugEmoji.visibility = View.VISIBLE
-            binding.ivDrugImage.visibility = View.GONE
+            // 약 이미지 처리
+             if (!drug.imageUrl.isNullOrBlank()) {
+                 // 이미지 있으면 이미지뷰로 표시
+                 binding.tvDrugEmoji.visibility = View.GONE
+                 binding.ivDrugImage.visibility = View.VISIBLE
+                 // Glide 또는 Coil로 이미지 로드
+                 Glide.with(binding.root.context)
+                     .load(drug.imageUrl)
+                     .centerCrop()
+                     .into(binding.ivDrugImage)
+             } else {
+                 // 이미지없으면 임티로
+                 binding.tvDrugEmoji.visibility = View.VISIBLE
+                 binding.ivDrugImage.visibility = View.GONE
+             }
 
             // 복용 정보
             binding.tvDosageInfo.text = "1회 ${drug.dosage}, 1일 ${drug.frequency}"

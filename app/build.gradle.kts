@@ -82,4 +82,8 @@ dependencies {
 
     // WorkManager (알림용)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // image_uri를 가져오기 위한
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }

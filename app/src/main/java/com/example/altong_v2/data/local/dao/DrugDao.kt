@@ -54,7 +54,7 @@ interface DrugDao {
     @Query("DELETE FROM drugs WHERE prescription_id = :prescriptionId")
     suspend fun deleteByPrescription(prescriptionId: Long)
 
-    // 모든 약 삭제 (테스트용)
+    // 모든 약 삭제 (개발/테스트용)
     @Query("DELETE FROM drugs")
     suspend fun deleteAll()
 }

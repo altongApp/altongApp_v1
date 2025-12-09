@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/background_cream"
     android:fitsSystemWindows="true">
 
@@ -80,7 +80,7 @@
                         android:id="@+id/tv_drug_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="타이레놀정 500mg"
+                        tools:text="타이레놀정 500mg"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary"
@@ -89,7 +89,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="효능: 해열, 진통"
+                        tools:text="효능: 해열, 진통"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:layout_marginBottom="4dp" />
@@ -97,7 +97,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="주의사항: 1일 최대 용량 4,000mg 초과 금지. 음주 시 간 손상 위험."
+                        tools:text="주의사항: 1일 최대 용량 초과 금지"
                         android:textSize="13sp"
                         android:textColor="@color/text_secondary"/>
                 </LinearLayout>

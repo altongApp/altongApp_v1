@@ -24,7 +24,7 @@ import com.example.altong_v2.data.local.entity.PrescriptionEntity
         FavoriteMedicineEntity::class,
         DrugCompletionEntity::class
     ],
-    version = 1,
+    version = 2,    // 데이터이미지 가져오는 과정에서 버전2로 변경
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -50,6 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "altong_database"  // 우리 DB파일명
                 )
+                    .addMigrations(MIGRATION_1_2)   // 마이그레이션 추가
                     // .fallbackToDestructiveMigration()  // 개발 중에만 사용 (데이터 삭제됨)
                     .build()
                 INSTANCE = instance

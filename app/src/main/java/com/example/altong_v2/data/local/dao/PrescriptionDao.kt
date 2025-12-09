@@ -46,7 +46,7 @@ interface PrescriptionDao {
     @Query("SELECT * FROM prescriptions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
     suspend fun getPrescriptionsByDateRange(startDate: String, endDate: String): List<PrescriptionEntity>
 
-    // 모든 처방전 삭제 (테스트용임)
+    // 모든 처방전 삭제 (개발/테스트용)
     @Query("DELETE FROM prescriptions")
     suspend fun deleteAll()
 

@@ -20,12 +20,14 @@ class DrugDetailFragment : Fragment() {
 
     private var drugName: String = ""
     private var drugDescription: String = ""
+    private var drugImageUrl: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             drugName = it.getString(ARG_DRUG_NAME, "")
             drugDescription = it.getString(ARG_DRUG_DESCRIPTION, "")
+            drugImageUrl = it.getString(ARG_DRUG_IMAGE_URL)
         }
     }
 
@@ -205,7 +207,8 @@ class DrugDetailFragment : Fragment() {
              days = days,
              timing = timing,
              memo = memo,
-             timeSlots = timeSlots
+             timeSlots = timeSlots,
+             imageUrl = drugImageUrl
          )
 
          // 4. 모드 확인 및 처리
@@ -260,7 +263,8 @@ class DrugDetailFragment : Fragment() {
              days = days,
              timing = timing,
              memo = memo,
-             timeSlots = timeSlots
+             timeSlots = timeSlots,
+             imageUrl = drugImageUrl
          )
 
          // 4. 모드에 따라 처리
@@ -315,11 +319,13 @@ class DrugDetailFragment : Fragment() {
     companion object {
         private const val ARG_DRUG_NAME = "drug_name"
         private const val ARG_DRUG_DESCRIPTION = "drug_description"
+        private const val ARG_DRUG_IMAGE_URL = "drug_image_url"
 
-        fun newInstance(drugName: String, drugDescription: String) = DrugDetailFragment().apply {
+        fun newInstance(drugName: String, drugDescription: String, imageUrl: String? = null) = DrugDetailFragment().apply {
             arguments = Bundle().apply {
                 putString(ARG_DRUG_NAME, drugName)
                 putString(ARG_DRUG_DESCRIPTION, drugDescription)
+                putString(ARG_DRUG_IMAGE_URL, imageUrl)
             }
         }
     }

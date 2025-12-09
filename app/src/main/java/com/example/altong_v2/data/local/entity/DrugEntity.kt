@@ -46,7 +46,10 @@ data class DrugEntity(
     // 알림 시간대 (쉼표로 구분된 문자열)
     // 예: "아침,저녁" 또는 "아침,점심,저녁,취침 전"
     @ColumnInfo(name = "time_slots")
-    val timeSlots: String
+    val timeSlots: String,
+
+    @ColumnInfo(name = "image_url")
+    val imageUrl: String? = null
 )
 
 

@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.altong_v2.R
 import com.example.altong_v2.databinding.ItemDrugSearchResultBinding
 
@@ -49,6 +50,17 @@ class DrugSearchAdapter(
         fun bind(drug: DrugSearchResult, position: Int, isSelected: Boolean) {
             binding.tvDrugName.text = drug.name
             binding.tvDrugDescription.text = drug.description
+            // Glide로 약 이미지 표시
+            if (!drug.imageUrl.isNullOrBlank()) {
+                Glide.with(binding.root.context)
+                    .load(drug.imageUrl)
+                    .centerCrop()
+                    .into(binding.ivDrugImage)
+            } else {
+                // 이미지 없으면 null (현재 XML의 💊 이모티콘 유지)
+                binding.ivDrugImage.setImageDrawable(null)
+            }
+
             // 선택 상태에 따라 배경색 변경
             if (isSelected) {
                 binding.root.strokeColor = ContextCompat.getColor(

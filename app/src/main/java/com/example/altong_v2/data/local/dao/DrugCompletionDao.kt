@@ -52,7 +52,7 @@ interface DrugCompletionDao {
     @Query("UPDATE drug_completions SET is_completed = :isCompleted, completed_at = :completedAt WHERE drug_id = :drugId AND date = :date")
     suspend fun updateCompletion(drugId: Long, date: String, isCompleted: Boolean, completedAt: Long?)
 
-    // 모든 기록 삭제 (테스트용)
+    // 모든 기록 삭제 (개발/테스트용)
     @Query("DELETE FROM drug_completions")
     suspend fun deleteAll()
 }
