@@ -66,7 +66,12 @@ class MyPageFragment : Fragment() {
     }
 
     private fun navigateToAlarmHistory() {
-        showToast("알림 기록 화면으로 이동")
+        // 알람 기록 화면으로 가기
+        val fragment = AlarmHistoryFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun showToast(message: String) {
