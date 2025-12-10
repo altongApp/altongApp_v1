@@ -58,7 +58,11 @@ class MyPageFragment : Fragment() {
     }
 
     private fun navigateToAlarmSettings() {
-        showToast("알림 설정 화면으로 이동 ")
+        val fragment = AlarmSettingsFragment()
+        parentFragmentManager.beginTransaction()
+            .replace(android.R.id.content, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun navigateToAlarmHistory() {
