@@ -16,9 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }  // Material Calendar용 JitPack 추가
     }
 }
 
 rootProject.name = "Altong_v2"
 include(":app")
- 

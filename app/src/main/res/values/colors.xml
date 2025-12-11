@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="primary_green_light">#B5E2B3</color>
     <color name="primary_green_dark">#9DD6A1</color>
 
@@ -24,4 +25,8 @@
 
     <color name="background_ivory">@color/background_cream</color>
     <color name="primary_green">@color/primary_green_dark</color>
+
+    <!-- 캘린더 전용 색상 -->
+    <color name="calendar_selected_pink">#FFB6C1</color>    <!-- 선택된 날짜: 분홍색 배경 -->
+    <color name="calendar_drug_green">#90EE90</color>       <!-- 약 있는 날짜: 연두색 원 -->
 </resources>

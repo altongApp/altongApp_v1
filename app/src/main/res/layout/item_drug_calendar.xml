@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 약 체크박스 -->
+    <CheckBox
+        android:id="@+id/cb_drug"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:button="@null"
+        android:background="@drawable/checkbox_selector" />
+
+    <!-- 약 정보 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <!-- 약 이름 -->
+        <TextView
+            android:id="@+id/tv_drug_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아모스정 375mg"
+            android:textSize="14sp"
+            android:textColor="@color/black" />
+
+        <!-- 복용 시점 (있으면 표시) -->
+        <TextView
+            android:id="@+id/tv_timing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="식후 30분"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- 복용량 + 남은 일수 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <!-- 복용량 -->
+        <TextView
+            android:id="@+id/tv_dosage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1정"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@drawable/bg_dosage_badge" />
+
+        <!-- 남은 일수 (있으면 표시) -->
+        <TextView
+            android:id="@+id/tv_remaining_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="(남은 약: 5일분)"
+            android:textSize="10sp"
+            android:textColor="@color/primary_green_dark"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

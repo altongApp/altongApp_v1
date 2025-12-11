@@ -29,11 +29,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true  // Desugaring 활성화 - material calendar에서 필요함
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         viewBinding = true
@@ -86,4 +87,10 @@ dependencies {
     // image_uri를 가져오기 위한
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Material Calendar (캘린더용)
+    implementation("com.github.prolificinteractive:material-calendarview:2.0.1")
+
+    // Desugaring (Java 8 API를 Android 7.0 이하에서 사용 - material calendar가 java8이상부터 사용이 된다네용)
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

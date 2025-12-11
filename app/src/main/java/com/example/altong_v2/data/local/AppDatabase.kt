@@ -24,7 +24,7 @@ import com.example.altong_v2.data.local.entity.PrescriptionEntity
         FavoriteMedicineEntity::class,
         DrugCompletionEntity::class
     ],
-    version = 2,    // 데이터이미지 가져오는 과정에서 버전2로 변경
+    version = 3,    // 버전 그대로 유지
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -40,8 +40,8 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-         //Database 인스턴스 가져오기
-         //없으면 생성, 있으면 기존 인스턴스 반환
+        //Database 인스턴스 가져오기
+        //없으면 생성, 있으면 기존 인스턴스 반환
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -50,8 +50,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "altong_database"  // 우리 DB파일명
                 )
-                    .addMigrations(MIGRATION_1_2)   // 마이그레이션 추가
-                    // .fallbackToDestructiveMigration()  // 개발 중에만 사용 (데이터 삭제됨)
+                    // .addMigrations(MIGRATION_1_2)   // 임시로 주석 처리
+                    .fallbackToDestructiveMigration()  // 활성화 - 스키마 안 맞으면 DB 재생성
                     .build()
                 INSTANCE = instance
                 instance
