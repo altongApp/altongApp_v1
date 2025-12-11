@@ -67,21 +67,21 @@ class AlarmSettings(context: Context) {
     // 시간대에 해당하는 시간 가져오기
     fun getTimeBySlot(timeSlot: String): String {
         return when (timeSlot) {
-            "morning" -> morningTime
-            "lunch" -> lunchTime
-            "dinner" -> dinnerTime
-            "bedtime" -> bedtimeTime
+            "morning", "아침" -> morningTime
+            "lunch", "점심" -> lunchTime
+            "dinner", "저녁" -> dinnerTime
+            "bedtime", "취침 전", "취침전" -> bedtimeTime
             else -> DEFAULT_MORNING
         }
     }
 
-    // 시간대에 대핟ㅇ하는 시간 설정하기
+    // 시간대에 해당하는 시간 설정하기
     fun setTimeBySlot(timeSlot: String, time: String) {
         when (timeSlot) {
-            "morning" -> morningTime = time
-            "lunch" -> lunchTime = time
-            "dinner" -> dinnerTime = time
-            "bedtime" -> bedtimeTime = time
+            "morning", "아침" -> morningTime = time
+            "lunch", "점심" -> lunchTime = time
+            "dinner", "저녁" -> dinnerTime = time
+            "bedtime", "취침 전", "취침전" -> bedtimeTime = time
         }
     }
     // 모든 설정 초기화
