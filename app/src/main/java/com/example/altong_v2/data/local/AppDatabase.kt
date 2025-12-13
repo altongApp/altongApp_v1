@@ -89,7 +89,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "altong_database"  // 우리 DB파일명
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)   // 마이그레이션 추가
+                    //.addMigrations(MIGRATION_1_2, MIGRATION_2_3)   // 마이그레이션 추가
                     .fallbackToDestructiveMigration()  // 개발 중에만 사용 (데이터 삭제됨)
                     .build()
                 INSTANCE = instance
