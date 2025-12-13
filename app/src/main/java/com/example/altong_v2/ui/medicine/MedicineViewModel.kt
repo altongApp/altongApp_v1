@@ -11,8 +11,8 @@ import com.example.altong_v2.data.local.entity.FavoriteMedicineEntity
 import com.example.altong_v2.data.model.Medicine
 import com.example.altong_v2.data.model.PrescriptionMedicine
 import com.example.altong_v2.data.repository.MedicineRepository
+import com.example.altong_v2.data.repository.FavoriteMedicineRepository
 import com.google.firebase.firestore.DocumentSnapshot
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 
@@ -22,12 +22,14 @@ import kotlinx.coroutines.flow.Flow
  */
 class MedicineViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: MedicineRepository
+    private val medicineRepository: MedicineRepository
+    private val favoriteRepository: FavoriteMedicineRepository
     private val TAG = "MedicineViewModel"
 
     init {
         val favoriteMedicineDao = AppDatabase.getDatabase(application).favoriteMedicineDao()
-        repository = MedicineRepository(favoriteMedicineDao)
+        medicineRepository = MedicineRepository()
+        favoriteRepository = FavoriteMedicineRepository(favoriteMedicineDao)
     }
 
     // ========== 일반의약품 관련 ==========
@@ -58,7 +60,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _isLoadingGeneral.value = true
                 _errorMessage.value = null
 
-                val (medicines, lastDoc) = repository.getGeneralMedicines()
+                val (medicines, lastDoc) = medicineRepository.getGeneralMedicines()
                 allGeneralMedicines = medicines
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
@@ -83,7 +85,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                val (medicines, lastDoc) = repository.getGeneralMedicines(lastGeneralDocument)
+                val (medicines, lastDoc) = medicineRepository.getGeneralMedicines(lastGeneralDocument)
 
                 if (medicines.isNotEmpty()) {
                     allGeneralMedicines = allGeneralMedicines + medicines
@@ -108,7 +110,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
             try {
                 _isLoadingGeneral.value = true
 
-                val (medicines, lastDoc) = repository.getMedicinesByCategory(category)
+                val (medicines, lastDoc) = medicineRepository.getMedicinesByCategory(category)
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
@@ -133,7 +135,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                val (medicines, lastDoc) = repository.getMedicinesByCategory(
+                val (medicines, lastDoc) = medicineRepository.getMedicinesByCategory(
                     category,
                     lastGeneralDocument
                 )
@@ -167,7 +169,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _isLoadingGeneral.value = true
                 _errorMessage.value = null
 
-                val (medicines, lastDoc) = repository.searchGeneralMedicines(query)
+                val (medicines, lastDoc) = medicineRepository.searchGeneralMedicines(query)
                 _generalMedicines.value = medicines
                 lastGeneralDocument = lastDoc
 
@@ -191,7 +193,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                val (medicines, lastDoc) = repository.searchGeneralMedicines(
+                val (medicines, lastDoc) = medicineRepository.searchGeneralMedicines(
                     query,
                     lastGeneralDocument
                 )
@@ -230,7 +232,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _isLoadingPrescription.value = true
                 _errorMessage.value = null
 
-                val (medicines, lastDoc) = repository.getPrescriptionMedicines()
+                val (medicines, lastDoc) = medicineRepository.getPrescriptionMedicines()
                 _prescriptionMedicines.value = medicines
                 lastPrescriptionDocument = lastDoc
 
@@ -254,7 +256,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                val (medicines, lastDoc) = repository.getPrescriptionMedicines(lastPrescriptionDocument)
+                val (medicines, lastDoc) = medicineRepository.getPrescriptionMedicines(lastPrescriptionDocument)
 
                 if (medicines.isNotEmpty()) {
                     val currentList = _prescriptionMedicines.value ?: emptyList()
@@ -284,7 +286,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                 _isLoadingPrescription.value = true
                 _errorMessage.value = null
 
-                val (medicines, lastDoc) = repository.searchPrescriptionMedicines(query)
+                val (medicines, lastDoc) = medicineRepository.searchPrescriptionMedicines(query)
                 _prescriptionMedicines.value = medicines
                 lastPrescriptionDocument = lastDoc
 
@@ -308,7 +310,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
         viewModelScope.launch {
             try {
-                val (medicines, lastDoc) = repository.searchPrescriptionMedicines(
+                val (medicines, lastDoc) = medicineRepository.searchPrescriptionMedicines(
                     query,
                     lastPrescriptionDocument
                 )
@@ -326,27 +328,29 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // ========== 찜 기능 관련 ==========
+    // ========== 약품 상세 조회 ==========
 
     /**
      * 약품 ID로 일반의약품 조회
      */
     suspend fun getMedicineById(medicineId: String): Medicine? {
-        return repository.getMedicineById(medicineId)
+        return medicineRepository.getMedicineById(medicineId)
     }
 
     /**
      * 약품 ID로 전문의약품 조회
      */
     suspend fun getPrescriptionMedicineById(medicineId: String): PrescriptionMedicine? {
-        return repository.getPrescriptionMedicineById(medicineId)
+        return medicineRepository.getPrescriptionMedicineById(medicineId)
     }
+
+    // ========== 찜 기능 ==========
 
     /**
      * 찜 여부 확인
      */
     suspend fun isFavorite(medicineId: String): Boolean {
-        return repository.isFavorite(medicineId)
+        return favoriteRepository.isFavorite(medicineId)
     }
 
     /**
@@ -362,7 +366,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     medicineType = "general",
                     imageUrl = medicine.image_url ?: ""
                 )
-                repository.addFavorite(favorite)
+                favoriteRepository.addFavorite(favorite)
                 Log.d(TAG, "찜 추가: ${medicine.medicine_name}")
             } catch (e: Exception) {
                 Log.e(TAG, "찜 추가 실패", e)
@@ -384,7 +388,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
                     medicineType = "prescription",
                     imageUrl = medicine.image_url ?: ""
                 )
-                repository.addFavorite(favorite)
+                favoriteRepository.addFavorite(favorite)
                 Log.d(TAG, "찜 추가: ${medicine.medicine_name}")
             } catch (e: Exception) {
                 Log.e(TAG, "찜 추가 실패", e)
@@ -399,7 +403,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     fun removeFavorite(medicineId: String) {
         viewModelScope.launch {
             try {
-                repository.removeFavoriteById(medicineId)
+                favoriteRepository.removeFavoriteById(medicineId)
                 Log.d(TAG, "찜 해제: $medicineId")
             } catch (e: Exception) {
                 Log.e(TAG, "찜 해제 실패", e)
@@ -412,18 +416,18 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      * 타입별 찜 목록 조회
      */
     fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>> {
-        return repository.getFavoritesByType(type)
+        return favoriteRepository.getFavoritesByType(type)
     }
 
-    // MedicineViewModel.kt에 추가할 함수
+    // ========== 메모 기능 ==========
 
     /**
-     *  메모 저장/수정 (일반의약품만)
+     * 메모 저장/수정 (일반의약품만)
      */
     fun saveMemo(medicine: Medicine, memo: String) {
         viewModelScope.launch {
             try {
-                repository.saveMemo(medicine, memo)
+                favoriteRepository.saveMemo(medicine, memo)
 
                 if (memo.isBlank()) {
                     Log.d(TAG, "메모 삭제: ${medicine.medicine_name}")
@@ -441,14 +445,14 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
      * 메모 조회
      */
     suspend fun getMemo(medicineId: String): String? {
-        return repository.getMemo(medicineId)
+        return favoriteRepository.getMemo(medicineId)
     }
 
     /**
      * 메모 있는지 확인
      */
     suspend fun hasMemo(medicineId: String): Boolean {
-        val memo = repository.getMemo(medicineId)
+        val memo = favoriteRepository.getMemo(medicineId)
         return !memo.isNullOrBlank()
     }
 }
