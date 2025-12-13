@@ -7,7 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.example.altong_v2.data.local.AppDatabase
+import com.example.altong_v2.data.repository.PrescriptionRepository
 import com.example.altong_v2.databinding.FragmentTimeSettingBinding
+import com.example.altong_v2.ui.alarm.AlarmScheduler
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /*
@@ -21,6 +26,9 @@ class TimeSettingFragment : Fragment() {
     private lateinit var alarmSettings: AlarmSettings
     private lateinit var timeSlot: String
     private lateinit var timeLabel: String
+
+    private lateinit var repository: PrescriptionRepository
+    private lateinit var alarmScheduler: AlarmScheduler
 
     companion object {
         private const val ARG_TIME_SLOT = "time_slot"
@@ -58,7 +66,20 @@ class TimeSettingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        alarmSettings = AlarmSettings(requireContext())
+        // Repository와 AlarmScheduler 생성
+        val database = AppDatabase.getDatabase(requireContext())
+        repository = PrescriptionRepository(
+            database.prescriptionDao(),
+            database.drugDao()
+        )
+        alarmScheduler = AlarmScheduler(requireContext())
+
+        // AlarmSettings에 넘겨주기
+        alarmSettings = AlarmSettings(
+            requireContext(),
+            repository,
+            alarmScheduler
+        )
 
         setupUI()
         setupTimePicker()
@@ -114,37 +135,37 @@ class TimeSettingFragment : Fragment() {
 
      // 사용자가 선택한 시간 저장
     private fun saveTime() {
-        // TimePicker에서 시간 가져오기
-        val hour = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.timePicker.hour
-        } else {
-            @Suppress("DEPRECATION")
-            binding.timePicker.currentHour
-        }
+         // TimePicker에서 시간 가져오기
+         val hour = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             binding.timePicker.hour
+         } else {
+             @Suppress("DEPRECATION")
+             binding.timePicker.currentHour
+         }
 
-        val minute = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.timePicker.minute
-        } else {
-            @Suppress("DEPRECATION")
-            binding.timePicker.currentMinute
-        }
+         val minute = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+             binding.timePicker.minute
+         } else {
+             @Suppress("DEPRECATION")
+             binding.timePicker.currentMinute
+         }
 
-        // "HH:mm" 형식으로 변환
-        val timeString = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
-        // SharedPreferences에 저장
-        alarmSettings.setTimeBySlot(timeSlot, timeString)
+         // "HH:mm" 형식으로 변환
+         val timeString = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+         // SharedPreferences에 저장
+         viewLifecycleOwner.lifecycleScope.launch {
+             alarmSettings.setTimeAndReschedule(timeSlot, timeString)
 
-        Toast.makeText(
-            requireContext(),
-            "저장되었습니다",
-            Toast.LENGTH_SHORT
-        ).show()
+             Toast.makeText(
+                 requireContext(),
+                 "저장되었습니다",
+                 Toast.LENGTH_SHORT
+             ).show()
 
-        // TODO: Step 20에서 알람 재등록 로직 추가
-        // 뒤로가기
-        parentFragmentManager.popBackStack()
-    }
-
+             // 뒤로가기
+             parentFragmentManager.popBackStack()
+         }
+     }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

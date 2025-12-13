@@ -10,10 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.altong_v2.MainActivity
 import com.example.altong_v2.R
 import com.example.altong_v2.data.model.PrescriptionMedicine
 import com.example.altong_v2.data.repository.MedicineRepository
 import com.example.altong_v2.databinding.FragmentDrugSearchBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
@@ -28,6 +30,10 @@ class DrugSearchFragment : Fragment() {
     private lateinit var searchAdapter: DrugSearchAdapter
     // 선택된 약
     private var selectedDrug: DrugSearchResult? = null
+
+    // 디바운스용 변수
+    private var searchJob: Job? = null
+    private val searchDelay = 300L  //300ms
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,9 +69,27 @@ class DrugSearchFragment : Fragment() {
         binding.etDrugSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchDrugs(s.toString())
+//                searchDrugs(s.toString())
             }
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                val query = s?.toString()?.trim() ?: ""
+                // 기존 검색 작업 취소
+                searchJob?.cancel()
+                if (query.isEmpty()) {
+                    // 빈 문자열이면 즉시 초기화
+                    binding.layoutEmptyState.visibility = View.VISIBLE
+                    binding.rvSearchResults.visibility = View.GONE
+                    selectedDrug = null
+                    binding.btnSelectDrug.isEnabled = false
+                    return
+                }
+
+                // 새로운 검색 작업 예약 (300ms 후)
+                searchJob = lifecycleScope.launch {
+                    kotlinx.coroutines.delay(searchDelay)
+                    searchDrugs(query)
+                }
+            }
         })
     }
 
@@ -183,11 +207,17 @@ class DrugSearchFragment : Fragment() {
         android.util.Log.d("DrugAdd", "=== skipDrugRegistration 호출 ===")
         android.util.Log.d("DrugAdd", "isAddDrugMode: ${viewModel.isAddDrugMode}")
 
-        parentFragmentManager.popBackStack(
-            null,
-            androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-        )
-        showToast("처방전이 등록되었습니다")
+        // MainActivity 통해 "나의 약통" 탭으로 이동
+        (activity as? MainActivity)?.let { mainActivity ->
+            // 모든 백스택 제거
+            while (parentFragmentManager.backStackEntryCount > 0) {
+                parentFragmentManager.popBackStackImmediate()
+            }
+            // 하단 네비게이션을 "나의 약통"으로 변경
+            mainActivity.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+                R.id.bottom_navigation
+            )?.selectedItemId = R.id.nav_prescription
+        }
     }
 
     private fun showToast(message: String) {

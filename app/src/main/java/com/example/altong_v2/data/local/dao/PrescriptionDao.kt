@@ -8,7 +8,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import kotlinx.coroutines.flow.Flow
-
+import androidx.room.Transaction
+import com.example.altong_v2.data.local.entity.DrugEntity
 
 /*
  * 처방전 DAO
@@ -53,4 +54,8 @@ interface PrescriptionDao {
     // 처방전 개수 조회
     @Query("SELECT COUNT(*) FROM prescriptions")
     suspend fun getCount(): Int
+
+    // 모든 처방전 조회 (동기 버전 - 알람 재등록용)
+    @Query("SELECT * FROM prescriptions ORDER BY date DESC")
+    suspend fun getAllPrescriptionsSync(): List<PrescriptionEntity>
 }

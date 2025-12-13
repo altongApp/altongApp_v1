@@ -34,6 +34,9 @@ class AlarmScheduler(private val context: Context) {
         Log.d(TAG, "==================================================")
         Log.d(TAG, "알림 등록 시작: prescription=$prescriptionId, drug=${drug.name}")
         Log.d(TAG, "약품 timeSlots 원본: '${drug.timeSlots}'")
+        val systemNow = Calendar.getInstance()
+        Log.d(TAG, "📱 시스템 현재 시간: ${systemNow.time}")
+        Log.d(TAG, "📱 시스템 타임존: ${systemNow.timeZone.id}")
 
         // 알림이 비활성화되어 있으면 등록하지 않음
         if (!alarmSettings.isAlarmEnabled) {
@@ -132,6 +135,16 @@ class AlarmScheduler(private val context: Context) {
             putExtra(AlarmReceiver.EXTRA_DRUG_NAME, drug.name)
             putExtra(AlarmReceiver.EXTRA_TIME_SLOT, timeSlot)
             putExtra(AlarmReceiver.EXTRA_DIAGNOSIS, prescriptionId.toString())
+
+            // scheduledDate 추가 (날짜만, 시간은 00:00:00)
+            val scheduledDateCalendar = Calendar.getInstance().apply {
+                timeInMillis = alarmCalendar.timeInMillis
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            putExtra(AlarmReceiver.EXTRA_SCHEDULED_DATE, scheduledDateCalendar.timeInMillis)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(

@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.altong_v2.databinding.FragmentAlarmHistoryBinding
 import java.util.Calendar
 
-/* 알림 기록 Fragment
-TODO: Phase 2에서 실제 알림 기록 DB 연동 */
+/* 알림 기록 Fragment */
 class AlarmHistoryFragment : Fragment() {
     private var _binding: FragmentAlarmHistoryBinding? = null
     private val binding get() = _binding!!
@@ -60,8 +59,7 @@ class AlarmHistoryFragment : Fragment() {
         }
     }
 
-/*     * 알림 기록 불러오기
-     * TODO: Phase 2에서 실제 DB에서 가져오기 */
+/*     * 알림 기록 불러오기 - 임시 */
     private fun loadAlarmHistory() {
         // 더미 데이터 생성 (테스트용)
         val todayList = getDummyTodayData()
@@ -103,7 +101,6 @@ class AlarmHistoryFragment : Fragment() {
 
     /**
      * 더미 데이터 - 오늘
-     * TODO: Phase 2에서 삭제
      */
     private fun getDummyTodayData(): List<AlarmHistory> {
         val calendar = Calendar.getInstance()
@@ -131,7 +128,6 @@ class AlarmHistoryFragment : Fragment() {
 
     /**
      * 더미 데이터 - 어제
-     * TODO: Phase 2에서 삭제
      */
     private fun getDummyYesterdayData(): List<AlarmHistory> {
         val calendar = Calendar.getInstance()

@@ -344,6 +344,11 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     fun addDrugToPrescription(drug: TempDrugData) {
         viewModelScope.launch {
             try {
+                Log.d("PrescriptionVM", "==== addDrugToPrescription 시작 ====")
+                Log.d("PrescriptionVM", "addingToPrescriptionId: $addingToPrescriptionId")
+                Log.d("PrescriptionVM", "약품명: ${drug.name}")
+                Log.d("PrescriptionVM", "timeSlots: ${drug.timeSlots}")
+
                 val drugEntity = DrugEntity(
                     prescriptionId = addingToPrescriptionId,
                     name = drug.name,
@@ -355,27 +360,44 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                     timeSlots = drug.timeSlots.joinToString(","),
                     imageUrl = drug.imageUrl
                 )
+                Log.d("PrescriptionVM", "DrugEntity 생성 완료")
+                Log.d("PrescriptionVM", "  - timeSlots 저장값: '${drugEntity.timeSlots}'")
 
                 repository.insertDrug(drugEntity)
+                Log.d("PrescriptionVM", "DB 저장 완료")
 
                 //알림 등록 추가
                 try {
+                    Log.d("PrescriptionVM", "처방전 조회 시작...")
                     val prescription = repository.getPrescriptionById(addingToPrescriptionId)
-                    prescription?.let {
+
+                    if (prescription == null) {
+                        Log.e("PrescriptionVM", "❌ 처방전을 찾을 수 없습니다! prescriptionId=$addingToPrescriptionId")
+                    } else {
+                        Log.d("PrescriptionVM", "✅ 처방전 조회 성공")
+                        Log.d("PrescriptionVM", "  - 처방일: ${prescription.date}")
+                        Log.d("PrescriptionVM", "  - 진단명: ${prescription.diagnosis}")
+
+                        Log.d("PrescriptionVM", "AlarmScheduler 호출 시작...")
                         alarmScheduler.scheduleMedicationAlarms(
                             prescriptionId = addingToPrescriptionId,
                             drug = drugEntity,
-                            prescriptionDate = it.date
+                            prescriptionDate = prescription.date
                         )
+                        Log.d("PrescriptionVM", "AlarmScheduler 호출 완료")
                     }
                 } catch (e: Exception) {
-                    Log.e("PrescriptionVM", "알림 등록 실패: ${e.message}")
+                    Log.e("PrescriptionVM", "❌ 알림 등록 실패: ${e.message}", e)
+                    e.printStackTrace()
                 }
 
                 // 추가 모드 종료
-                isAddDrugMode = false
-                addingToPrescriptionId = -1L
+//                isAddDrugMode = false
+  //              addingToPrescriptionId = -1L
+
+                Log.d("PrescriptionVM", "==== addDrugToPrescription 완료 ====")
             } catch (e: Exception) {
+                Log.e("PrescriptionVM", "❌ 전체 프로세스 실패: ${e.message}", e)
                 e.printStackTrace()
             }
         }

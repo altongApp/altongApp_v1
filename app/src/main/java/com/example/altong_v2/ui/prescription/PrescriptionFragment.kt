@@ -89,7 +89,20 @@ class PrescriptionFragment : Fragment() {
             binding.emptyState.visibility = View.GONE
             binding.recyclerViewPrescriptions.visibility = View.VISIBLE
 
-            // 수정: 각 처방전의 약 정보를 LiveData로 관찰
+            // 위 블록 대신 이것만 추가 ↓
+            lifecycleScope.launch {
+                val prescriptionsWithDrugs = prescriptions.map { prescription ->
+                    val drugs = viewModel.getDrugsList(prescription.id)
+                    PrescriptionAdapter.PrescriptionWithDrugs(
+                        prescription = prescription,
+                        drugCount = drugs.size,
+                        drugNames = drugs.take(3).map { it.name }
+                    )
+                }
+                prescriptionAdapter.submitList(prescriptionsWithDrugs)
+            }
+
+/*            // 수정: 각 처방전의 약 정보를 LiveData로 관찰
             val prescriptionsWithDrugsMap = mutableMapOf<Long, PrescriptionAdapter.PrescriptionWithDrugs>()
 
             prescriptions.forEach { prescription ->
@@ -120,7 +133,7 @@ class PrescriptionFragment : Fragment() {
             val initialList = prescriptions.map { prescription ->
                 prescriptionsWithDrugsMap[prescription.id]!!
             }
-            prescriptionAdapter.submitList(initialList)
+            prescriptionAdapter.submitList(initialList)*/
         }
     }
 

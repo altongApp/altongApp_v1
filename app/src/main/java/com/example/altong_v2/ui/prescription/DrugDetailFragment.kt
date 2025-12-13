@@ -280,6 +280,10 @@ class DrugDetailFragment : Fragment() {
              // 약 추가 모드 (기존 처방전에)
              viewModel.isAddDrugMode -> {
                  viewModel.addDrugToPrescription(drugData)
+
+                 viewModel.isAddDrugMode = false
+                 viewModel.addingToPrescriptionId = -1L
+
                  showToast("약이 추가되었습니다")
                  // 상세 화면으로 돌아가기 (2번 pop)
                  parentFragmentManager.popBackStack()
