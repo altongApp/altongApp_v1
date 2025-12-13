@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/efficacy_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="두통, 치통, 발치후 동통, 인후통, 이통, 관절통, 신경통, 요통, 근육통, 견관절 주위염 동통, 타박통, 염좌통, 월경통, 분만후 동통, 골절통의 진통, 감기의 발열, 오한의 해열, 소염"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:lineSpacingMultiplier="1.6" />
+
+    </LinearLayout>
+</ScrollView>

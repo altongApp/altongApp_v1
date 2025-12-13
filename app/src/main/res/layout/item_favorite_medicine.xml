@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- 약품 이미지 -->
+        <ImageView
+            android:id="@+id/medicine_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/medicine_image_placeholder" />
+
+        <!-- 약품 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/medicine_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="타이레놀정 500mg"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/medicine_company"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="한국안센"
+                android:textSize="13sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp" />
+
+            <!-- ⭐ 메모 상태 표시 -->
+            <TextView
+                android:id="@+id/memo_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📝 메모 있음"
+                android:textSize="12sp"
+                android:textColor="@color/primary_green_dark"
+                android:layout_marginTop="4dp"
+                android:visibility="gone" />
+
+            <!-- 메모 내용 (접힌 상태) -->
+            <TextView
+                android:id="@+id/memo_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/primary_green_dark"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- 삭제 버튼 -->
+        <ImageButton
+            android:id="@+id/delete_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_delete"
+            android:contentDescription="찜 해제" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

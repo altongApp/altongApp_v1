@@ -19,8 +19,14 @@ import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import androidx.room.TypeConverters
 import com.example.altong_v2.data.local.Converters
 
-/* * Room Database 메인 클래스
- * 싱글톤 패턴으로 앱 전체에서 하나의 인스턴스만 사용*/
+/**
+ * Room Database 메인 클래스
+ * 싱글톤 패턴으로 앱 전체에서 하나의 인스턴스만 사용
+ *
+ * 📝 Version History:
+ * - v1: 초기 버전 (처방전, 처방약, 찜, 복용완료)
+ * - v2: FavoriteMedicineEntity에 isFavorite 필드 추가 (찜/메모 분리)
+ */
 
 @TypeConverters(Converters::class)
 @Database(
@@ -84,7 +90,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "altong_database"  // 우리 DB파일명
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3)   // 마이그레이션 추가
-                    // .fallbackToDestructiveMigration()  // 개발 중에만 사용 (데이터 삭제됨)
+                    .fallbackToDestructiveMigration()  // 개발 중에만 사용 (데이터 삭제됨)
                     .build()
                 INSTANCE = instance
                 instance
