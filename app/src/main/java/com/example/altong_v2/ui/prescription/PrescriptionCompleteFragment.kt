@@ -50,8 +50,6 @@ class PrescriptionCompleteFragment : Fragment() {
              .replace(R.id.fragment_container, fragment)
              .addToBackStack(null)
              .commit()
-
-        showToast("약 등록 기능은 Phase 5에서 구현됩니다")
     }
 
     // 약 등록 건뛰

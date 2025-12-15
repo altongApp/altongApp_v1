@@ -5,6 +5,8 @@ import com.example.altong_v2.data.local.dao.PrescriptionDao
 import com.example.altong_v2.data.local.entity.DrugEntity
 import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import kotlinx.coroutines.flow.Flow
+import com.example.altong_v2.data.model.PrescriptionWithDrugs
+import kotlinx.coroutines.flow.first
 
 /*
  * 처방전 Repository
@@ -74,5 +76,15 @@ class PrescriptionRepository(
     // 모든 약 조회 (캘린더용)
     fun getAllDrugs(): Flow<List<DrugEntity>> {
         return drugDao.getAllDrugs()
+    }
+
+    // 모든 처방전과 약품 가져오기
+    suspend fun getAllPrescriptionsWithDrugs(): List<PrescriptionWithDrugs> {
+        val prescriptions = prescriptionDao.getAllPrescriptionsSync() // 모든 처방전
+        // 각 처방전의 약품 가져오기
+        return prescriptions.map { prescription ->
+            val drugs = drugDao.getDrugsByPrescription(prescription.id).first()
+            PrescriptionWithDrugs(prescription, drugs)
+        }
     }
 }

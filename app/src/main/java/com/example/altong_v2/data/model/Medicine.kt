@@ -1,6 +1,9 @@
 package com.example.altong_v2.data.model
 
-// 일반의약품 (OTC - Over The Counter)
+/**
+ * 일반의약품 (OTC - Over The Counter)
+ * Firebase 'medicines' 컬렉션과 매핑
+ */
 data class Medicine(
     val medicine_id: String = "",           // 품목기준코드
     val medicine_name: String = "",         // 약품명

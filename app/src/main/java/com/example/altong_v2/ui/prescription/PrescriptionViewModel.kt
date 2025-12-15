@@ -1,6 +1,7 @@
 package com.example.altong_v2.ui.prescription
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
@@ -11,12 +12,14 @@ import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import com.example.altong_v2.data.repository.PrescriptionRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import com.example.altong_v2.ui.alarm.AlarmScheduler
 
 /* * 나의 약통 ViewModel
  * 처방전 및 약 데이터 관리*/
 
 class PrescriptionViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: PrescriptionRepository
+    private val alarmScheduler: AlarmScheduler
 
     // 모든 처방전 (LiveData로 실시간 업데이트)
     val allPrescriptions: LiveData<List<PrescriptionEntity>>
@@ -28,6 +31,7 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
 
         repository = PrescriptionRepository(prescriptionDao, drugDao)
         allPrescriptions = repository.allPrescriptions.asLiveData()
+        alarmScheduler = AlarmScheduler(application)
     }
     // 처방전 추가
     fun insertPrescription(prescription: PrescriptionEntity, onSuccess: (Long) -> Unit) {
@@ -70,6 +74,21 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     fun insertDrug(drug: DrugEntity, onSuccess: (Long) -> Unit = {}) {
         viewModelScope.launch {
             val id = repository.insertDrug(drug)
+
+            // 알림 등록 추가
+            try {
+                val prescription = repository.getPrescriptionById(drug.prescriptionId)
+                prescription?.let {
+                    alarmScheduler.scheduleMedicationAlarms(
+                        prescriptionId = drug.prescriptionId,
+                        drug = drug,
+                        prescriptionDate = it.date
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("PrescriptionVM", "알림 등록 실패: ${e.message}")
+            }
+
             onSuccess(id)
         }
     }
@@ -82,6 +101,20 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     // 약 삭제
     fun deleteDrug(drug: DrugEntity) {
         viewModelScope.launch {
+            //알림 취소 추가
+            try {
+                val prescription = repository.getPrescriptionById(drug.prescriptionId)
+                prescription?.let {
+                    alarmScheduler.cancelMedicationAlarms(
+                        prescriptionId = drug.prescriptionId,
+                        drug = drug,
+                        prescriptionDate = it.date
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("PrescriptionVM", "알림 취소 실패: ${e.message}")
+            }
+
             repository.deleteDrug(drug)
         }
     }
@@ -149,7 +182,19 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                         imageUrl = drug.imageUrl
                     )
                     repository.insertDrug(drugEntity)
+
+                    //알림 등록 추가
+                    try {
+                        alarmScheduler.scheduleMedicationAlarms(
+                            prescriptionId = prescriptionId,
+                            drug = drugEntity,
+                            prescriptionDate = tempDate
+                        )
+                    } catch (e: Exception) {
+                        Log.e("PrescriptionVM", "알림 등록 실패: ${e.message}")
+                    }
                 }
+
                 // 3. 임시 데이터 초기화
                 clearTempData()
             } catch (e: Exception) {
@@ -230,9 +275,23 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     fun updateDrugsOnly() {
         viewModelScope.launch {
             try {
+                // 처방일 미리 가져오기
+                val prescription = repository.getPrescriptionById(editingPrescriptionId)
+                val prescriptionDate = prescription?.date ?: ""
+
                 // 1. 기존 약품 전체 삭제
                 val oldDrugs = getDrugsList(editingPrescriptionId)
                 oldDrugs.forEach { drug ->
+                    //  알림 취소 추가
+                    try {
+                        alarmScheduler.cancelMedicationAlarms(
+                            prescriptionId = editingPrescriptionId,
+                            drug = drug,
+                            prescriptionDate = prescriptionDate
+                        )
+                    } catch (e: Exception) {
+                        Log.e("PrescriptionVM", "알림 취소 실패: ${e.message}")
+                    }
                     repository.deleteDrug(drug)
                 }
                 // 2. 새로운 약품 전체 추가
@@ -249,6 +308,16 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                         imageUrl = drug.imageUrl
                     )
                     repository.insertDrug(drugEntity)
+                    // 알림 등록 추가
+                    try {
+                        alarmScheduler.scheduleMedicationAlarms(
+                            prescriptionId = editingPrescriptionId,
+                            drug = drugEntity,
+                            prescriptionDate = prescriptionDate
+                        )
+                    } catch (e: Exception) {
+                        Log.e("PrescriptionVM", "알림 등록 실패: ${e.message}")
+                    }
                 }
                 isEditMode = false
                 editingPrescriptionId = -1L
@@ -275,6 +344,11 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
     fun addDrugToPrescription(drug: TempDrugData) {
         viewModelScope.launch {
             try {
+                Log.d("PrescriptionVM", "==== addDrugToPrescription 시작 ====")
+                Log.d("PrescriptionVM", "addingToPrescriptionId: $addingToPrescriptionId")
+                Log.d("PrescriptionVM", "약품명: ${drug.name}")
+                Log.d("PrescriptionVM", "timeSlots: ${drug.timeSlots}")
+
                 val drugEntity = DrugEntity(
                     prescriptionId = addingToPrescriptionId,
                     name = drug.name,
@@ -286,12 +360,44 @@ class PrescriptionViewModel(application: Application) : AndroidViewModel(applica
                     timeSlots = drug.timeSlots.joinToString(","),
                     imageUrl = drug.imageUrl
                 )
+                Log.d("PrescriptionVM", "DrugEntity 생성 완료")
+                Log.d("PrescriptionVM", "  - timeSlots 저장값: '${drugEntity.timeSlots}'")
 
                 repository.insertDrug(drugEntity)
+                Log.d("PrescriptionVM", "DB 저장 완료")
+
+                //알림 등록 추가
+                try {
+                    Log.d("PrescriptionVM", "처방전 조회 시작...")
+                    val prescription = repository.getPrescriptionById(addingToPrescriptionId)
+
+                    if (prescription == null) {
+                        Log.e("PrescriptionVM", "❌ 처방전을 찾을 수 없습니다! prescriptionId=$addingToPrescriptionId")
+                    } else {
+                        Log.d("PrescriptionVM", "✅ 처방전 조회 성공")
+                        Log.d("PrescriptionVM", "  - 처방일: ${prescription.date}")
+                        Log.d("PrescriptionVM", "  - 진단명: ${prescription.diagnosis}")
+
+                        Log.d("PrescriptionVM", "AlarmScheduler 호출 시작...")
+                        alarmScheduler.scheduleMedicationAlarms(
+                            prescriptionId = addingToPrescriptionId,
+                            drug = drugEntity,
+                            prescriptionDate = prescription.date
+                        )
+                        Log.d("PrescriptionVM", "AlarmScheduler 호출 완료")
+                    }
+                } catch (e: Exception) {
+                    Log.e("PrescriptionVM", "❌ 알림 등록 실패: ${e.message}", e)
+                    e.printStackTrace()
+                }
+
                 // 추가 모드 종료
-                isAddDrugMode = false
-                addingToPrescriptionId = -1L
+//                isAddDrugMode = false
+  //              addingToPrescriptionId = -1L
+
+                Log.d("PrescriptionVM", "==== addDrugToPrescription 완료 ====")
             } catch (e: Exception) {
+                Log.e("PrescriptionVM", "❌ 전체 프로세스 실패: ${e.message}", e)
                 e.printStackTrace()
             }
         }

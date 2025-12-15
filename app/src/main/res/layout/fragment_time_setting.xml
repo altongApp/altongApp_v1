@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_cream"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:elevation="2dp">
+
+        <TextView
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="‹"
+            android:textSize="24sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="시간 설정"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center"
+            android:layout_marginEnd="24dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="40dp">
+
+        <!-- 시간대 아이콘 -->
+        <TextView
+            android:id="@+id/tv_time_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌅"
+            android:textSize="64sp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- 시간대 라벨 -->
+        <TextView
+            android:id="@+id/tv_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아침 시간"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="32dp" />
+
+        <!-- TimePicker -->
+        <TimePicker
+            android:id="@+id/time_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:timePickerMode="spinner" />
+
+        <!-- 저장 버튼 -->
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="저장"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_button_primary"
+            android:layout_marginTop="32dp" />
+    </LinearLayout>
+</LinearLayout>
