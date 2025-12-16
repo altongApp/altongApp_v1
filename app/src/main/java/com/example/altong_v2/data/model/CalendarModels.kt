@@ -6,14 +6,15 @@ package com.example.altong_v2.data.model
  */
 data class CalendarDayData(
     val date: String,                               // 날짜 (YYYY-MM-DD)
-    val prescriptions: List<PrescriptionWithDrugs>  // 해당 날짜의 처방전 리스트
+    val prescriptions: List<CalendarPrescription>   // 해당 날짜의 처방전 리스트 (이름 변경!)
 )
 
 /**
- * 처방전과 해당 처방전의 약들을 함께 담는 클래스
+ * 캘린더용 처방전과 약 정보
  * 진단명별로 그룹핑하기 위한 구조
+ * (약통용 PrescriptionWithDrugs와 구별하기 위해 이름 변경)
  */
-data class PrescriptionWithDrugs(
+data class CalendarPrescription(
     val prescriptionId: Long,                       // 처방전 ID
     val diagnosis: String,                          // 진단명 (예: "감기")
     val prescriptionDate: String,                   // 처방일

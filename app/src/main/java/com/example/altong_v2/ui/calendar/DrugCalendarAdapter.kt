@@ -54,22 +54,37 @@ class DrugCalendarAdapter(
     fun submitList(drugsByTimeSlot: Map<String, List<DrugItem>>) {
         displayItems.clear()
 
+        // 🔍 디버깅 로그
+        android.util.Log.d("DrugAdapter", """
+            ========================================
+            submitList 호출됨!
+            받은 시간대 개수: ${drugsByTimeSlot.size}
+            시간대 키: ${drugsByTimeSlot.keys.joinToString()}
+        """.trimIndent())
+
         // 시간대 순서 정의 (아침 → 점심 → 저녁 → 취침 전)
         val timeSlotOrder = listOf("아침", "점심", "저녁", "취침 전")
 
         // 시간대별로 헤더와 약들 추가
         for (timeSlot in timeSlotOrder) {
             val drugs = drugsByTimeSlot[timeSlot]
+            android.util.Log.d("DrugAdapter", "  체크: '$timeSlot' -> ${drugs?.size ?: 0}개 약")
+
             if (drugs != null && drugs.isNotEmpty()) {
                 // 시간대 헤더 추가
                 displayItems.add(DisplayItem.TimeSlotHeader(timeSlot))
+                android.util.Log.d("DrugAdapter", "    → 헤더 추가: $timeSlot")
 
                 // 해당 시간대의 약들 추가
                 drugs.forEach { drug ->
                     displayItems.add(DisplayItem.Drug(drug))
+                    android.util.Log.d("DrugAdapter", "    → 약 추가: ${drug.drugName}")
                 }
             }
         }
+
+        android.util.Log.d("DrugAdapter", "최종 displayItems 개수: ${displayItems.size}")
+        android.util.Log.d("DrugAdapter", "========================================")
 
         notifyDataSetChanged()
     }

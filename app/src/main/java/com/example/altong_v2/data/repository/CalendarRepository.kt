@@ -8,7 +8,7 @@ import com.example.altong_v2.data.local.entity.DrugEntity
 import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import com.example.altong_v2.data.model.CalendarDayData
 import com.example.altong_v2.data.model.DrugItem
-import com.example.altong_v2.data.model.PrescriptionWithDrugs
+import com.example.altong_v2.data.model.CalendarPrescription
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
@@ -88,7 +88,7 @@ class CalendarRepository(
         val allPrescriptions = prescriptionDao.getAllPrescriptions().first()
 
         // 2. 날짜에 해당하는 처방전들을 처리
-        val prescriptionsWithDrugs = mutableListOf<PrescriptionWithDrugs>()
+        val prescriptionsWithDrugs = mutableListOf<CalendarPrescription>()
 
         for (prescription in allPrescriptions) {
             // 3. 각 처방전의 약들 가져오기
@@ -112,7 +112,7 @@ class CalendarRepository(
                 val maxDays = validDrugs.maxOf { it.days }
 
                 prescriptionsWithDrugs.add(
-                    PrescriptionWithDrugs(
+                    CalendarPrescription(
                         prescriptionId = prescription.id,
                         diagnosis = prescription.diagnosis,
                         prescriptionDate = prescription.date,

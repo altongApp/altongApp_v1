@@ -52,14 +52,26 @@ class CalendarFragment : Fragment() {
      * RecyclerView 설정
      */
     private fun setupRecyclerView() {
-        prescriptionAdapter = PrescriptionCalendarAdapter { prescriptionId, isCompleted ->
-            // 진단명 체크박스 클릭 시 해당 처방전의 모든 약 체크/해제
-            viewModel.togglePrescriptionCompletion(prescriptionId, isCompleted)
-        }
+        prescriptionAdapter = PrescriptionCalendarAdapter(
+            onPrescriptionCheckChanged = { prescriptionId, isCompleted ->
+                // 진단명 체크박스 클릭 시 해당 처방전의 모든 약 체크/해제
+                viewModel.togglePrescriptionCompletion(prescriptionId, isCompleted)
+            },
+            onToggleStateChanged = {
+                // ✅ 토글 상태 변경 시 RecyclerView 강제 갱신
+                binding.rvPrescriptions.post {
+                    prescriptionAdapter.notifyDataSetChanged()
+                }
+            }
+        )
 
         binding.rvPrescriptions.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = prescriptionAdapter
+
+            // ✅ 높이 재계산을 위한 설정
+            setHasFixedSize(false)
+            itemAnimator = null  // 애니메이션 제거 (깜빡임 방지)
         }
     }
 
