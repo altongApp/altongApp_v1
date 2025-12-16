@@ -106,20 +106,6 @@
                 android:overScrollMode="never"
                 tools:listitem="@layout/item_prescription_calendar" />
 
-            <!-- 모두 복용 완료 버튼 -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_toggle_all"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:text="✓ 모두 복용 완료"
-                android:textSize="16sp"
-                android:textColor="@color/primary_green_dark"
-                app:strokeColor="@color/primary_green_dark"
-                app:strokeWidth="2dp"
-                app:backgroundTint="@color/white"
-                app:cornerRadius="12dp" />
-
             <!-- 약이 없을 때 표시되는 메시지 -->
             <LinearLayout
                 android:id="@+id/layout_empty"

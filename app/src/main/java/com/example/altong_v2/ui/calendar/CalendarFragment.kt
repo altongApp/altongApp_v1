@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentCalendarBinding
@@ -53,14 +56,37 @@ class CalendarFragment : Fragment() {
      */
     private fun setupRecyclerView() {
         prescriptionAdapter = PrescriptionCalendarAdapter(
+            activity = requireActivity(),
             onPrescriptionCheckChanged = { prescriptionId, isCompleted ->
-                // 진단명 체크박스 클릭 시 해당 처방전의 모든 약 체크/해제
+                // 진단명의 모든 약 체크/해제
                 viewModel.togglePrescriptionCompletion(prescriptionId, isCompleted)
+
+                // 데이터 다시 로드
+                viewModel.selectedDate.value?.let { date ->
+                    viewModel.selectDate(date)
+                }
             },
-            onToggleStateChanged = {
-                // ✅ 토글 상태 변경 시 RecyclerView 강제 갱신
-                binding.rvPrescriptions.post {
-                    prescriptionAdapter.notifyDataSetChanged()
+            onDrugCheckChanged = { drugId, timeSlot ->
+                // 개별 약 체크 시
+                viewModel.toggleDrugCompletion(drugId, timeSlot)
+
+                // 데이터 다시 로드
+                viewModel.selectedDate.value?.let { date ->
+                    viewModel.selectDate(date)
+                }
+            },
+            onGetUpdatedPrescription = { prescriptionId, callback ->
+                // ✅ 최신 데이터 가져오기
+                viewModel.selectedDate.value?.let { date ->
+                    viewModel.selectDate(date)
+
+                    // LiveData 관찰해서 최신 데이터 전달
+                    viewModel.selectedDayData.observeOnce(viewLifecycleOwner) { dayData ->
+                        val updatedPrescription = dayData.prescriptions.find {
+                            it.prescriptionId == prescriptionId
+                        }
+                        callback(updatedPrescription)
+                    }
                 }
             }
         )
@@ -68,10 +94,8 @@ class CalendarFragment : Fragment() {
         binding.rvPrescriptions.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = prescriptionAdapter
-
-            // ✅ 높이 재계산을 위한 설정
             setHasFixedSize(false)
-            itemAnimator = null  // 애니메이션 제거 (깜빡임 방지)
+            itemAnimator = null
         }
     }
 
@@ -108,11 +132,6 @@ class CalendarFragment : Fragment() {
         binding.btnAddPrescription.setOnClickListener {
             showAddPrescriptionDialog()
         }
-
-        // 모두 복용 완료 / 체크 해제 버튼
-        binding.btnToggleAll.setOnClickListener {
-            onToggleAllClicked()
-        }
     }
 
     /**
@@ -124,19 +143,14 @@ class CalendarFragment : Fragment() {
             if (dayData.prescriptions.isEmpty()) {
                 // 약이 없을 때
                 binding.rvPrescriptions.visibility = View.GONE
-                binding.btnToggleAll.visibility = View.GONE
                 binding.layoutEmpty.visibility = View.VISIBLE
             } else {
                 // 약이 있을 때
                 binding.rvPrescriptions.visibility = View.VISIBLE
-                binding.btnToggleAll.visibility = View.VISIBLE
                 binding.layoutEmpty.visibility = View.GONE
 
                 // 어댑터에 데이터 전달
                 prescriptionAdapter.submitList(dayData.prescriptions)
-
-                // "모두 복용 완료" 버튼 텍스트 업데이트
-                updateToggleAllButtonText()
             }
         }
 
@@ -226,28 +240,6 @@ class CalendarFragment : Fragment() {
     }
 
     /**
-     * "모두 복용 완료" 버튼 텍스트 업데이트
-     * 모두 완료 상태면 "체크 해제", 아니면 "모두 복용 완료"
-     */
-    private fun updateToggleAllButtonText() {
-        val allCompleted = viewModel.areAllDrugsCompleted()
-        binding.btnToggleAll.text = if (allCompleted) {
-            "✓ 체크 해제"
-        } else {
-            "✓ 모두 복용 완료"
-        }
-    }
-
-    /**
-     * "모두 복용 완료" / "체크 해제" 버튼 클릭
-     */
-    private fun onToggleAllClicked() {
-        val allCompleted = viewModel.areAllDrugsCompleted()
-        // 현재 상태의 반대로 토글
-        viewModel.toggleAllDrugs(!allCompleted)
-    }
-
-    /**
      * 처방전 등록 다이얼로그 표시
      */
     private fun showAddPrescriptionDialog() {
@@ -276,4 +268,16 @@ class CalendarFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+}
+
+/**
+ * LiveData를 한 번만 관찰하는 확장 함수
+ */
+fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, observer: (T) -> Unit) {
+    observe(owner, object : Observer<T> {
+        override fun onChanged(value: T) {
+            observer(value)
+            removeObserver(this)
+        }
+    })
 }

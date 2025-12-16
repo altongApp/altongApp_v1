@@ -123,13 +123,16 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     /**
      * 개별 약의 체크박스 토글
      * @param drugId 약 ID
+     * @param timeSlot 시간대 (예: "아침", "점심")
      */
-    fun toggleDrugCompletion(drugId: Long) {
+    fun toggleDrugCompletion(drugId: Long, timeSlot: String) {
         val date = _selectedDate.value ?: return
 
         viewModelScope.launch {
             try {
-                repository.toggleCompletion(drugId, date)
+                // ✅ date에 시간대 포함해서 전달
+                val dateWithSlot = "$date-$timeSlot"
+                repository.toggleCompletion(drugId, dateWithSlot)
                 // 데이터 새로고침
                 loadDrugsForDate(date)
             } catch (e: Exception) {

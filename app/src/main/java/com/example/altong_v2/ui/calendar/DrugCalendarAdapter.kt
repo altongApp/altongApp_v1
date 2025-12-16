@@ -17,7 +17,7 @@ import com.example.altong_v2.databinding.ItemTimeSlotHeaderBinding
  * - DRUG_ITEM: 개별 약 아이템
  */
 class DrugCalendarAdapter(
-    private val onDrugCheckChanged: (Long) -> Unit  // 약 체크박스 클릭 콜백
+    private val onDrugCheckChanged: (Long, String) -> Unit  // ✅ (drugId, timeSlot) 전달
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // ViewType 상수
@@ -179,13 +179,13 @@ class DrugCalendarAdapter(
 
             // 체크박스 클릭 리스너
             binding.cbDrug.setOnClickListener {
-                onDrugCheckChanged(drug.drugId)
+                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // ✅ timeSlot 추가
             }
 
             // 아이템 전체 클릭 시 체크박스 토글
             binding.root.setOnClickListener {
                 binding.cbDrug.isChecked = !binding.cbDrug.isChecked
-                onDrugCheckChanged(drug.drugId)
+                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // ✅ timeSlot 추가
             }
         }
     }

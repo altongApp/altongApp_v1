@@ -14,33 +14,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
-        <!-- 진단명 헤더 (클릭 가능) -->
+        <!-- 진단명 헤더 -->
         <LinearLayout
             android:id="@+id/layout_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <!-- 진단명 체크박스 -->
-            <CheckBox
-                android:id="@+id/cb_prescription"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:button="@null"
-                android:background="@drawable/checkbox_selector" />
+            android:gravity="center_vertical">
 
             <!-- 진단명 정보 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="12dp"
                 android:orientation="vertical">
 
                 <!-- 진단명 -->
@@ -64,30 +55,26 @@
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
 
-            <!-- 펼침/접힘 아이콘 -->
+            <!-- 복용 완료 라벨 -->
+            <TextView
+                android:id="@+id/tv_completed_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✓ 복용 완료!"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_green_dark"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+
+            <!-- 클릭 유도 아이콘 (→) -->
             <ImageView
-                android:id="@+id/iv_expand"
+                android:id="@+id/iv_arrow"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_expand_more"
+                android:src="@android:drawable/ic_menu_more"
+                android:rotation="270"
                 app:tint="@color/text_secondary" />
-        </LinearLayout>
-
-        <!-- 약 리스트 (접었다 펼칠 수 있음) -->
-        <LinearLayout
-            android:id="@+id/layout_drugs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <!-- 시간대별 약 리스트 RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_drugs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

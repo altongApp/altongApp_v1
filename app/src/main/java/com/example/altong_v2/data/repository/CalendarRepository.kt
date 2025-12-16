@@ -187,25 +187,34 @@ class CalendarRepository(
             val prescription = prescriptionDao.getPrescriptionById(prescriptionId)
             prescription?.let {
                 if (isDateInPrescriptionRange(date, it.date, drug.days)) {
-                    // 기존 기록 확인
-                    val existing = drugCompletionDao.getCompletion(drug.id, date)
+                    // ✅ 시간대별로 체크
+                    val timeSlots = drug.timeSlots.split(",").map { it.trim() }
 
-                    if (existing == null) {
-                        // 기록 없으면 새로 생성
-                        if (isCompleted) {
-                            drugCompletionDao.insert(
-                                DrugCompletionEntity(
-                                    drugId = drug.id,
-                                    date = date,
-                                    isCompleted = true,
-                                    completedAt = System.currentTimeMillis()
-                                )
-                            )
+                    for (slot in timeSlots) {
+                        if (slot.isNotEmpty()) {
+                            val dateWithSlot = "$date-$slot"
+
+                            // 기존 기록 확인
+                            val existing = drugCompletionDao.getCompletion(drug.id, dateWithSlot)
+
+                            if (existing == null) {
+                                // 기록 없으면 새로 생성
+                                if (isCompleted) {
+                                    drugCompletionDao.insert(
+                                        DrugCompletionEntity(
+                                            drugId = drug.id,
+                                            date = dateWithSlot,  // ✅ 시간대 포함
+                                            isCompleted = true,
+                                            completedAt = System.currentTimeMillis()
+                                        )
+                                    )
+                                }
+                            } else {
+                                // 기록 있으면 업데이트
+                                val completedAt = if (isCompleted) System.currentTimeMillis() else null
+                                drugCompletionDao.updateCompletion(drug.id, dateWithSlot, isCompleted, completedAt)
+                            }
                         }
-                    } else {
-                        // 기록 있으면 업데이트
-                        val completedAt = if (isCompleted) System.currentTimeMillis() else null
-                        drugCompletionDao.updateCompletion(drug.id, date, isCompleted, completedAt)
                     }
                 }
             }
@@ -273,23 +282,25 @@ class CalendarRepository(
                 calculateRemainingDays(it.date, drug.days, date)
             } ?: 0
 
-            // 체크 상태 조회
-            val completion = drugCompletionDao.getCompletion(drug.id, date)
-            val isCompleted = completion?.isCompleted ?: false
-
-            // DrugItem 생성
-            val drugItem = DrugItem(
-                drugId = drug.id,
-                drugName = drug.name,
-                dosage = drug.dosage,
-                timing = drug.timing,
-                remainingDays = remainingDays,
-                isCompleted = isCompleted
-            )
-
-            // 각 시간대에 약 추가
+            // 각 시간대마다 별도의 DrugItem 생성
             for (slot in timeSlots) {
                 if (slot.isNotEmpty()) {
+                    // ✅ 체크 상태 조회: date에 시간대 포함
+                    val dateWithSlot = "$date-$slot"
+                    val completion = drugCompletionDao.getCompletion(drug.id, dateWithSlot)
+                    val isCompleted = completion?.isCompleted ?: false
+
+                    // DrugItem 생성 (시간대 포함!)
+                    val drugItem = DrugItem(
+                        drugId = drug.id,
+                        drugName = drug.name,
+                        dosage = drug.dosage,
+                        timing = drug.timing,
+                        remainingDays = remainingDays,
+                        isCompleted = isCompleted,
+                        timeSlot = slot  // ✅ 시간대 추가
+                    )
+
                     grouped.getOrPut(slot) { mutableListOf() }.add(drugItem)
                 }
             }

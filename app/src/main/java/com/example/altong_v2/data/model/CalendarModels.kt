@@ -35,5 +35,6 @@ data class DrugItem(
     val dosage: String,                             // 1회 복용량 (예: "1정")
     val timing: String?,                            // 복용 시점 (예: "식후 30분")
     val remainingDays: Int,                         // 남은 복용 일수
-    val isCompleted: Boolean                        // 복용 완료 여부 (체크박스 상태)
+    val isCompleted: Boolean,                       // 복용 완료 여부 (체크박스 상태)
+    val timeSlot: String                            // ✅ 시간대 (예: "아침", "점심")
 )
