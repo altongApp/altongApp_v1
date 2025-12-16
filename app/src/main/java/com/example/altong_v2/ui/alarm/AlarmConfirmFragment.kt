@@ -13,6 +13,7 @@ import com.example.altong_v2.MainActivity
 import com.example.altong_v2.R
 import com.example.altong_v2.data.local.AppDatabase
 import com.example.altong_v2.data.local.entity.MedicationLog
+import com.example.altong_v2.data.repository.CalendarRepository
 import com.example.altong_v2.databinding.FragmentAlarmConfirmBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -23,9 +24,11 @@ class AlarmConfirmFragment : Fragment() {
     private var _binding: FragmentAlarmConfirmBinding? = null
     private val binding get() = _binding!!
     private lateinit var database: AppDatabase
+    private lateinit var calendarRepository: CalendarRepository
 
     // Arguments로 받을 데이터
     private var prescriptionId: Long = 0L
+    private var drugId: Long = 0L  // ✅ drugId 추가
     private var drugName: String = ""
     private var timeSlot: String = ""
     private var scheduledDate: Long = 0L
@@ -33,12 +36,14 @@ class AlarmConfirmFragment : Fragment() {
     companion object {
         private const val TAG = "AlarmConfirm"
         private const val ARG_PRESCRIPTION_ID = "prescription_id"
+        private const val ARG_DRUG_ID = "drug_id"  // ✅ drugId 추가
         private const val ARG_DRUG_NAME = "drug_name"
         private const val ARG_TIME_SLOT = "time_slot"
         private const val ARG_SCHEDULED_DATE = "scheduled_date"
 
         fun newInstance(
             prescriptionId: Long,
+            drugId: Long,  // ✅ drugId 추가
             drugName: String,
             timeSlot: String,
             scheduledDate: Long
@@ -46,6 +51,7 @@ class AlarmConfirmFragment : Fragment() {
             return AlarmConfirmFragment().apply {
                 arguments = Bundle().apply {
                     putLong(ARG_PRESCRIPTION_ID, prescriptionId)
+                    putLong(ARG_DRUG_ID, drugId)  // ✅ drugId 추가
                     putString(ARG_DRUG_NAME, drugName)
                     putString(ARG_TIME_SLOT, timeSlot)
                     putLong(ARG_SCHEDULED_DATE, scheduledDate)
@@ -59,13 +65,21 @@ class AlarmConfirmFragment : Fragment() {
         // Arguments에서 데이터 받기
         arguments?.let {
             prescriptionId = it.getLong(ARG_PRESCRIPTION_ID)
+            drugId = it.getLong(ARG_DRUG_ID)  // ✅ drugId 받기
             drugName = it.getString(ARG_DRUG_NAME) ?: ""
             timeSlot = it.getString(ARG_TIME_SLOT) ?: ""
             scheduledDate = it.getLong(ARG_SCHEDULED_DATE)
         }
         database = AppDatabase.getDatabase(requireContext())
 
-        Log.d(TAG, "Fragment 생성: prescription=$prescriptionId, drug=$drugName, timeSlot=$timeSlot")
+        // ✅ CalendarRepository 초기화
+        calendarRepository = CalendarRepository(
+            drugDao = database.drugDao(),
+            drugCompletionDao = database.drugCompletionDao(),
+            prescriptionDao = database.prescriptionDao()
+        )
+
+        Log.d(TAG, "Fragment 생성: prescription=$prescriptionId, drugId=$drugId, drug=$drugName, timeSlot=$timeSlot")
     }
 
     override fun onCreateView(
@@ -188,7 +202,7 @@ class AlarmConfirmFragment : Fragment() {
     private fun markAsTaken() {
         lifecycleScope.launch {
             try {
-                // 기존 로그 확인
+                // 1. MedicationLog 저장 (기존 알림용)
                 val existingLog = database.medicationLogDao().getLog(
                     prescriptionId = prescriptionId,
                     drugName = drugName,
@@ -197,22 +211,18 @@ class AlarmConfirmFragment : Fragment() {
                 )
 
                 if (existingLog != null) {
-                    // 이미 복용 완료 처리된 경우
                     if (existingLog.taken) {
                         Log.d(TAG, "이미 복용 완료된 약품")
                         showToast("이미 복용 완료 처리되었습니다")
                     } else {
-                        // 복용 완료로 업데이트
                         val updatedLog = existingLog.copy(
                             taken = true,
                             takenAt = Date()
                         )
                         database.medicationLogDao().update(updatedLog)
-                        Log.d(TAG, "복용 완료 업데이트 성공")
-                        showToast("복용 완료 처리되었습니다 ✅")
+                        Log.d(TAG, "MedicationLog 업데이트 성공")
                     }
                 } else {
-                    // 새로운 로그 생성
                     val newLog = MedicationLog(
                         logId = 0,
                         prescriptionId = prescriptionId.toLong(),
@@ -224,11 +234,13 @@ class AlarmConfirmFragment : Fragment() {
                         createdAt = Date()
                     )
                     database.medicationLogDao().insert(newLog)
-                    Log.d(TAG, "새 복용 로그 생성 성공")
-                    showToast("복용 완료 처리되었습니다 ✅")
+                    Log.d(TAG, "새 MedicationLog 생성 성공")
                 }
 
-                // 화면 닫기
+                // ✅ 2. 캘린더에도 체크 (DrugCompletionEntity)
+                syncToCalendar()
+
+                showToast("복용 완료 처리되었습니다 ✅")
                 closeFragment()
 
             } catch (e: Exception) {
@@ -238,18 +250,47 @@ class AlarmConfirmFragment : Fragment() {
         }
     }
 
+    /**
+     * ✅ 캘린더와 동기화
+     */
+    private suspend fun syncToCalendar() {
+        try {
+            // 날짜 변환: Long → "yyyy-MM-dd"
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val dateString = dateFormat.format(Date(scheduledDate))
+
+            // 시간대 변환: "morning" → "아침"
+            val timeSlotKorean = when(timeSlot) {
+                "morning" -> "아침"
+                "lunch" -> "점심"
+                "dinner" -> "저녁"
+                "bedtime" -> "취침 전"
+                else -> timeSlot
+            }
+
+            // dateWithSlot: "2024-12-16-아침"
+            val dateWithSlot = "$dateString-$timeSlotKorean"
+
+            Log.d(TAG, "캘린더 동기화 시작:")
+            Log.d(TAG, "  drugId=$drugId")
+            Log.d(TAG, "  date=$dateString")
+            Log.d(TAG, "  timeSlot=$timeSlot → $timeSlotKorean")
+            Log.d(TAG, "  dateWithSlot=$dateWithSlot")
+
+            // ✅ CalendarRepository로 체크 상태 저장
+            calendarRepository.toggleCompletion(drugId, dateWithSlot)
+
+            Log.d(TAG, "캘린더 동기화 성공!")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "캘린더 동기화 실패", e)
+            // 실패해도 알림 기록은 저장되었으므로 에러 무시
+        }
+    }
+
     private fun closeFragment() {
         Log.d(TAG, "closeFragment 호출")
         (activity as? MainActivity)?.navigateToHome()
-//        parentFragmentManager.popBackStack()
-
-//        if (parentFragmentManager.backStackEntryCount == 0) {
-//            Log.d(TAG, "백스택 비어있음 → 홈으로 이동")
-//            val prescriptionFragment = com.example.altong_v2.ui.prescription.PrescriptionFragment()
-//            parentFragmentManager.beginTransaction()
-//                .replace(R.id.fragment_container, prescriptionFragment)
-//                .commit()
-//        }
     }
 
     private fun showToast(message: String) {

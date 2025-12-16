@@ -132,6 +132,7 @@ class AlarmScheduler(private val context: Context) {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             action = AlarmReceiver.ACTION_MEDICATION_ALARM
             putExtra(AlarmReceiver.EXTRA_PRESCRIPTION_ID, prescriptionId)
+            putExtra(AlarmReceiver.EXTRA_DRUG_ID, drug.id)  // ✅ drugId 추가
             putExtra(AlarmReceiver.EXTRA_DRUG_NAME, drug.name)
             putExtra(AlarmReceiver.EXTRA_TIME_SLOT, timeSlot)
             putExtra(AlarmReceiver.EXTRA_DIAGNOSIS, prescriptionId.toString())
@@ -246,8 +247,8 @@ class AlarmScheduler(private val context: Context) {
             null
         }
     }
-     // timeSlots 문자열 파싱
-     //// "morning,dinner" -> ["morning", "dinner"]
+    // timeSlots 문자열 파싱
+    //// "morning,dinner" -> ["morning", "dinner"]
     private fun parseTimeSlots(timeSlotsString: String): List<String> {
         return try {
             timeSlotsString

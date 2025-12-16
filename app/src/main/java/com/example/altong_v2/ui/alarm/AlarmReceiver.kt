@@ -17,6 +17,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Intent Extra Keys
         const val EXTRA_PRESCRIPTION_ID = "prescription_id"
+        const val EXTRA_DRUG_ID = "drug_id"  // ✅ drugId 추가
         const val EXTRA_DRUG_NAME = "drug_name"
         const val EXTRA_TIME_SLOT = "time_slot"
         const val EXTRA_DIAGNOSIS = "diagnosis"
@@ -41,18 +42,20 @@ class AlarmReceiver : BroadcastReceiver() {
     // 복약 알림 처리
     private fun handleMedicationAlarm(context: Context, intent: Intent) {
         val prescriptionId = intent.getLongExtra(EXTRA_PRESCRIPTION_ID, -1)
+        val drugId = intent.getLongExtra(EXTRA_DRUG_ID, -1)  // ✅ drugId 추출
         val drugName = intent.getStringExtra(EXTRA_DRUG_NAME) ?: ""
         val timeSlot = intent.getStringExtra(EXTRA_TIME_SLOT) ?: ""
         val diagnosis = intent.getStringExtra(EXTRA_DIAGNOSIS) ?: ""
         val scheduledDate = intent.getLongExtra(EXTRA_SCHEDULED_DATE, System.currentTimeMillis())
 
-        Log.d(TAG, "복약 알림 수신: prescription=$prescriptionId, drug=$drugName, slot=$timeSlot")
+        Log.d(TAG, "복약 알림 수신: prescription=$prescriptionId, drugId=$drugId, drug=$drugName, slot=$timeSlot")
 
         // NotificationHelper로 알림 표시
         try {
             val notificationHelper = NotificationHelper(context)
             notificationHelper.showMedicationNotification(
                 prescriptionId = prescriptionId,
+                drugId = drugId,  // ✅ drugId 전달
                 drugName = drugName,
                 timeSlot = timeSlot,
                 diagnosis = diagnosis,

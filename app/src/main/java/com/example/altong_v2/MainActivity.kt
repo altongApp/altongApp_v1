@@ -22,7 +22,6 @@ import com.example.altong_v2.ui.prescription.PrescriptionFragment
 import kotlinx.coroutines.handleCoroutineException
 
 /*
-
  * MainActivity 에서는
  * 하단 네비게이션을 통한 Fragment 전환 관리
  * - 나의 약통 (PrescriptionFragment)
@@ -158,6 +157,10 @@ class MainActivity : AppCompatActivity() {
                 NotificationHelper.EXTRA_PRESCRIPTION_ID,
                 0L
             )
+            val drugId = intent.getLongExtra(
+                NotificationHelper.EXTRA_DRUG_ID,  // ✅ drugId 추가
+                0L
+            )
             val drugName = intent.getStringExtra(
                 NotificationHelper.EXTRA_DRUG_NAME
             ) ?: ""
@@ -170,6 +173,7 @@ class MainActivity : AppCompatActivity() {
             )
             Log.d(TAG, "알림 데이터:")
             Log.d(TAG, "  prescriptionId: $prescriptionId")
+            Log.d(TAG, "  drugId: $drugId")  // ✅ drugId 로그
             Log.d(TAG, "  drugName: $drugName")
             Log.d(TAG, "  timeSlot: $timeSlot")
             Log.d(TAG, "  scheduledDate: $scheduledDate")
@@ -178,6 +182,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "AlarmConfirmFragment 표시 시작")
             val fragment = AlarmConfirmFragment.newInstance(
                 prescriptionId = prescriptionId,
+                drugId = drugId,  // ✅ drugId 전달
                 drugName = drugName,
                 timeSlot = timeSlot,
                 scheduledDate = scheduledDate
@@ -194,7 +199,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "알림 Intent 아님")
         Log.d(TAG, "========================================")
         return false  // 🔥 알림 처리 안함
-        }
+    }
 
     fun navigateToHome() {
         Log.d(TAG, "navigateToHome 호출")

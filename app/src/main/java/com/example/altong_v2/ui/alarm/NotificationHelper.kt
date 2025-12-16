@@ -24,6 +24,7 @@ class NotificationHelper(private val context: Context) {
         private const val CHANNEL_DESCRIPTION = "약 복용 시간을 알려드립니다"
 
         const val EXTRA_PRESCRIPTION_ID = "prescription_id"
+        const val EXTRA_DRUG_ID = "drug_id"  // ✅ drugId 추가
         const val EXTRA_DRUG_NAME = "drug_name"
         const val EXTRA_TIME_SLOT = "time_slot"
         const val EXTRA_SCHEDULED_DATE = "scheduled_date"
@@ -54,12 +55,15 @@ class NotificationHelper(private val context: Context) {
      ** 복약 알림 표시 **
      *
      * @param prescriptionId 처방전 ID
+     * @param drugId 약품 ID
      * @param drugName 약품명
      * @param timeSlot 시간대 (morning, lunch, dinner, bedtime)
      * @param diagnosis 진단명
+     * @param scheduledDate 예정된 날짜
      */
     fun showMedicationNotification(
         prescriptionId: Long,
+        drugId: Long,  // ✅ drugId 추가
         drugName: String,
         timeSlot: String,
         diagnosis: String,
@@ -82,6 +86,7 @@ class NotificationHelper(private val context: Context) {
         val intent = Intent(context, com.example.altong_v2.MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(EXTRA_PRESCRIPTION_ID, prescriptionId)
+            putExtra(EXTRA_DRUG_ID, drugId)  // ✅ drugId 추가
             putExtra(EXTRA_DRUG_NAME, drugName)
             putExtra(EXTRA_TIME_SLOT, timeSlot)
             putExtra(EXTRA_SCHEDULED_DATE, scheduledDate)
@@ -115,6 +120,7 @@ class NotificationHelper(private val context: Context) {
 
         Log.d(TAG, "Intent 데이터:")
         Log.d(TAG, "  EXTRA_PRESCRIPTION_ID: $prescriptionId")
+        Log.d(TAG, "  EXTRA_DRUG_ID: $drugId")  // ✅ drugId 로그
         Log.d(TAG, "  EXTRA_DRUG_NAME: $drugName")
         Log.d(TAG, "  EXTRA_TIME_SLOT: $timeSlot")
         Log.d(TAG, "  EXTRA_SCHEDULED_DATE: $scheduledDate")
