@@ -103,6 +103,8 @@ class TodayDecorator(
      */
     override fun decorate(view: DayViewFacade) {
         view.setBackgroundDrawable(createCircleBorderDrawable(color))
+        // ✅ 텍스트 색상을 명시적으로 검정으로 설정 (선택 해제 시에도 검정 유지)
+        view.addSpan(ForegroundColorSpan(Color.BLACK))
     }
 
     /**
@@ -114,5 +116,34 @@ class TodayDecorator(
         drawable.setStroke(4, color)  // 4px 두께의 테두리
         drawable.setColor(Color.TRANSPARENT)  // 배경은 투명
         return drawable
+    }
+}
+
+/**
+ * 기본 날짜 데코레이터 (선택되지 않은 날짜들)
+ * 선택되지 않은 날짜의 텍스트를 검정색으로 리셋
+ *
+ * @param selectedDate 현재 선택된 날짜
+ * @param today 오늘 날짜
+ */
+class DefaultDayDecorator(
+    private val selectedDate: CalendarDay?,
+    private val today: CalendarDay
+) : DayViewDecorator {
+
+    /**
+     * 선택되지 않은 날짜인지 판단
+     */
+    override fun shouldDecorate(day: CalendarDay): Boolean {
+        return day != selectedDate
+    }
+
+    /**
+     * 날짜 꾸미기
+     * 텍스트 색상을 검정으로 설정
+     */
+    override fun decorate(view: DayViewFacade) {
+        // 선택되지 않은 날짜는 텍스트를 검정으로
+        view.addSpan(ForegroundColorSpan(Color.BLACK))
     }
 }

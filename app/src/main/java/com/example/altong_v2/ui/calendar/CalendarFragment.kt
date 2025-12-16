@@ -202,27 +202,30 @@ class CalendarFragment : Fragment() {
         // 기존 데코레이터 제거
         binding.calendarView.removeDecorators()
 
-        // 약이 있는 날짜에 연두색 점 표시
+        // ✅ 1. 기본 날짜 데코레이터 (선택되지 않은 날짜는 검정 텍스트)
+        val selectedDate = binding.calendarView.selectedDate
+        val today = CalendarDay.today()
+        binding.calendarView.addDecorator(
+            DefaultDayDecorator(selectedDate, today)
+        )
+
+        // 2. 약이 있는 날짜에 연두색 점 표시
         val drugDotColor = requireContext().getColor(R.color.calendar_drug_green)
         binding.calendarView.addDecorator(
             DrugDatesDecorator(calendarDays, drugDotColor)
         )
 
-        // 선택된 날짜 데코레이터
-        val selectedDate = binding.calendarView.selectedDate
-        val pinkColor = requireContext().getColor(R.color.calendar_selected_pink)
+        // ✅ 3. 선택된 날짜: 빨간색 원 배경 + 흰색 텍스트
+        val redColor = android.graphics.Color.parseColor("#FF6B6B")  // 부드러운 빨간색
         binding.calendarView.addDecorator(
-            SelectedDateDecorator(selectedDate, pinkColor, android.graphics.Color.WHITE)
+            SelectedDateDecorator(selectedDate, redColor, android.graphics.Color.WHITE)
         )
 
-        // 오늘 날짜 데코레이터 (선택되지 않았을 때 테두리 표시)
-        val today = CalendarDay.today()
-        if (selectedDate != today) {
-            val todayBorderColor = requireContext().getColor(R.color.primary_green_dark)
-            binding.calendarView.addDecorator(
-                TodayDecorator(today, todayBorderColor)
-            )
-        }
+        // ✅ 4. 오늘 날짜: 초록 테두리 + 검정 텍스트 (항상 표시)
+        val greenBorderColor = requireContext().getColor(R.color.primary_green_dark)
+        binding.calendarView.addDecorator(
+            TodayDecorator(today, greenBorderColor)
+        )
     }
 
     /**
