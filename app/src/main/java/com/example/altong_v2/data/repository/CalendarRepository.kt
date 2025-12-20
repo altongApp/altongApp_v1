@@ -5,7 +5,6 @@ import com.example.altong_v2.data.local.dao.DrugDao
 import com.example.altong_v2.data.local.dao.PrescriptionDao
 import com.example.altong_v2.data.local.entity.DrugCompletionEntity
 import com.example.altong_v2.data.local.entity.DrugEntity
-import com.example.altong_v2.data.local.entity.PrescriptionEntity
 import com.example.altong_v2.data.model.CalendarDayData
 import com.example.altong_v2.data.model.DrugItem
 import com.example.altong_v2.data.model.CalendarPrescription
@@ -14,10 +13,7 @@ import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/**
- * 캘린더 Repository
- * 날짜별 복용 약 및 완료 기록 관리
- */
+
 class CalendarRepository(
     private val drugDao: DrugDao,
     private val drugCompletionDao: DrugCompletionDao,
@@ -27,18 +23,12 @@ class CalendarRepository(
     val allDrugs: Flow<List<DrugEntity>> = drugDao.getAllDrugs()
 
     // ========== 복용 완료 기록 ==========
-
-    /**
-     * 특정 날짜의 복용 기록 조회
-     */
+    // 특정 날짜의 복용 기록 조회
     fun getCompletionsByDate(date: String): Flow<List<DrugCompletionEntity>> {
         return drugCompletionDao.getCompletionsByDate(date)
     }
 
-    /**
-     * 개별 약의 복용 완료 토글
-     * 체크박스 클릭 시 호출
-     */
+    // 특정 약의 복용 완료 상태 토글
     suspend fun toggleCompletion(drugId: Long, date: String) {
         val existing = drugCompletionDao.getCompletion(drugId, date)
 
@@ -59,30 +49,19 @@ class CalendarRepository(
         }
     }
 
-    /**
-     * 특정 날짜의 완료율 계산
-     * @return Pair(완료한 약 개수, 전체 약 개수)
-     */
+
     suspend fun getCompletionRate(date: String): Pair<Int, Int> {
         val completed = drugCompletionDao.getCompletedCount(date)
         val total = drugCompletionDao.getTotalCount(date)
         return Pair(completed, total)
     }
 
-    /**
-     * 날짜 범위의 복용 기록 조회
-     */
+     // 날짜 범위의 복용 기록 조회
     fun getCompletionsByDateRange(startDate: String, endDate: String): Flow<List<DrugCompletionEntity>> {
         return drugCompletionDao.getCompletionsByDateRange(startDate, endDate)
     }
 
     // ========== 날짜별 복용할 약 계산 ==========
-
-    /**
-     * 특정 날짜에 복용해야 할 약 리스트 계산
-     * @param date 조회할 날짜 (YYYY-MM-DD)
-     * @return 해당 날짜의 처방전별 약 리스트
-     */
     suspend fun getDrugsForDate(date: String): CalendarDayData {
         // 1. 모든 처방전 가져오기
         val allPrescriptions = prescriptionDao.getAllPrescriptions().first()
@@ -130,12 +109,6 @@ class CalendarRepository(
         )
     }
 
-    /**
-     * 월간 캘린더에서 약이 있는 날짜들 조회
-     * @param year 연도
-     * @param month 월 (1-12)
-     * @return 약이 있는 날짜들의 Set (YYYY-MM-DD)
-     */
     suspend fun getMonthlyDrugDates(year: Int, month: Int): Set<String> {
         val drugDates = mutableSetOf<String>()
 
@@ -169,10 +142,9 @@ class CalendarRepository(
         return drugDates
     }
 
-    /**
-     * 특정 처방전의 모든 약 일괄 체크/해제
-     * 진단명 체크박스 클릭 시 호출
-     */
+
+    // 특정 처방전의 모든 약 일괄 체크/해제
+    // 진단명 체크박스 클릭 시 호출
     suspend fun togglePrescriptionCompletion(
         prescriptionId: Long,
         date: String,
@@ -187,7 +159,7 @@ class CalendarRepository(
             val prescription = prescriptionDao.getPrescriptionById(prescriptionId)
             prescription?.let {
                 if (isDateInPrescriptionRange(date, it.date, drug.days)) {
-                    // ✅ 시간대별로 체크
+                    // 시간대별로 체크
                     val timeSlots = drug.timeSlots.split(",").map { it.trim() }
 
                     for (slot in timeSlots) {
@@ -203,7 +175,7 @@ class CalendarRepository(
                                     drugCompletionDao.insert(
                                         DrugCompletionEntity(
                                             drugId = drug.id,
-                                            date = dateWithSlot,  // ✅ 시간대 포함
+                                            date = dateWithSlot,
                                             isCompleted = true,
                                             completedAt = System.currentTimeMillis()
                                         )
@@ -221,10 +193,7 @@ class CalendarRepository(
         }
     }
 
-    /**
-     * 특정 날짜의 모든 약 일괄 체크/해제
-     * "모두 복용 완료" 버튼 클릭 시 호출
-     */
+  // 모두 복용완료 버튼 클릭 시 호출
     suspend fun toggleAllDrugsForDate(date: String, isCompleted: Boolean) {
         // 해당 날짜에 복용해야 할 모든 약 조회
         val dayData = getDrugsForDate(date)
@@ -258,14 +227,7 @@ class CalendarRepository(
         }
     }
 
-    // ========== 내부 유틸리티 메서드 ==========
 
-    /**
-     * 약들을 시간대별로 그룹핑
-     * @param drugs 약 리스트
-     * @param date 체크 상태를 조회할 날짜
-     * @return Map<시간대, 약 리스트>
-     */
     private suspend fun groupDrugsByTimeSlot(
         drugs: List<DrugEntity>,
         date: String
@@ -285,7 +247,6 @@ class CalendarRepository(
             // 각 시간대마다 별도의 DrugItem 생성
             for (slot in timeSlots) {
                 if (slot.isNotEmpty()) {
-                    // ✅ 체크 상태 조회: date에 시간대 포함
                     val dateWithSlot = "$date-$slot"
                     val completion = drugCompletionDao.getCompletion(drug.id, dateWithSlot)
                     val isCompleted = completion?.isCompleted ?: false
@@ -298,7 +259,7 @@ class CalendarRepository(
                         timing = drug.timing,
                         remainingDays = remainingDays,
                         isCompleted = isCompleted,
-                        timeSlot = slot  // ✅ 시간대 추가
+                        timeSlot = slot
                     )
 
                     grouped.getOrPut(slot) { mutableListOf() }.add(drugItem)
@@ -309,13 +270,6 @@ class CalendarRepository(
         return grouped
     }
 
-    /**
-     * 날짜가 처방 기간 내인지 체크
-     * @param targetDate 확인할 날짜
-     * @param prescriptionDate 처방일
-     * @param days 처방 일수
-     * @return 처방 기간 내이면 true
-     */
     private fun isDateInPrescriptionRange(
         targetDate: String,
         prescriptionDate: String,
@@ -333,13 +287,7 @@ class CalendarRepository(
         }
     }
 
-    /**
-     * 남은 복용 일수 계산
-     * @param prescriptionDate 처방일
-     * @param totalDays 총 처방 일수
-     * @param currentDate 현재 날짜
-     * @return 남은 일수
-     */
+ // 남은 복용 일수
     private fun calculateRemainingDays(
         prescriptionDate: String,
         totalDays: Int,
