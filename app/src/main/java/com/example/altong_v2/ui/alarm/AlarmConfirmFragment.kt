@@ -28,7 +28,7 @@ class AlarmConfirmFragment : Fragment() {
 
     // Arguments로 받을 데이터
     private var prescriptionId: Long = 0L
-    private var drugId: Long = 0L  // ✅ drugId 추가
+    private var drugId: Long = 0L  // drugId 추가
     private var drugName: String = ""
     private var timeSlot: String = ""
     private var scheduledDate: Long = 0L
@@ -36,14 +36,14 @@ class AlarmConfirmFragment : Fragment() {
     companion object {
         private const val TAG = "AlarmConfirm"
         private const val ARG_PRESCRIPTION_ID = "prescription_id"
-        private const val ARG_DRUG_ID = "drug_id"  // ✅ drugId 추가
+        private const val ARG_DRUG_ID = "drug_id"  //drugId 추가
         private const val ARG_DRUG_NAME = "drug_name"
         private const val ARG_TIME_SLOT = "time_slot"
         private const val ARG_SCHEDULED_DATE = "scheduled_date"
 
         fun newInstance(
             prescriptionId: Long,
-            drugId: Long,  // ✅ drugId 추가
+            drugId: Long,  // drugId 추가
             drugName: String,
             timeSlot: String,
             scheduledDate: Long
@@ -51,7 +51,7 @@ class AlarmConfirmFragment : Fragment() {
             return AlarmConfirmFragment().apply {
                 arguments = Bundle().apply {
                     putLong(ARG_PRESCRIPTION_ID, prescriptionId)
-                    putLong(ARG_DRUG_ID, drugId)  // ✅ drugId 추가
+                    putLong(ARG_DRUG_ID, drugId)
                     putString(ARG_DRUG_NAME, drugName)
                     putString(ARG_TIME_SLOT, timeSlot)
                     putLong(ARG_SCHEDULED_DATE, scheduledDate)
@@ -65,14 +65,14 @@ class AlarmConfirmFragment : Fragment() {
         // Arguments에서 데이터 받기
         arguments?.let {
             prescriptionId = it.getLong(ARG_PRESCRIPTION_ID)
-            drugId = it.getLong(ARG_DRUG_ID)  // ✅ drugId 받기
+            drugId = it.getLong(ARG_DRUG_ID)
             drugName = it.getString(ARG_DRUG_NAME) ?: ""
             timeSlot = it.getString(ARG_TIME_SLOT) ?: ""
             scheduledDate = it.getLong(ARG_SCHEDULED_DATE)
         }
         database = AppDatabase.getDatabase(requireContext())
 
-        // ✅ CalendarRepository 초기화
+        // CalendarRepository 초기화
         calendarRepository = CalendarRepository(
             drugDao = database.drugDao(),
             drugCompletionDao = database.drugCompletionDao(),
@@ -141,7 +141,7 @@ class AlarmConfirmFragment : Fragment() {
                 // 3. 한글로 필터링
                 val drugsForTimeSlot = drugs.filter { drug ->
                     Log.d(TAG, "약품: ${drug.name}, timeSlots: ${drug.timeSlots}")
-                    drug.timeSlots?.contains(timeSlotKorean) == true  // ✅ 한글로 비교
+                    drug.timeSlots?.contains(timeSlotKorean) == true  // 한글 비교
                 }
 
                 Log.d(TAG, "로드된 약품 수: ${drugsForTimeSlot.size}")
@@ -237,7 +237,7 @@ class AlarmConfirmFragment : Fragment() {
                     Log.d(TAG, "새 MedicationLog 생성 성공")
                 }
 
-                // ✅ 2. 캘린더에도 체크 (DrugCompletionEntity)
+                // 2. 캘린더에도 체크 (DrugCompletionEntity)
                 syncToCalendar()
 
                 showToast("복용 완료 처리되었습니다 ✅")
@@ -250,9 +250,7 @@ class AlarmConfirmFragment : Fragment() {
         }
     }
 
-    /**
-     * ✅ 캘린더와 동기화
-     */
+   // 캘린더와 동기화
     private suspend fun syncToCalendar() {
         try {
             // 날짜 변환: Long → "yyyy-MM-dd"
@@ -271,13 +269,7 @@ class AlarmConfirmFragment : Fragment() {
             // dateWithSlot: "2024-12-16-아침"
             val dateWithSlot = "$dateString-$timeSlotKorean"
 
-            Log.d(TAG, "캘린더 동기화 시작:")
-            Log.d(TAG, "  drugId=$drugId")
-            Log.d(TAG, "  date=$dateString")
-            Log.d(TAG, "  timeSlot=$timeSlot → $timeSlotKorean")
-            Log.d(TAG, "  dateWithSlot=$dateWithSlot")
-
-            // ✅ CalendarRepository로 체크 상태 저장
+            // CalendarRepository로 체크 상태 저장
             calendarRepository.toggleCompletion(drugId, dateWithSlot)
 
             Log.d(TAG, "캘린더 동기화 성공!")

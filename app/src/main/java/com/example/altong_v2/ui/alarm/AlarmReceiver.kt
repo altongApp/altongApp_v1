@@ -17,7 +17,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Intent Extra Keys
         const val EXTRA_PRESCRIPTION_ID = "prescription_id"
-        const val EXTRA_DRUG_ID = "drug_id"  // ✅ drugId 추가
+        const val EXTRA_DRUG_ID = "drug_id"
         const val EXTRA_DRUG_NAME = "drug_name"
         const val EXTRA_TIME_SLOT = "time_slot"
         const val EXTRA_DIAGNOSIS = "diagnosis"
@@ -34,7 +34,7 @@ class AlarmReceiver : BroadcastReceiver() {
             Intent.ACTION_BOOT_COMPLETED -> {
                 // 디바이스 재부팅 시 알림 재등록
                 Log.d(TAG, "Boot completed - 알림 재등록 필요")
-                // TODO: 모든 활성 처방전 알림 재등록
+
             }
         }
     }
@@ -42,7 +42,7 @@ class AlarmReceiver : BroadcastReceiver() {
     // 복약 알림 처리
     private fun handleMedicationAlarm(context: Context, intent: Intent) {
         val prescriptionId = intent.getLongExtra(EXTRA_PRESCRIPTION_ID, -1)
-        val drugId = intent.getLongExtra(EXTRA_DRUG_ID, -1)  // ✅ drugId 추출
+        val drugId = intent.getLongExtra(EXTRA_DRUG_ID, -1)
         val drugName = intent.getStringExtra(EXTRA_DRUG_NAME) ?: ""
         val timeSlot = intent.getStringExtra(EXTRA_TIME_SLOT) ?: ""
         val diagnosis = intent.getStringExtra(EXTRA_DIAGNOSIS) ?: ""
@@ -55,7 +55,7 @@ class AlarmReceiver : BroadcastReceiver() {
             val notificationHelper = NotificationHelper(context)
             notificationHelper.showMedicationNotification(
                 prescriptionId = prescriptionId,
-                drugId = drugId,  // ✅ drugId 전달
+                drugId = drugId,
                 drugName = drugName,
                 timeSlot = timeSlot,
                 diagnosis = diagnosis,
