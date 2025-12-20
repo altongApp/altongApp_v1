@@ -8,7 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-/* * 약 복용 완료 기록 테이블
+/* 약 복용 완료 기록 테이블
  * 캘린더에서 체크박스 체크 시 기록*/
 
 @Entity(

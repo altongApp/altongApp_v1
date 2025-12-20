@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.altong_v2.databinding.FragmentDetailEfficacyBinding
 
-/**
+/*
  * 약품 상세 - 효능/효과 탭
  */
 class DetailEfficacyFragment : Fragment() {

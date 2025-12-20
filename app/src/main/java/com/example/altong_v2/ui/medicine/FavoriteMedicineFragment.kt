@@ -18,7 +18,7 @@ class FavoriteMedicineFragment : Fragment() {
     private var _binding: FragmentFavoriteMedicineBinding? = null
     private val binding get() = _binding!!
 
-    private var initialTab: Int = 0  // ⭐ 초기 탭 (0=약국약, 1=병원약)
+    private var initialTab: Int = 0  // 초기 탭 (0=약국약, 1=병원약)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,15 +77,13 @@ class FavoriteMedicineFragment : Fragment() {
     companion object {
         private const val ARG_INITIAL_TAB = "initial_tab"
 
-        /**
-         * ⭐ 약국약 탭부터 보기 (기본)
-         */
+        // 약국약 탭부터 보기 (기본)
         fun newInstance(): FavoriteMedicineFragment {
             return newInstance(0)
         }
 
-        /**
-         * ⭐ 특정 탭부터 보기
+        /*
+         * 특정 탭부터 보기
          * @param tabIndex 0=약국약, 1=병원약
          */
         fun newInstance(tabIndex: Int): FavoriteMedicineFragment {
@@ -98,7 +96,7 @@ class FavoriteMedicineFragment : Fragment() {
     }
 }
 
-/**
+/*
  * ViewPager2 Adapter
  */
 class FavoriteViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -107,7 +105,7 @@ class FavoriteViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FavoriteListTabFragment.newInstance("general")  // ⭐ "otc" → "general"
+            0 -> FavoriteListTabFragment.newInstance("general")  //  "otc" → "general"
             1 -> FavoriteListTabFragment.newInstance("prescription")
             else -> FavoriteListTabFragment.newInstance("general")
         }

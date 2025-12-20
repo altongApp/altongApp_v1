@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.altong_v2.databinding.FragmentDetailUsageBinding
 
-/**
+/*
  * 약품 상세 - 용법/용량 탭
  */
 class DetailUsageFragment : Fragment() {

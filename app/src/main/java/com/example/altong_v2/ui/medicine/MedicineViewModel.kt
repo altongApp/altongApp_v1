@@ -16,7 +16,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 
-/**
+/*
  * 약품 검색 ViewModel
  * Firebase에서 약품 데이터를 가져오고 UI에 전달
  */
@@ -46,9 +46,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    /**
-     * 일반의약품 목록 로드 (첫 페이지)
-     */
+
+    // 일반의약품 목록 로드 (첫 페이지)
     fun loadGeneralMedicines() {
         if (_isLoadingGeneral.value == true) {
             Log.d(TAG, "⚠️ 이미 로딩 중 - 중복 요청 무시")
@@ -75,9 +74,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 일반의약품 다음 페이지 로드
-     */
+
+    // 일반의약품 다음 페이지 로드
     fun loadMoreGeneralMedicines() {
         if (_isLoadingGeneral.value == true) return
 
@@ -102,9 +100,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 카테고리별 약품 로드
-     */
+     // 카테고리별 약품 로드
     fun loadMedicinesByCategory(category: String) {
         viewModelScope.launch {
             try {
@@ -125,9 +121,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 카테고리별 약품 추가 로드
-     */
+
+    // 카테고리별 약품 추가 로드
     fun loadMoreMedicinesByCategory(category: String) {
         if (_isLoadingGeneral.value == true) return
 
@@ -155,9 +150,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 일반의약품 검색 (첫 페이지)
-     */
+
+     // 일반의약품 검색 (첫 페이지)
     fun searchGeneralMedicines(query: String) {
         if (query.isBlank()) {
             loadGeneralMedicines()
@@ -183,9 +177,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 일반의약품 검색 (추가 페이지)
-     */
+
+     // 일반의약품 검색 (추가 페이지)
     fun searchMoreGeneralMedicines(query: String) {
         if (_isLoadingGeneral.value == true) return
 
@@ -214,7 +207,6 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     }
 
     // ========== 전문의약품 관련 ==========
-
     private val _prescriptionMedicines = MutableLiveData<List<PrescriptionMedicine>>(emptyList())
     val prescriptionMedicines: LiveData<List<PrescriptionMedicine>> = _prescriptionMedicines
 
@@ -223,9 +215,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
     private val _isLoadingPrescription = MutableLiveData<Boolean>(false)
     val isLoadingPrescription: LiveData<Boolean> = _isLoadingPrescription
 
-    /**
-     * 전문의약품 목록 로드 (첫 페이지)
-     */
+
+    // 전문의약품 목록 로드 (첫 페이지)
     fun loadPrescriptionMedicines() {
         viewModelScope.launch {
             try {
@@ -246,9 +237,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 전문의약품 다음 페이지 로드
-     */
+
+    // 전문의약품 다음 페이지 로드
     fun loadMorePrescriptionMedicines() {
         if (_isLoadingPrescription.value == true) return
 
@@ -272,9 +262,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 전문의약품 검색 (첫 페이지)
-     */
+
+    // 전문의약품 검색 (첫 페이지)
     fun searchPrescriptionMedicines(query: String) {
         if (query.isBlank()) {
             loadPrescriptionMedicines()
@@ -300,9 +289,8 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 전문의약품 검색 (추가 페이지)
-     */
+
+    // 전문의약품 검색 (추가 페이지)
     fun searchMorePrescriptionMedicines(query: String) {
         if (_isLoadingPrescription.value == true) return
 
@@ -330,32 +318,25 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
 
     // ========== 약품 상세 조회 ==========
 
-    /**
-     * 약품 ID로 일반의약품 조회
-     */
+    // 약품 ID로 일반의약품 조회
     suspend fun getMedicineById(medicineId: String): Medicine? {
         return medicineRepository.getMedicineById(medicineId)
     }
 
-    /**
-     * 약품 ID로 전문의약품 조회
-     */
+
+    // 약품 ID로 전문의약품 조회
     suspend fun getPrescriptionMedicineById(medicineId: String): PrescriptionMedicine? {
         return medicineRepository.getPrescriptionMedicineById(medicineId)
     }
 
     // ========== 찜 기능 ==========
 
-    /**
-     * 찜 여부 확인
-     */
+    // 찜 여부 확인
     suspend fun isFavorite(medicineId: String): Boolean {
         return favoriteRepository.isFavorite(medicineId)
     }
 
-    /**
-     * 찜 추가
-     */
+    // 찜 추가
     fun addFavorite(medicine: Medicine) {
         viewModelScope.launch {
             try {
@@ -375,9 +356,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 전문의약품 찜 추가
-     */
+   // 전문의약품 추가
     fun addPrescriptionFavorite(medicine: PrescriptionMedicine) {
         viewModelScope.launch {
             try {
@@ -397,9 +376,7 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 찜 해제
-     */
+    // 찜해제
     fun removeFavorite(medicineId: String) {
         viewModelScope.launch {
             try {
@@ -412,18 +389,13 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 타입별 찜 목록 조회
-     */
+    // 타입별 찜 목록 조회
     fun getFavoritesByType(type: String): Flow<List<FavoriteMedicineEntity>> {
         return favoriteRepository.getFavoritesByType(type)
     }
 
     // ========== 메모 기능 ==========
-
-    /**
-     * 메모 저장/수정 (일반의약품만)
-     */
+    // 메모 저장 수정
     fun saveMemo(medicine: Medicine, memo: String) {
         viewModelScope.launch {
             try {
@@ -441,16 +413,12 @@ class MedicineViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 메모 조회
-     */
+    // 메모 조회
     suspend fun getMemo(medicineId: String): String? {
         return favoriteRepository.getMemo(medicineId)
     }
 
-    /**
-     * 메모 있는지 확인
-     */
+    // 메모있는지 확인
     suspend fun hasMemo(medicineId: String): Boolean {
         val memo = favoriteRepository.getMemo(medicineId)
         return !memo.isNullOrBlank()

@@ -13,7 +13,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.data.model.MedicineCategory
 import com.example.altong_v2.databinding.FragmentGeneralMedicineTabBinding
 
-/**
+/*
  * 일반의약품 탭 Fragment
  * 카테고리 그리드 + 약품 리스트
  * 구조: NestedScrollView 안에 RecyclerView가 있는 형태
@@ -27,7 +27,6 @@ class GeneralMedicineTabFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("GeneralMedicineTab", "🔴 onCreate 호출!")
     }
 
     override fun onCreateView(
@@ -35,15 +34,12 @@ class GeneralMedicineTabFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d("GeneralMedicineTab", "🟡 onCreateView 호출!")
         _binding = FragmentGeneralMedicineTabBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.d("GeneralMedicineTab", "🟢 onViewCreated 호출!")
 
         // ViewModel 초기화 (Activity 레벨)
         viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
@@ -68,8 +64,8 @@ class GeneralMedicineTabFragment : Fragment() {
      * 카테고리 그리드 설정
      */
     private fun setupCategoryGrid() {
-        Log.d("GeneralMedicineTab", "🎨 setupCategoryGrid 호출됨!")
-        Log.d("GeneralMedicineTab", "📦 카테고리 개수: ${MedicineCategory.ALL_CATEGORIES.size}")
+        Log.d("GeneralMedicineTab", "setupCategoryGrid 호출됨!")
+        Log.d("GeneralMedicineTab", "카테고리 개수: ${MedicineCategory.ALL_CATEGORIES.size}")
 
         val categoryAdapter = CategoryAdapter { category: String ->
             // 카테고리 클릭 시 해당 카테고리 약품 목록 화면으로 이동
@@ -84,7 +80,7 @@ class GeneralMedicineTabFragment : Fragment() {
         // 카테고리 데이터 설정
         categoryAdapter.submitList(MedicineCategory.ALL_CATEGORIES)
 
-        Log.d("GeneralMedicineTab", "✅ 카테고리 데이터 submitList 완료!")
+        Log.d("GeneralMedicineTab", "카테고리 데이터 submitList 완료!")
     }
 
     /**
@@ -99,15 +95,10 @@ class GeneralMedicineTabFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * 약품 리스트 설정
-     * ★ 수정됨: 바닥에 닿기 전에 미리 로딩하도록 감도 조절
-     */
+    // 약품 리스트 설정
     private fun setupMedicineList() {
         val medicineAdapter = MedicineAdapter(
             onItemClick = { medicine ->
-                // 약품 클릭 시 상세 화면으로 이동
-                // TODO: MedicineDetailFragment로 이동
                 navigateToDetail(medicine.medicine_id, MedicineDetailFragment.TYPE_GENERAL)
             },
             onFavoriteClick = { medicine ->
@@ -143,15 +134,13 @@ class GeneralMedicineTabFragment : Fragment() {
 
                 // 로딩 중이 아닐 때만 요청
                 if (!isLoading) {
-                    Log.d("GeneralMedicineTab", "📜 (스크롤뷰) 추가 데이터 미리 로딩 요청 (Threshold: $threshold)")
                     viewModel.loadMoreGeneralMedicines()
                 }
             }
         }
     }
-    /**
-     * 상세 화면으로 이동
-     */
+
+    // 상세 화면으로 이동
     private fun navigateToDetail(medicineId: String, type: String) {
         val fragment = MedicineDetailFragment.newInstance(medicineId, type)
 
@@ -161,9 +150,8 @@ class GeneralMedicineTabFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * ViewModel 관찰
-     */
+
+     // ViewModel 관찰
     private fun observeViewModel() {
         // 일반의약품 리스트 관찰
         viewModel.generalMedicines.observe(viewLifecycleOwner) { medicines ->
@@ -182,23 +170,20 @@ class GeneralMedicineTabFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 Log.e("GeneralMedicineTab", "❌ Error: $it")
-                // TODO: Snackbar 또는 Toast로 에러 표시
             }
         }
     }
 
-    /**
-     *  찜 보기 버튼 설정
-     */
+
+    // 찜 보기 버튼 설정
     private fun setupFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
             navigateToFavoriteList()
         }
     }
 
-    /**
-     *  찜 목록 화면으로 이동
-     */
+
+    // 찜 목록 화면으로 이동
     private fun navigateToFavoriteList() {
         val fragment = FavoriteMedicineFragment.newInstance(0)  // 약국약 탭
 
@@ -210,7 +195,6 @@ class GeneralMedicineTabFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("GeneralMedicineTab", "💀 onDestroyView 호출!")
         _binding = null
     }
 }

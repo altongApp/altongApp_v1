@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.altong_v2.databinding.FragmentDetailPrecautionsBinding
 
-/**
+/*
  * 약품 상세 - 주의사항 탭
  */
 class DetailPrecautionsFragment : Fragment() {

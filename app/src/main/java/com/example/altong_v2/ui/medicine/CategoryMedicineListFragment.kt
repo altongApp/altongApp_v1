@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentCategoryMedicineListBinding
 
-/**
+/*
  * 카테고리별 약품 리스트 Fragment
  * 선택한 카테고리에 속하는 일반의약품만 표시
  */
@@ -52,9 +52,8 @@ class CategoryMedicineListFragment : Fragment() {
         viewModel.loadMedicinesByCategory(categoryName)
     }
 
-    /**
-     * 툴바 설정 (뒤로가기 + 카테고리명)
-     */
+
+    // 툴바 설정 (뒤로가기 + 카테고리명)
     private fun setupToolbar() {
         binding.toolbar.apply {
             title = categoryName
@@ -64,9 +63,7 @@ class CategoryMedicineListFragment : Fragment() {
         }
     }
 
-    /**
-     * 약품 리스트 설정
-     */
+     // 약품 리스트 설정
     private fun setupMedicineList() {
         val adapter = MedicineAdapter(
             onItemClick = { medicine ->
@@ -105,9 +102,8 @@ class CategoryMedicineListFragment : Fragment() {
             })
         }
     }
-    /**
-     * ⭐ 상세 화면으로 이동
-     */
+
+    //상세 화면으로 이동
     private fun navigateToDetail(medicineId: String, type: String) {
         val fragment = MedicineDetailFragment.newInstance(medicineId, type)
 
@@ -117,9 +113,7 @@ class CategoryMedicineListFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * ViewModel 관찰
-     */
+
     private fun observeViewModel() {
         // 약품 리스트 관찰
         viewModel.generalMedicines.observe(viewLifecycleOwner) { medicines ->
@@ -153,9 +147,7 @@ class CategoryMedicineListFragment : Fragment() {
     companion object {
         private const val ARG_CATEGORY = "category"
 
-        /**
-         * Fragment 생성 (Bundle로 카테고리 전달)
-         */
+        // Fragment 생성 (Bundle로 카테고리 전달)
         fun newInstance(category: String): CategoryMedicineListFragment {
             return CategoryMedicineListFragment().apply {
                 arguments = Bundle().apply {

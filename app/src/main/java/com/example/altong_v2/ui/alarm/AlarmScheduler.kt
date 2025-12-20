@@ -31,13 +31,7 @@ class AlarmScheduler(private val context: Context) {
         drug: DrugEntity,
         prescriptionDate: String
     ) {
-        Log.d(TAG, "==================================================")
-        Log.d(TAG, "알림 등록 시작: prescription=$prescriptionId, drug=${drug.name}")
-        Log.d(TAG, "약품 timeSlots 원본: '${drug.timeSlots}'")
         val systemNow = Calendar.getInstance()
-        Log.d(TAG, "📱 시스템 현재 시간: ${systemNow.time}")
-        Log.d(TAG, "📱 시스템 타임존: ${systemNow.timeZone.id}")
-
         // 알림이 비활성화되어 있으면 등록하지 않음
         if (!alarmSettings.isAlarmEnabled) {
             Log.d(TAG, "알림이 비활성화되어 있습니다")
@@ -132,7 +126,7 @@ class AlarmScheduler(private val context: Context) {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             action = AlarmReceiver.ACTION_MEDICATION_ALARM
             putExtra(AlarmReceiver.EXTRA_PRESCRIPTION_ID, prescriptionId)
-            putExtra(AlarmReceiver.EXTRA_DRUG_ID, drug.id)  // ✅ drugId 추가
+            putExtra(AlarmReceiver.EXTRA_DRUG_ID, drug.id)  // drugId 추가 - 캘린더 알림 연동 구현
             putExtra(AlarmReceiver.EXTRA_DRUG_NAME, drug.name)
             putExtra(AlarmReceiver.EXTRA_TIME_SLOT, timeSlot)
             putExtra(AlarmReceiver.EXTRA_DIAGNOSIS, prescriptionId.toString())

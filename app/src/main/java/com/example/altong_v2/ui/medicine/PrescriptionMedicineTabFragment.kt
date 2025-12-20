@@ -13,7 +13,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentPrescriptionMedicineTabBinding
 
 
-/**
+/*
  * 전문의약품 탭 Fragment
  * 전체 전문의약품 리스트 (8,208개)
  */
@@ -56,14 +56,11 @@ class PrescriptionMedicineTabFragment : Fragment() {
         }
     }
 
-    /**
-     * 약품 리스트 설정
-     */
+    // 약품 리스트 설정
     private fun setupMedicineList() {
         val adapter = PrescriptionMedicineAdapter(
             onItemClick = { medicine ->
                 // 약품 클릭 시 상세 화면으로 이동
-                // TODO: MedicineDetailFragment로 이동
                 navigateToDetail(medicine.medicine_id, MedicineDetailFragment.TYPE_PRESCRIPTION)
 
             },
@@ -100,9 +97,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
         }
     }
 
-    /**
-     * 상세 화면으로 이동
-     */
+    // 상세화면이동
     private fun navigateToDetail(medicineId: String, type: String) {
         val fragment = MedicineDetailFragment.newInstance(medicineId, type)
 
@@ -112,9 +107,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * 병원약 찜 보기 버튼 설정
-     */
+
     private fun setupFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
             // 찜 목록 화면으로 이동 (병원약 탭으로)
@@ -122,9 +115,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
         }
     }
 
-    /**
-     * 찜 목록 화면으로 이동
-     */
+    // 찜 목록 화면으로 이동
     private fun navigateToFavoriteList() {
         val fragment = FavoriteMedicineFragment.newInstance(1)  // 병원약 탭
 
@@ -134,9 +125,7 @@ class PrescriptionMedicineTabFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * ViewModel 관찰
-     */
+
     private fun observeViewModel() {
         // 전문의약품 리스트 관찰
         viewModel.prescriptionMedicines.observe(viewLifecycleOwner) { medicines ->
@@ -155,7 +144,6 @@ class PrescriptionMedicineTabFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
             message?.let {
                 android.util.Log.e("PrescriptionMedicineTab", "Error: $it")
-                // TODO: Snackbar 또는 Toast로 에러 표시
             }
         }
     }

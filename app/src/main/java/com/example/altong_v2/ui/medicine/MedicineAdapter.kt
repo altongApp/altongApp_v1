@@ -12,7 +12,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.ItemMedicineBinding
 import com.example.altong_v2.data.model.Medicine
 
-/**
+/*
  * 일반의약품 리스트 Adapter
  * Glide를 사용한 이미지 로딩 포함
  */

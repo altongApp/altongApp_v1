@@ -14,7 +14,7 @@ import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentMedicineBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
-/**
+/*
  * 약 검색 Fragment (메인)
  * TabLayout + ViewPager2로 일반의약품/전문의약품 탭 구성
  */
@@ -30,37 +30,29 @@ class MedicineFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, "🎨 onCreateView 호출")
+
         _binding = FragmentMedicineBinding.inflate(inflater, container, false)
-        Log.d(TAG, "✅ Binding 생성 완료")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d(TAG, "🎯 onViewCreated 호출")
 
         // ViewModel 초기화
         viewModel = ViewModelProvider(requireActivity())[MedicineViewModel::class.java]
-        Log.d(TAG, "✅ ViewModel 생성 완료")
 
         setupViewPager()
         setupSearchBar()
-
-        Log.d(TAG, "✅ 모든 설정 완료")
     }
 
     /**
      * ViewPager2 + TabLayout 설정
      */
     private fun setupViewPager() {
-        Log.d(TAG, "📱 ViewPager 어댑터 설정 중...")
 
         val adapter = MedicineViewPagerAdapter(this)
         binding.viewPager.adapter = adapter
-
-        Log.d(TAG, "📑 TabLayout 연결 중...")
 
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
@@ -69,17 +61,14 @@ class MedicineFragment : Fragment() {
                 else -> ""
             }
         }.attach()
-
-        Log.d(TAG, "✅ ViewPager 설정 완료!")
     }
 
-    /**
-     * ⭐ 검색바 설정 (버튼 + 엔터 둘 다 지원)
-     */
+
+    // 검색바 설정 (버튼 + 엔터 둘 다 지원)
     private fun setupSearchBar() {
         Log.d(TAG, "🔧 setupSearchBar 호출됨")
 
-        // ⭐ 검색 버튼 클릭
+        // 검색 버튼 클릭
         binding.searchButton.setOnClickListener {
             val query = binding.searchEditText.text.toString().trim()
             Log.d(TAG, "🔍 검색 버튼 클릭: $query")
@@ -111,9 +100,7 @@ class MedicineFragment : Fragment() {
         }
     }
 
-    /**
-     * ⭐ 검색 실행 (검색 결과 화면으로 이동)
-     */
+    // 검색 실행 (검색 결과 화면으로 이동)
     private fun performSearch(query: String) {
         val currentTab = binding.viewPager.currentItem
 
@@ -138,9 +125,7 @@ class MedicineFragment : Fragment() {
             .commit()
     }
 
-    /**
-     * 키보드 숨기기
-     */
+   // 키보드 숨기기
     private fun hideKeyboard() {
         val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE)
                 as android.view.inputmethod.InputMethodManager
@@ -157,7 +142,7 @@ class MedicineFragment : Fragment() {
     }
 }
 
-/**
+/*
  * ViewPager2 Adapter
  */
 class MedicineViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {

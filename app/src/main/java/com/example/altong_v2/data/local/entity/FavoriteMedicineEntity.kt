@@ -5,20 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/**
- * 찜한 약품 테이블
- * 일반의약품 또는 전문의약품을 찜한 목록 저장
- *
- *  medicineType 값:
- * - "general" : 일반의약품 (약국약)
- * - "prescription" : 전문의약품 (병원약)
- *
- *  isFavorite vs memo:
- * - isFavorite = true, memo = null → 찜만
- * - isFavorite = true, memo = "..." → 찜 + 메모
- * - isFavorite = false, memo = "..." → 메모만 (찜 해제됨)
- * - isFavorite = false, memo = null → 삭제 대상
- */
+
 @Entity(
     tableName = "favorite_medicines",
     indices = [Index(value = ["medicine_id"], unique = true)]  // 중복 찜 방지

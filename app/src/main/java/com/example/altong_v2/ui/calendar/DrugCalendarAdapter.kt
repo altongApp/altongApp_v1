@@ -8,16 +8,9 @@ import com.example.altong_v2.data.model.DrugItem
 import com.example.altong_v2.databinding.ItemDrugCalendarBinding
 import com.example.altong_v2.databinding.ItemTimeSlotHeaderBinding
 
-/**
- * 약 리스트 어댑터
- * 시간대(아침, 점심, 저녁, 취침 전)별로 약을 표시
- *
- * ViewType 2개:
- * - TIME_SLOT_HEADER: 시간대 헤더 (예: "🌅 아침 08:00")
- * - DRUG_ITEM: 개별 약 아이템
- */
+
 class DrugCalendarAdapter(
-    private val onDrugCheckChanged: (Long, String) -> Unit  // ✅ (drugId, timeSlot) 전달
+    private val onDrugCheckChanged: (Long, String) -> Unit  // (drugId, timeSlot) 전달
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     // ViewType 상수
@@ -25,42 +18,35 @@ class DrugCalendarAdapter(
         private const val TYPE_TIME_SLOT_HEADER = 0
         private const val TYPE_DRUG_ITEM = 1
 
-        // 시간대별 이모지와 시간 매핑 (하드코딩 - 추후 마이페이지 설정으로 변경 가능)
-        private val TIME_SLOT_INFO = mapOf(
-            "아침" to Pair("🌅", "08:00"),
-            "점심" to Pair("☀️", "12:00"),
-            "저녁" to Pair("🌆", "18:00"),
-            "취침 전" to Pair("🌙", "22:00")
+        // 시간대별 이모지 매핑
+        private val TIME_SLOT_EMOJI = mapOf(
+            "아침" to "🌅",
+            "점심" to "☀️",
+            "저녁" to "🌆",
+            "취침 전" to "🌙"
         )
     }
 
     // 표시할 아이템 리스트 (헤더 + 약들)
     private val displayItems = mutableListOf<DisplayItem>()
 
-    /**
+    /*
      * 표시할 아이템 타입
-     * - TimeSlotHeader: 시간대 헤더
-     * - DrugItem: 개별 약
+     - TimeSlotHeader: 시간대 헤더
+     - DrugItem: 개별 약
      */
     sealed class DisplayItem {
         data class TimeSlotHeader(val timeSlot: String) : DisplayItem()
         data class Drug(val drugItem: DrugItem) : DisplayItem()
     }
 
-    /**
+    /*
      * 데이터 업데이트
      * @param drugsByTimeSlot 시간대별 약 리스트 Map
      */
     fun submitList(drugsByTimeSlot: Map<String, List<DrugItem>>) {
         displayItems.clear()
 
-        // 🔍 디버깅 로그
-        android.util.Log.d("DrugAdapter", """
-            ========================================
-            submitList 호출됨!
-            받은 시간대 개수: ${drugsByTimeSlot.size}
-            시간대 키: ${drugsByTimeSlot.keys.joinToString()}
-        """.trimIndent())
 
         // 시간대 순서 정의 (아침 → 점심 → 저녁 → 취침 전)
         val timeSlotOrder = listOf("아침", "점심", "저녁", "취침 전")
@@ -131,22 +117,19 @@ class DrugCalendarAdapter(
 
     override fun getItemCount(): Int = displayItems.size
 
-    /**
-     * 시간대 헤더 ViewHolder
-     */
+    // 시간대 헤더
     class TimeSlotHeaderViewHolder(
         private val binding: ItemTimeSlotHeaderBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(timeSlot: String) {
-            val (emoji, time) = TIME_SLOT_INFO[timeSlot] ?: Pair("⏰", "00:00")
-            binding.tvTimeSlot.text = "$emoji $timeSlot $time"
+            val emoji = TIME_SLOT_EMOJI[timeSlot] ?: "⏰"
+            binding.tvTimeSlot.text = "$emoji $timeSlot"  // ✅ 시간 삭제, 이모지 + 시간대만
         }
     }
 
-    /**
-     * 약 아이템 ViewHolder
-     */
+
+    // 약 아이템 ViewHolder
     inner class DrugViewHolder(
         private val binding: ItemDrugCalendarBinding
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -179,13 +162,13 @@ class DrugCalendarAdapter(
 
             // 체크박스 클릭 리스너
             binding.cbDrug.setOnClickListener {
-                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // ✅ timeSlot 추가
+                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // timeSlot 추가
             }
 
             // 아이템 전체 클릭 시 체크박스 토글
             binding.root.setOnClickListener {
                 binding.cbDrug.isChecked = !binding.cbDrug.isChecked
-                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // ✅ timeSlot 추가
+                onDrugCheckChanged(drug.drugId, drug.timeSlot)  // timeSlot 추가
             }
         }
     }

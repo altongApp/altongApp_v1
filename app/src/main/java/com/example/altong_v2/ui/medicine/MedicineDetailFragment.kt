@@ -210,9 +210,8 @@ class MedicineDetailFragment : Fragment() {
         }.attach()
     }
 
-    /**
-     * ⭐ 찜 상태 확인
-     */
+
+     // 찜 상태 확인
     private fun checkFavoriteStatus() {
         lifecycleScope.launch {
             isFavorite = viewModel.isFavorite(medicineId ?: "")
@@ -220,18 +219,15 @@ class MedicineDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * ⭐ 찜 버튼 설정
-     */
+    // 찜 버튼 설정
     private fun setupFavoriteButton() {
         binding.favoriteButton.setOnClickListener {
             toggleFavorite()
         }
     }
 
-    /**
-     * ⭐ 찜 토글 (추가/취소)
-     */
+
+     // 찜 토글 (추가/취소)
     private fun toggleFavorite() {
         lifecycleScope.launch {
             if (isFavorite) {
@@ -258,9 +254,7 @@ class MedicineDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * ⭐ 찜 버튼 UI 업데이트
-     */
+   //  찜 버튼 UI 업데이트
     private fun updateFavoriteButton() {
         if (isFavorite) {
             // 찜 취소 상태
@@ -279,9 +273,8 @@ class MedicineDetailFragment : Fragment() {
         }
     }
 
-    /**
-     * ⭐ 메모 버튼 설정 (일반의약품 전용)
-     */
+
+    // 메모 버튼 설정 (일반의약품 전용)
     private fun setupMemoButton(medicine: Medicine) {
         lifecycleScope.launch {
             // 메모 여부 확인
@@ -295,25 +288,21 @@ class MedicineDetailFragment : Fragment() {
         }
     }
 
-    /**
-     *  메모 버튼 텍스트 업데이트
-     */
+
     private fun updateMemoButtonText(hasMemo: Boolean) {
         binding.memoButton.apply {
             if (hasMemo) {
                 text = "📝 메모 보기"
-                setBackgroundResource(R.drawable.button_memo_view)  // ⭐ 주황색
+                setBackgroundResource(R.drawable.button_memo_view)  // 주황색
             } else {
                 text = "📝 메모 하기"
-                setBackgroundResource(R.drawable.button_memo_write)  // ⭐ 파란색
+                setBackgroundResource(R.drawable.button_memo_write)  // 파란색
             }
             setTextColor(resources.getColor(android.R.color.white, null))
         }
     }
 
-    /**
-     * ⭐ 메모 다이얼로그 표시
-     */
+    // 메모 다이얼로그
     private fun showMemoDialog(medicine: Medicine) {
         lifecycleScope.launch {
             // 기존 메모 조회
@@ -358,7 +347,7 @@ class MedicineDetailFragment : Fragment() {
                 // 버튼 텍스트 업데이트
                 updateMemoButtonText(memo.isNotBlank())
 
-                // ⭐ 찜 상태 재확인 (메모 작성 시 자동 찜되므로)
+                // 찜 상태 재확인 (메모 작성 시 자동 찜되므로)
                 lifecycleScope.launch {
                     // 약간의 지연 (DB 저장 완료 대기)
                     kotlinx.coroutines.delay(100)

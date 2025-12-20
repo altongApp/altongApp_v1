@@ -5,12 +5,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.altong_v2.databinding.ActivityMainBinding
 import com.example.altong_v2.ui.alarm.AlarmConfirmFragment
@@ -19,16 +16,6 @@ import com.example.altong_v2.ui.calendar.CalendarFragment
 import com.example.altong_v2.ui.medicine.MedicineFragment
 import com.example.altong_v2.ui.mypage.MyPageFragment
 import com.example.altong_v2.ui.prescription.PrescriptionFragment
-import kotlinx.coroutines.handleCoroutineException
-
-/*
- * MainActivity 에서는
- * 하단 네비게이션을 통한 Fragment 전환 관리
- * - 나의 약통 (PrescriptionFragment)
- * - 약 검색 (MedicineFragment)
- * - 캘린더 (CalendarFragment)
- * - 마이페이지 (MyPageFragment)
-*/
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -141,11 +128,6 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "========================================")
             return false
         }
-
-        // 🔥 Intent 데이터 전체 로그
-        Log.d(TAG, "Intent action: ${intent.action}")
-        Log.d(TAG, "Intent extras: ${intent.extras?.keySet()?.joinToString()}")
-
         val showAlarmConfirm = intent.getBooleanExtra(
             NotificationHelper.EXTRA_SHOW_ALARM_CONFIRM,
             false
@@ -158,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                 0L
             )
             val drugId = intent.getLongExtra(
-                NotificationHelper.EXTRA_DRUG_ID,  // ✅ drugId 추가
+                NotificationHelper.EXTRA_DRUG_ID,  //drugId 추가
                 0L
             )
             val drugName = intent.getStringExtra(
@@ -173,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             )
             Log.d(TAG, "알림 데이터:")
             Log.d(TAG, "  prescriptionId: $prescriptionId")
-            Log.d(TAG, "  drugId: $drugId")  // ✅ drugId 로그
+            Log.d(TAG, "  drugId: $drugId")
             Log.d(TAG, "  drugName: $drugName")
             Log.d(TAG, "  timeSlot: $timeSlot")
             Log.d(TAG, "  scheduledDate: $scheduledDate")
@@ -182,7 +164,7 @@ class MainActivity : AppCompatActivity() {
             Log.d(TAG, "AlarmConfirmFragment 표시 시작")
             val fragment = AlarmConfirmFragment.newInstance(
                 prescriptionId = prescriptionId,
-                drugId = drugId,  // ✅ drugId 전달
+                drugId = drugId,  // drugId 전달
                 drugName = drugName,
                 timeSlot = timeSlot,
                 scheduledDate = scheduledDate
@@ -191,14 +173,9 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack("AlarmConfirm")
                 .commit()
-            Log.d(TAG, "AlarmConfirmFragment 표시 완료")
-            Log.d(TAG, "========================================")
-            return true  // 🔥 알림 처리함
+            return true  // 알림 처리함
         }
-
-        Log.d(TAG, "알림 Intent 아님")
-        Log.d(TAG, "========================================")
-        return false  // 🔥 알림 처리 안함
+        return false  // 알림 처리 안함
     }
 
     fun navigateToHome() {

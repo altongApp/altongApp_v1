@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.data.model.MedicineCategory
 import com.example.altong_v2.databinding.ItemCategoryBinding
 
-/**
+/*
  * 카테고리 그리드 Adapter
  */
 class CategoryAdapter(

@@ -1,20 +1,15 @@
 package com.example.altong_v2.ui.calendar
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.altong_v2.R
 import com.example.altong_v2.data.model.CalendarPrescription
 import com.example.altong_v2.databinding.DialogDrugListBinding
 
-/**
- * 약 리스트 Dialog
- * 처방전 카드 클릭 시 표시
- */
+// 약 리스트 다이얼로그 - 진단명 카드 클릭시 나오는 거
 class DrugListDialog : DialogFragment() {
 
     private var _binding: DialogDrugListBinding? = null
@@ -25,19 +20,17 @@ class DrugListDialog : DialogFragment() {
 
     // 콜백
     private var onDrugCheckChanged: ((Long, String) -> Unit)? = null
-    private var onCheckAllClicked: ((Long, Boolean) -> Unit)? = null  // ✅ (prescriptionId, newState)
+    private var onCheckAllClicked: ((Long, Boolean) -> Unit)? = null  // (prescriptionId, newState)
     private var onDataRefreshNeeded: ((Long, (CalendarPrescription) -> Unit) -> Unit)? = null
 
     companion object {
         private const val ARG_PRESCRIPTION = "prescription"
 
-        /**
-         * Dialog 인스턴스 생성
-         */
+        //Dialog 인스턴스 생성
         fun newInstance(
             prescription: CalendarPrescription,
             onDrugCheckChanged: (Long, String) -> Unit,
-            onCheckAllClicked: (Long, Boolean) -> Unit,  // ✅ (prescriptionId, newState)
+            onCheckAllClicked: (Long, Boolean) -> Unit,
             onDataRefreshNeeded: (Long, (CalendarPrescription) -> Unit) -> Unit
         ): DrugListDialog {
             return DrugListDialog().apply {
@@ -85,9 +78,7 @@ class DrugListDialog : DialogFragment() {
         )
     }
 
-    /**
-     * UI 설정
-     */
+    // UI 설정
     private fun setupUI() {
         // 진단명
         binding.tvDiagnosis.text = prescription.diagnosis
@@ -101,9 +92,8 @@ class DrugListDialog : DialogFragment() {
             "처방일: ${prescription.prescriptionDate}"
     }
 
-    /**
-     * RecyclerView 설정
-     */
+
+     // RecyclerView 설정
     private fun setupRecyclerView() {
         drugAdapter = DrugCalendarAdapter { drugId, timeSlot ->
             // 약 체크박스 클릭 (timeSlot 전달!)
@@ -119,24 +109,22 @@ class DrugListDialog : DialogFragment() {
         drugAdapter.submitList(prescription.drugsByTimeSlot)
     }
 
-    /**
-     * 클릭 리스너 설정
-     */
+
+    // 클릭 리스너 설정
     private fun setupClickListeners() {
         // 모두 체크/해제 버튼
         updateCheckAllButton()  // 초기 버튼 텍스트 설정
 
         binding.btnCheckAll.setOnClickListener {
-            // ✅ 현재 시점의 상태 확인
+            // 현재 시점의 상태 확인
             val allCompleted = isAllDrugsCompleted()
-
             android.util.Log.d("DrugListDialog", "버튼 클릭: allCompleted=$allCompleted, 진단명=${prescription.diagnosis}")
 
             // 현재 상태의 반대로 토글 (allCompleted면 해제, 아니면 체크)
             val newState = !allCompleted
-            onCheckAllClicked?.invoke(prescription.prescriptionId, newState)  // ✅ 명확한 상태 전달
+            onCheckAllClicked?.invoke(prescription.prescriptionId, newState)  // 명확한 상태 전달
 
-            // ✅ 500ms 후 최신 데이터 가져와서 Dialog 갱신
+            //500ms 후 최신 데이터 가져와서 Dialog 갱신
             binding.root.postDelayed({
                 onDataRefreshNeeded?.invoke(prescription.prescriptionId) { updatedPrescription ->
                     prescription = updatedPrescription
@@ -154,17 +142,14 @@ class DrugListDialog : DialogFragment() {
         }
     }
 
-    /**
-     * "모두 체크" / "모두 해제" 버튼 텍스트 업데이트
-     */
+    // "모두 체크" / "모두 해제" 버튼 텍스트 업데이트
     private fun updateCheckAllButton() {
         val allCompleted = isAllDrugsCompleted()
         binding.btnCheckAll.text = if (allCompleted) "모두 해제" else "모두 체크"
     }
 
-    /**
-     * 모든 약이 완료되었는지 확인
-     */
+
+    // 모든 약이 완료되었는지 확인
     private fun isAllDrugsCompleted(): Boolean {
         for (drugList in prescription.drugsByTimeSlot.values) {
             for (drug in drugList) {

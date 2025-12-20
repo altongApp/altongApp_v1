@@ -43,7 +43,7 @@ class FavoriteMedicineAdapter(
             binding.medicineName.text = favorite.medicineName
             binding.medicineCompany.text = favorite.manufacturer
 
-            // ⭐ 메모 상태 표시
+            //메모 상태 표시
             if (!favorite.memo.isNullOrBlank()) {
                 binding.memoStatus.visibility = View.VISIBLE
                 binding.memoStatus.text = "📝 메모 있음"

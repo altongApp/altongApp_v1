@@ -12,10 +12,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/**
- * 캘린더 ViewModel
- * 캘린더 화면의 데이터와 비즈니스 로직 관리
- */
 class CalendarViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: CalendarRepository
@@ -31,33 +27,26 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     }
 
     // ========== LiveData: UI에서 관찰할 데이터 ==========
-
-    /**
-     * 선택된 날짜의 약 데이터
-     */
+    // 선택된 날짜의 약 데이터
     private val _selectedDayData = MutableLiveData<CalendarDayData>()
     val selectedDayData: LiveData<CalendarDayData> = _selectedDayData
 
-    /**
-     * 약이 있는 날짜들 (캘린더에 점 표시용)
-     */
+
+    // 약이 있는 날짜들 (캘린더에 점 표시용)
     private val _drugDates = MutableLiveData<Set<String>>()
     val drugDates: LiveData<Set<String>> = _drugDates
 
-    /**
-     * 현재 선택된 날짜
-     */
+
+    // 현재 선택된 날짜
     private val _selectedDate = MutableLiveData<String>()
     val selectedDate: LiveData<String> = _selectedDate
 
-    /**
-     * 로딩 상태
-     */
+
+    // 로딩
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // ========== 초기 설정 ==========
-
+    // 초기 설정
     init {
         // 오늘 날짜로 초기화
         val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
@@ -72,8 +61,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     }
 
     // ========== 날짜 선택 및 데이터 로드 ==========
-
-    /**
+    /*
      * 날짜 선택 시 호출
      * @param date 선택된 날짜 (YYYY-MM-DD)
      */
@@ -82,9 +70,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         loadDrugsForDate(date)
     }
 
-    /**
-     * 특정 날짜의 약 정보 로드
-     */
+     // 특정 날짜의 약 정보 로드
     private fun loadDrugsForDate(date: String) {
         viewModelScope.launch {
             try {
@@ -101,10 +87,10 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 월간 캘린더의 약 있는 날짜들 로드
-     * @param year 연도
-     * @param month 월 (1-12)
+    /*
+     - 월간 캘린더의 약 있는 날짜들 로드
+     - @param year 연도
+     - @param month 월 (1-12)
      */
     fun loadMonthlyDrugDates(year: Int, month: Int) {
         viewModelScope.launch {
@@ -118,19 +104,18 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // ========== 복용 완료 체크 기능 ==========
-
-    /**
-     * 개별 약의 체크박스 토글
-     * @param drugId 약 ID
-     * @param timeSlot 시간대 (예: "아침", "점심")
+    // 복용 완료 체크 기능
+    /*
+     - 개별 약의 체크박스 토글
+     - @param drugId 약 ID
+     - @param timeSlot 시간대 (예: "아침", "점심")
      */
     fun toggleDrugCompletion(drugId: Long, timeSlot: String) {
         val date = _selectedDate.value ?: return
 
         viewModelScope.launch {
             try {
-                // ✅ date에 시간대 포함해서 전달
+                //  date에 시간대 포함해서 전달 - 그래야 제대로 체크 가능 !!
                 val dateWithSlot = "$date-$timeSlot"
                 repository.toggleCompletion(drugId, dateWithSlot)
                 // 데이터 새로고침
@@ -141,11 +126,11 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 특정 처방전의 모든 약 일괄 체크/해제
-     * 진단명 체크박스 클릭 시 호출
-     * @param prescriptionId 처방전 ID
-     * @param isCompleted 체크 상태
+    /*
+     - 특정 처방전의 모든 약 일괄 체크/해제
+     - 진단명 체크박스 클릭 시 호출
+     - @param prescriptionId 처방전 ID
+     - @param isCompleted 체크 상태
      */
     fun togglePrescriptionCompletion(prescriptionId: Long, isCompleted: Boolean) {
         val date = _selectedDate.value ?: return
@@ -161,10 +146,10 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    /**
-     * 선택된 날짜의 모든 약 일괄 체크/해제
-     * "모두 복용 완료" 버튼 클릭 시 호출
-     * @param isCompleted 체크 상태
+    /*
+     - 선택된 날짜의 모든 약 일괄 체크/해제
+     - "모두 복용 완료" 버튼 클릭 시 호출
+     - @param isCompleted 체크 상태
      */
     fun toggleAllDrugs(isCompleted: Boolean) {
         val date = _selectedDate.value ?: return
@@ -180,12 +165,10 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    // ========== 유틸리티 메서드 ==========
-
-    /**
-     * 현재 선택된 날짜의 모든 약이 완료되었는지 확인
-     * "모두 복용 완료" vs "체크 해제" 버튼 텍스트 결정용
-     * @return true면 모두 완료, false면 미완료 있음
+    /*
+     - 현재 선택된 날짜의 모든 약이 완료되었는지 확인
+     - "모두 복용 완료" vs "체크 해제" 버튼 텍스트 결정용
+     - @return true면 모두 완료, false면 미완료 있음
      */
     fun areAllDrugsCompleted(): Boolean {
         val data = _selectedDayData.value ?: return false
@@ -204,11 +187,11 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         return true  // 모두 완료
     }
 
-    /**
+    /*
      * 특정 처방전의 모든 약이 완료되었는지 확인
-     * 진단명 체크박스 상태 결정용
-     * @param prescriptionId 처방전 ID
-     * @return true면 모두 완료, false면 미완료 있음
+     - 진단명 체크박스 상태 결정용
+     - @param prescriptionId 처방전 ID
+     - @return true면 모두 완료, false면 미완료 있음
      */
     fun arePrescriptionDrugsCompleted(prescriptionId: Long): Boolean {
         val data = _selectedDayData.value ?: return false
@@ -229,7 +212,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         return true  // 모두 완료
     }
 
-    /**
+    /*
      * 현재 선택된 날짜가 오늘인지 확인
      */
     fun isToday(): Boolean {
@@ -237,7 +220,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
         return _selectedDate.value == today
     }
 
-    /**
+    /*
      * 날짜를 읽기 좋은 형식으로 변환
      * @param date "2024-12-10"
      * @return "12월 10일 (화)"

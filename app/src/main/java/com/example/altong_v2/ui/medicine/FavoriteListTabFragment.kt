@@ -16,7 +16,7 @@ import com.example.altong_v2.databinding.FragmentFavoriteListTabBinding
 import kotlinx.coroutines.launch
 
 
-/**
+/*
  * 찜 목록 탭 Fragment
  * 약국약 또는 병원약 찜 목록 표시
  */
@@ -51,7 +51,7 @@ class FavoriteListTabFragment : Fragment() {
         loadFavorites()
     }
 
-    /**
+    /*
      * RecyclerView 설정
      */
     private fun setupRecyclerView() {
@@ -73,7 +73,7 @@ class FavoriteListTabFragment : Fragment() {
     }
 
     /**
-     * 찜 목록 로드
+    // 찜 목록 로드
      */
     private fun loadFavorites() {
         binding.progressBar.visibility = View.VISIBLE
@@ -99,11 +99,8 @@ class FavoriteListTabFragment : Fragment() {
         }
     }
 
-    /**
-     * 상세 화면으로 이동
-     */
+    // 상세화면이동
     private fun navigateToDetail(medicineId: String, type: String) {
-        // ⭐ 이제 타입이 통일되어 변환 불필요!
         val fragment = MedicineDetailFragment.newInstance(medicineId, type)
 
         requireActivity().supportFragmentManager.beginTransaction()
@@ -121,9 +118,8 @@ class FavoriteListTabFragment : Fragment() {
         private const val TAG = "FavoriteListTabFragment"
         private const val ARG_TYPE = "medicine_type"
 
-        /**
-         * ⭐ type: "general" (약국약) or "prescription" (병원약)
-         */
+
+        // type: "general" (약국약) or "prescription" (병원약)
         fun newInstance(type: String): FavoriteListTabFragment {
             return FavoriteListTabFragment().apply {
                 arguments = Bundle().apply {

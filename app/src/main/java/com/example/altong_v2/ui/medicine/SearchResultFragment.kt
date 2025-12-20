@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.altong_v2.R
 import com.example.altong_v2.databinding.FragmentSearchResultBinding
 
-/**
+/*
  * 약품 검색 결과 Fragment
  * 일반의약품 또는 전문의약품 검색 결과 표시
  */

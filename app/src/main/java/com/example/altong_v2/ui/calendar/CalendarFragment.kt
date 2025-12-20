@@ -18,9 +18,9 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/**
- * 캘린더 Fragment
- * 월간 캘린더와 선택된 날짜의 약 리스트 표시
+/*
+  캘린더 Fragment
+  월간 캘린더와 선택된 날짜의 약 리스트 표시
  */
 class CalendarFragment : Fragment() {
 
@@ -51,9 +51,8 @@ class CalendarFragment : Fragment() {
         observeViewModel()
     }
 
-    /**
-     * RecyclerView 설정
-     */
+    // RecyclerView 설정
+
     private fun setupRecyclerView() {
         prescriptionAdapter = PrescriptionCalendarAdapter(
             activity = requireActivity(),
@@ -76,7 +75,7 @@ class CalendarFragment : Fragment() {
                 }
             },
             onGetUpdatedPrescription = { prescriptionId, callback ->
-                // ✅ 최신 데이터 가져오기
+                // 최신 데이터 가져오기
                 viewModel.selectedDate.value?.let { date ->
                     viewModel.selectDate(date)
 
@@ -99,7 +98,7 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    /**
+    /*
      * Material CalendarView 설정
      */
     private fun setupCalendarView() {
@@ -124,9 +123,7 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    /**
-     * 클릭 리스너 설정
-     */
+
     private fun setupClickListeners() {
         // 처방전 등록 버튼
         binding.btnAddPrescription.setOnClickListener {
@@ -202,7 +199,7 @@ class CalendarFragment : Fragment() {
         // 기존 데코레이터 제거
         binding.calendarView.removeDecorators()
 
-        // ✅ 1. 기본 날짜 데코레이터 (선택되지 않은 날짜는 검정 텍스트)
+        // 1. 기본 날짜 데코레이터 (선택되지 않은 날짜는 검정 텍스트)
         val selectedDate = binding.calendarView.selectedDate
         val today = CalendarDay.today()
         binding.calendarView.addDecorator(
@@ -215,13 +212,13 @@ class CalendarFragment : Fragment() {
             DrugDatesDecorator(calendarDays, drugDotColor)
         )
 
-        // ✅ 3. 선택된 날짜: 빨간색 원 배경 + 흰색 텍스트
+        // 3. 선택된 날짜: 빨간색 원 배경 + 흰색 텍스트
         val redColor = android.graphics.Color.parseColor("#FF6B6B")  // 부드러운 빨간색
         binding.calendarView.addDecorator(
             SelectedDateDecorator(selectedDate, redColor, android.graphics.Color.WHITE)
         )
 
-        // ✅ 4. 오늘 날짜: 초록 테두리 + 검정 텍스트 (항상 표시)
+        //4. 오늘 날짜: 초록 테두리 + 검정 텍스트 (항상 표시)
         val greenBorderColor = requireContext().getColor(R.color.primary_green_dark)
         binding.calendarView.addDecorator(
             TodayDecorator(today, greenBorderColor)
@@ -242,9 +239,8 @@ class CalendarFragment : Fragment() {
         viewModel.selectDate(dateStr)
     }
 
-    /**
-     * 처방전 등록 다이얼로그 표시
-     */
+
+    // 처방전 등록 다이얼로그 표시
     private fun showAddPrescriptionDialog() {
         AlertDialog.Builder(requireContext())
             .setTitle("처방전 등록")
@@ -256,9 +252,8 @@ class CalendarFragment : Fragment() {
             .show()
     }
 
-    /**
-     * 처방전 등록 화면으로 이동
-     */
+
+    // 처방전 등록 화면으로 이동
     private fun navigateToAddPrescription() {
         val fragment = AddPrescriptionStep1Fragment()
         parentFragmentManager.beginTransaction()
@@ -273,9 +268,8 @@ class CalendarFragment : Fragment() {
     }
 }
 
-/**
- * LiveData를 한 번만 관찰하는 확장 함수
- */
+
+// LiveData를 한 번만 관찰하는 확장 함수
 fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, observer: (T) -> Unit) {
     observe(owner, object : Observer<T> {
         override fun onChanged(value: T) {
